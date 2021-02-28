@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+ ~
+ ~ Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
+ ~
+ ~ This files is part of Aksharam, a script teaching app for Indic
+ ~ languages.
+ ~
+ ~ Aksharam is free software: you can redistribute it and/or modify
+ ~ it under the terms of the GNU General Public License as published by
+ ~ the Free Software Foundation, either version 3 of the License, or
+ ~ (at your option) any later version.
+ ~
+ ~ Aksharam is distributed in the hope that it will be useful,
+ ~ but WITHOUT ANY WARRANTY; without even teh implied warranty of
+ ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ ~ GNU General Public License for more details.
+ ~
+ ~ You should have received a copy of the GNU General Public License
+ ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+ ~
+ -->
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    tools:context=".MainActivity">
+
+    <EditText
+        android:id="@+id/InputTextField"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:ems="10"
+        android:hint="@string/input_text_field"
+        android:inputType="text|textMultiLine"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.40"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/TransliterateButton"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:onClick="transliterateButtonOnClick"
+        android:text="@string/transliterate_button"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.10"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/InputTextField"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.60" />
+
+    <Spinner
+        android:id="@+id/LanguageSelectionSpinner"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.10"
+        app:layout_constraintStart_toEndOf="@+id/TransliterateButton"
+        app:layout_constraintTop_toBottomOf="@+id/InputTextField"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.30" />
+
+    <TextView
+        android:id="@+id/OutputTextView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        android:hint="@string/output_text_field"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHeight_default="percent"
+        app:layout_constraintHeight_percent="0.40"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/TransliterateButton" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
