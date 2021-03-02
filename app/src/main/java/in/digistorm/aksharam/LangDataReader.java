@@ -31,32 +31,68 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 
 public class LangDataReader {
+    private static final String logTag = "LangDataReader";
+    // Data object from the langdata file
+    private static JSONObject langData;
+    // {"vowels": ["a", "e", "i"...], "consonants": ["b", "c", "d"...]...}
+    private static LinkedHashMap<String, ArrayList<String>> categories;
+
+    public static void initialise(String file, Context context) {
+        langData = read(file, context);
+        categories = new LinkedHashMap<>();
+
+        findCategories();
+    }
+
+    private static void findCategories() {
+        if (langData != null) {
+            Iterator<String> keys = langData.keys();
+            while(keys.hasNext()) {
+                String key = keys.next();
+                String type = langData.optJSONObject(key)
+                        .optString("type");
+                if(!categories.containsKey(type))
+                    categories.put(type, new ArrayList<>());
+                categories.get(type).add(key);
+            }
+        }
+    }
 
     public static JSONObject read(String file, Context context) {
-        JSONObject langdata = null;
+        JSONObject langData = null;
 
         try {
-            InputStream is = context.getAssets().open("languages/kannada.json");
+            InputStream is = context.getAssets().open("languages/" + file);
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
 
             String s;
             while ((s = br.readLine()) != null) {
-                Log.d("TransliterateButton", s);
                 sb.append(s);
             }
-
-            langdata = (JSONObject) new JSONTokener(sb.toString()).nextValue();
+            langData = (JSONObject) new JSONTokener(sb.toString()).nextValue();
         } catch (JSONException je) {
-            Log.d ("TransliterateButton", "Error reading JSON from lang data");
+            Log.d (logTag, "Error reading JSON from lang data");
         } catch (IOException e) {
-            Log.d("TransliterateButton", "Exception caught while trying to read lang file");
+            Log.d(logTag, "Exception caught while trying to read lang file");
             e.printStackTrace();
         }
 
-        return langdata;
+        return langData.optJSONObject("data");
+    }
+
+    public static JSONObject getLangData() {
+        return langData;
+    }
+
+    public static HashMap<String, ArrayList<String>> getCategories() {
+        return categories;
     }
 }

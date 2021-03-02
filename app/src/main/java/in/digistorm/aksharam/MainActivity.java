@@ -21,7 +21,11 @@
 package in.digistorm.aksharam;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
+import androidx.viewpager2.widget.ViewPager2;
 
+import android.graphics.pdf.PdfDocument;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -31,51 +35,32 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
+
 import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    private String targetLanguage = "ml";
+    private ViewPager2 viewPager;
+    private PageCollectionAdapter pageCollectionAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initialiseSpinner();
+        LangDataReader.initialise("kannada.json", getApplicationContext());
+
+        pageCollectionAdapter = new PageCollectionAdapter(this);
+        viewPager = findViewById(R.id.pager);
+        viewPager.setAdapter(pageCollectionAdapter);
+        TabLayout tabLayout = findViewById(R.id.tab_layout);
+        new TabLayoutMediator(tabLayout, viewPager,
+                PageCollectionAdapter.tabConfigurationStrategy()
+        ).attach();
+        // initialiseSpinner();
     }
 
-    public void initialiseSpinner() {
-        Spinner languageSelectionSpinner = (Spinner) findViewById(R.id.LanguageSelectionSpinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        languageSelectionSpinner.setAdapter(adapter);
 
-        languageSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                targetLanguage = (parent.getItemAtPosition(position).toString().equals("Malayalam") ? "ml" : "hi");
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-    }
-
-    public void transliterateButtonOnClick(View view) {
-        String inputString = ((EditText) findViewById(R.id.InputTextField)).getText().toString();
-        Log.d("TransliterateButton", inputString);
-
-        JSONObject langData = LangDataReader.read("kannada.json", getApplicationContext());
-        Transliterator tr = new Transliterator(langData);
-
-        // Now we are ready to transliterate
-        String outputString = tr.transliterate(inputString, targetLanguage);
-
-        TextView tv = findViewById(R.id.OutputTextView);
-        tv.setText(outputString);
-    }
 }

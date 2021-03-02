@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+
 <!--
  ~
  ~ Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -20,17 +22,13 @@
  ~
  -->
 
-<resources>
-    <string name="app_name">Aksharam</string>
-    <string name="input_text_field">Input Text</string>
-    <string name="transliterate_button">Transliterate</string>
-    <string name="output_text_field">Output</string>
-    <string name="letters_tab_header">Letters</string>
-    <string name="transliterate_tab_header">Transliterate</string>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
 
-    <string-array name="language_selection_spinner">
-        <item>Malayalam</item>
-        <item>Hindi</item>
-    </string-array>
-
-</resources>
+    <TextView
+        android:id="@+id/LetterCategoryHeaderText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

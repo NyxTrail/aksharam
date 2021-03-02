@@ -22,49 +22,41 @@
  ~
  -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <com.google.android.material.tabs.TabLayout
-        android:id="@+id/tab_layout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <androidx.viewpager2.widget.ViewPager2
-        android:id="@+id/pager"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
-
-</LinearLayout>
-
-<!--
-<androidx.viewpager2.widget.ViewPager2
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/background"
-    tools:context=".MainActivity">
+    android:background="@drawable/background">
 
-    <EditText
-        android:id="@+id/InputTextField"
+    <ScrollView
+        android:id="@+id/InputScroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:ems="10"
-        android:hint="@string/input_text_field"
-        android:inputType="text|textMultiLine"
+        android:fillViewport="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.40"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/InputTextField"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:ems="10"
+                android:hint="@string/input_text_field"
+                android:inputType="text|textMultiLine" />
+        </LinearLayout>
+    </ScrollView>
 
     <Button
         android:id="@+id/TransliterateButton"
@@ -72,12 +64,11 @@
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
-        android:onClick="transliterateButtonOnClick"
         android:text="@string/transliterate_button"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.10"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/InputTextField"
+        app:layout_constraintTop_toBottomOf="@+id/InputScroll"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.60" />
 
@@ -91,23 +82,38 @@
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.10"
         app:layout_constraintStart_toEndOf="@+id/TransliterateButton"
-        app:layout_constraintTop_toBottomOf="@+id/InputTextField"
+        app:layout_constraintTop_toBottomOf="@+id/InputScroll"
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.30" />
 
-    <TextView
-        android:id="@+id/OutputTextView"
+
+    <ScrollView
+        android:id="@+id/OutputScroll"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:hint="@string/output_text_field"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHeight_default="percent"
         app:layout_constraintHeight_percent="0.40"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/TransliterateButton" />
+        app:layout_constraintTop_toBottomOf="@+id/TransliterateButton">
 
-</androidx.viewpager2.widget.ViewPager2>
-!-->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/OutputTextView"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:hint="@string/output_text_field"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHeight_percent="0.40"
+                app:layout_constraintStart_toStartOf="parent"/>
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

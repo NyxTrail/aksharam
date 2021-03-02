@@ -29,8 +29,8 @@ import org.json.JSONObject;
 public class Transliterator {
 
     // The JSON mapping used to transliterate
-    private final JSONObject langData;
-    private final String logTag = "Transliterator";
+    private JSONObject langData;
+    private final String logTag = getClass().getName();
 
     public Transliterator(JSONObject langData) {
         this.langData = langData;

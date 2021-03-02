@@ -1,0 +1,158 @@
+package in.digistorm.aksharam;
+
+/*
+ * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
+ *
+ * This files is part of Aksharam, a script teaching app for Indic
+ * languages.
+ *
+ * Aksharam is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Aksharam is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even teh implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import android.app.Activity;
+import android.content.Context;
+import android.graphics.Point;
+import android.graphics.Typeface;
+import android.util.Log;
+import android.util.TypedValue;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.GridLayout;
+import android.widget.GridView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+public class LetterCategoryAdapter extends BaseExpandableListAdapter {
+    private Activity activity;
+    private String logTag = getClass().getName();
+
+    private final String[] headers = LangDataReader.getCategories().keySet()
+            .toArray(new String[0]);
+
+    public LetterCategoryAdapter(Activity activity) {
+        this.activity = activity;
+    }
+
+    @Override
+    public int getGroupCount() {
+        return LangDataReader.getCategories().size();
+    }
+
+    @Override
+    public int getChildrenCount(int groupPosition) {
+        // Each category has a single child - a list of all letters in that category
+        return 1;
+    }
+
+    @Override
+    public Object getGroup(int groupPosition) {
+        return headers[groupPosition];
+    }
+
+    @Override
+    public Object getChild(int groupPosition, int childPosition) {
+        return LangDataReader.getCategories().get(headers[groupPosition]);
+    }
+
+    @Override
+    public long getGroupId(int groupPosition) {
+        return groupPosition;
+    }
+
+    @Override
+    public long getChildId(int groupPosition, int childPosition) {
+        return childPosition;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return false;
+    }
+
+    @Override
+    public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
+                             ViewGroup parent) {
+        if (convertView == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) this.activity
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = layoutInflater.inflate(R.layout.letter_category_header, null);
+        }
+
+        TextView letterCategoryHeaderTV = convertView.findViewById(R.id.LetterCategoryHeaderText);
+        // Set some padding on the left so that the text does not overwrite the expand indicator
+        letterCategoryHeaderTV.setPadding(100,
+                letterCategoryHeaderTV.getPaddingTop(),
+                letterCategoryHeaderTV.getPaddingRight(),
+                letterCategoryHeaderTV.getPaddingBottom());
+        letterCategoryHeaderTV.setTypeface(null, Typeface.BOLD);
+        letterCategoryHeaderTV.setText(headers[groupPosition].toUpperCase());
+        letterCategoryHeaderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+
+        return convertView;
+    }
+
+    @Override
+    public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
+                             View convertView, ViewGroup parent) {
+        if (convertView == null) {
+            LayoutInflater layoutInflater = (LayoutInflater) this.activity
+                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            convertView = layoutInflater.inflate(R.layout.letter_category_content, null);
+        }
+        Log.d(logTag, "creating grid for group" + groupPosition);
+        Log.d(logTag, "group is:" + LangDataReader.getCategories().get(headers[groupPosition]));
+        GridLayout gridLayout = convertView.findViewById(R.id.LetterGrid);
+        gridLayout.removeAllViews();
+
+        String[] letters = LangDataReader.getCategories()
+                .get(headers[groupPosition]).toArray(new String[0]);
+        for(String letter: letters) {
+            LinearLayout linearLayout = new LinearLayout(activity);
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            Display display = activity.getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            try {
+                display.getRealSize(size);
+            } catch (NoSuchMethodError err) {
+                display.getSize(size);
+            }
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    size.x/5,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            linearLayout.setLayoutParams(layoutParams);
+            linearLayout.setGravity(Gravity.CENTER);
+
+            TextView tv = new TextView(activity);
+            tv.setText(letter);
+            ViewGroup.LayoutParams tvLayoutParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            tv.setLayoutParams(tvLayoutParams);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+
+            linearLayout.addView(tv);
+            gridLayout.addView(linearLayout);
+        }
+        return convertView;
+    }
+
+    @Override
+    public boolean isChildSelectable(int groupPosition, int childPosition) {
+        return false;
+    }
+}
