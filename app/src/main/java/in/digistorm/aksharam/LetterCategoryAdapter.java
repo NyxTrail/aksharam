@@ -24,6 +24,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -33,9 +34,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 import android.widget.GridLayout;
-import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.annotation.RequiresApi;
 
 public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     private Activity activity;
@@ -101,11 +104,12 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                 letterCategoryHeaderTV.getPaddingBottom());
         letterCategoryHeaderTV.setTypeface(null, Typeface.BOLD);
         letterCategoryHeaderTV.setText(headers[groupPosition].toUpperCase());
-        letterCategoryHeaderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+        letterCategoryHeaderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25);
 
         return convertView;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
@@ -114,10 +118,17 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.letter_category_content, null);
         }
-        Log.d(logTag, "creating grid for group" + groupPosition);
-        Log.d(logTag, "group is:" + LangDataReader.getCategories().get(headers[groupPosition]));
+        Log.d(logTag, "creating grid for group: " + groupPosition);
+        Log.d(logTag, "group is: " + LangDataReader.getCategories().get(headers[groupPosition]));
         GridLayout gridLayout = convertView.findViewById(R.id.LetterGrid);
         gridLayout.removeAllViews();
+        gridLayout.setClickable(true);
+        gridLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(v.getContext(), "grid layout clicked!", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         String[] letters = LangDataReader.getCategories()
                 .get(headers[groupPosition]).toArray(new String[0]);
@@ -132,7 +143,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                 display.getSize(size);
             }
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                    size.x/5,
+                    size.x/6,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
             linearLayout.setLayoutParams(layoutParams);
             linearLayout.setGravity(Gravity.CENTER);
@@ -143,7 +154,19 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
             tv.setLayoutParams(tvLayoutParams);
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 30);
+            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+
+            linearLayout.setClickable(true);
+            linearLayout.setOnClickListener(v -> {
+                Log.d(logTag, letter + " linear layout clicked!");
+                if (tv.getText().toString() == letter)
+                    tv.setText(LettersTabFragment.getTransliterator().transliterate(
+                            letter,
+                            LettersTabFragment.getLettersTabFragmentTargetLanguage()
+                    ));
+                else
+                    tv.setText(letter);
+            });
 
             linearLayout.addView(tv);
             gridLayout.addView(linearLayout);

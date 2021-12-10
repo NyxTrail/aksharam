@@ -31,6 +31,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -89,7 +90,19 @@ public class TransliterateTabFragment extends Fragment {
         languageSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                targetLanguage = (parent.getItemAtPosition(position).toString().equals("Malayalam") ? "ml" : "hi");
+                switch (parent.getItemAtPosition(position).toString()) {
+                    case "Malayalam":
+                        targetLanguage = "ml";
+                        break;
+                    case "Hindi":
+                        targetLanguage = "hi";
+                        break;
+                    default:
+                        // Something went wrong
+                        Toast.makeText(getContext(),
+                                "TransliterateTabFragment: Something went wrong!",
+                                Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override

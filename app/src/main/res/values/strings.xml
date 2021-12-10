@@ -27,10 +27,14 @@
     <string name="output_text_field">Output</string>
     <string name="letters_tab_header">Letters</string>
     <string name="transliterate_tab_header">Transliterate</string>
+    <string name="letters_tab_lang_input_hint">Language</string>
+    <string name="letters_tab_trans_hint">Convert To</string>
 
     <string-array name="language_selection_spinner">
         <item>Malayalam</item>
         <item>Hindi</item>
+        <!-- not implemented yet -->
+        <item>Kannada</item>
     </string-array>
 
 </resources>

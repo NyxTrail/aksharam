@@ -64,10 +64,11 @@ public class LangDataReader {
         }
     }
 
-    public static JSONObject read(String file, Context context) {
+    private static JSONObject read(String file, Context context) {
         JSONObject langData = null;
 
         try {
+            Log.d(logTag, "Reading language file " + "languages/" + file);
             InputStream is = context.getAssets().open("languages/" + file);
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
@@ -90,6 +91,11 @@ public class LangDataReader {
 
     public static JSONObject getLangData() {
         return langData;
+    }
+
+    // Read langdata from a file and return immediately
+    public static JSONObject getLangData(String file, Context context) {
+        return read(file, context);
     }
 
     public static HashMap<String, ArrayList<String>> getCategories() {

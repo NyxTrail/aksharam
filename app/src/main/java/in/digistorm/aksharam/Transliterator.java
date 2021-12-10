@@ -20,6 +20,7 @@
 
 package in.digistorm.aksharam;
 
+import android.content.Context;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -34,6 +35,19 @@ public class Transliterator {
 
     public Transliterator(JSONObject langData) {
         this.langData = langData;
+    }
+
+    public Transliterator(String inputLang, Context context) {
+        String filename;
+        switch(inputLang) {
+            case "ka":
+                filename = "kannada.json";
+                break;
+            default:
+                filename = "kannada.json";
+                break;
+        }
+        this.langData = LangDataReader.getLangData(filename, context);
     }
 
     // Transliterate the input string using the mapping and return the transliterated string

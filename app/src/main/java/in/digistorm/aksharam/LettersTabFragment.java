@@ -20,47 +20,73 @@ package in.digistorm.aksharam;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import android.database.DataSetObserver;
-import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.TypedValue;
-import android.view.Display;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ExpandableListAdapter;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
-import android.widget.GridLayout;
 import android.widget.LinearLayout;
-import android.widget.TextView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 public class LettersTabFragment extends Fragment {
     public static final String ARG_OBJECT = "object";
     public ArrayList<String> categories;
     private String logTag = getClass().getName();
 
+    // The main language for which letters are displayed
+    private static String language = "ka";
+    // The target language to transliterate to
+    private static String targetLanguage = "ml";
+
+    private static Transliterator tr;
+
+    public static void setLettersTabFragmentLanguage(String lang) {
+        // should add some sanity checks here
+        language = lang;
+    }
+
+    public static String getLettersTabFragmentLanguage() {
+        return language;
+    }
+
+    public static void setLettersTabFragmentTargetLanguage(String lang) {
+        // should add some sanity checks here
+        targetLanguage = lang;
+    }
+    public static String getLettersTabFragmentTargetLanguage() {
+        return targetLanguage;
+    }
+
+    public static Transliterator getTransliterator() {
+        return tr;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
+        if (tr == null)
+            tr = new Transliterator(language, getContext());
+
         return inflater.inflate(R.layout.letters_layout, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        initialiseLettersTabLangSpinner(view);
+        initialiseLettersTabTransSpinner(view);
 
         Log.d(logTag, LangDataReader.getCategories().toString());
         // First, create an ExpandableListView for the categories
@@ -71,5 +97,77 @@ public class LettersTabFragment extends Fragment {
         categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
         LinearLayout linearLayout = view.findViewById(R.id.LettersView);
         linearLayout.addView(categoriesList);
+        for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
+            categoriesList.expandGroup(i);
+        }
+    }
+
+    public void initialiseLettersTabLangSpinner(@NonNull View view) {
+        Spinner lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        lettersTabLangSpinner.setAdapter(adapter);
+        lettersTabLangSpinner.setSelection(2);
+        lettersTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (parent.getItemAtPosition(position).toString()) {
+                    case "Malayalam":
+                        language = "ml";
+                        break;
+                    case "Hindi":
+                        language = "hi";
+                        break;
+                    case "Kannada":
+                        language = "ka";
+                        break;
+                    default:
+                        // Something went wrong
+                        Toast.makeText(getContext(),
+                                "LettersTabFragment: Something went wrong!",
+                                Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    public void initialiseLettersTabTransSpinner(@NonNull View view) {
+        Spinner lettersTabTransSpinner = view.findViewById(R.id.lettersTabTransSpinner);
+
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        lettersTabTransSpinner.setAdapter(adapter);
+        lettersTabTransSpinner.setSelection(0);
+        lettersTabTransSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (parent.getItemAtPosition(position).toString()) {
+                    case "Malayalam":
+                        targetLanguage = "ml";
+                        break;
+                    case "Hindi":
+                        targetLanguage = "hi";
+                        break;
+                    default:
+                        // Something went wrong
+                        Toast.makeText(getContext(),
+                                "LettersTabFragment: Something went wrong!",
+                                Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 }
