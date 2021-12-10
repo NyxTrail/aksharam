@@ -27,8 +27,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -42,6 +44,8 @@ public class LettersTabFragment extends Fragment {
     public static final String ARG_OBJECT = "object";
     public ArrayList<String> categories;
     private String logTag = getClass().getName();
+
+    private ExpandableListView categoriesList;
 
     // The main language for which letters are displayed
     private static String language = "ka";
@@ -90,13 +94,20 @@ public class LettersTabFragment extends Fragment {
 
         Log.d(logTag, LangDataReader.getCategories().toString());
         // First, create an ExpandableListView for the categories
-        ExpandableListView categoriesList = new ExpandableListView(getContext());
+        /*
+        ScrollView sv = new ScrollView(getContext());
+        sv.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+        ));
+         */
+        categoriesList = new ExpandableListView(getContext());
         categoriesList.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
         categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
-        LinearLayout linearLayout = view.findViewById(R.id.LettersView);
-        linearLayout.addView(categoriesList);
+        ScrollView sv = view.findViewById(R.id.LettersView);
+        sv.addView(categoriesList);
         for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
             categoriesList.expandGroup(i);
         }
@@ -116,12 +127,22 @@ public class LettersTabFragment extends Fragment {
                 switch (parent.getItemAtPosition(position).toString()) {
                     case "Malayalam":
                         language = "ml";
+                        LangDataReader.initialise("malayalam.json", getContext());
+                        categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
+                        for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
+                            categoriesList.expandGroup(i);
+                        }
                         break;
                     case "Hindi":
                         language = "hi";
                         break;
                     case "Kannada":
                         language = "ka";
+                        LangDataReader.initialise("kannada.json", getContext());
+                        categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
+                        for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
+                            categoriesList.expandGroup(i);
+                        }
                         break;
                     default:
                         // Something went wrong

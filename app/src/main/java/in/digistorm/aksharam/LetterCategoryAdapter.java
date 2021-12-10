@@ -90,6 +90,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
+        Log.d(logTag, "getting groupview for position " + groupPosition);
         if (convertView == null) {
             LayoutInflater layoutInflater = (LayoutInflater) this.activity
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);

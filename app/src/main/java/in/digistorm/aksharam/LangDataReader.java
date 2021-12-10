@@ -44,6 +44,7 @@ public class LangDataReader {
     private static LinkedHashMap<String, ArrayList<String>> categories;
 
     public static void initialise(String file, Context context) {
+        Log.d(logTag, "initialising lang data file: " + file);
         langData = read(file, context);
         categories = new LinkedHashMap<>();
 
