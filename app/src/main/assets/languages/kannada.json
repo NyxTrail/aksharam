@@ -1,5 +1,7 @@
 {
   "comment": "Transliteration data for Kannada. Order matters - within each type as well as among the types",
+  "code": "ka",
+  "trans_langs": ["ml", "hi"],
   "data": {
     "ಅ": {
       "ml": ["അ"],

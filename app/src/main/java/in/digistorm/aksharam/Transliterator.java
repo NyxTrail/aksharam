@@ -38,16 +38,8 @@ public class Transliterator {
     }
 
     public Transliterator(String inputLang, Context context) {
-        String filename;
-        switch(inputLang) {
-            case "ka":
-                filename = "kannada.json";
-                break;
-            default:
-                filename = "kannada.json";
-                break;
-        }
-        this.langData = LangDataReader.getLangData(filename, context);
+        LangDataReader.initialise(LangDataReader.getLangFile(inputLang), context);
+        this.langData = LangDataReader.getLangData();
     }
 
     // Transliterate the input string using the mapping and return the transliterated string
@@ -57,16 +49,20 @@ public class Transliterator {
        StringBuilder out = new StringBuilder();
        String index;
 
-       // Process the string character by character
+       Log.d(logTag, "Lang data: " + langData);
+        // Process the string character by character
        for (char ch: str.toCharArray()) {
            index = "" + ch;
            // + "." + targetLanguage;
-           Log.d(logTag, "Looking for index " + index);
+           Log.d(logTag, "Looking for " + index);
            try {
                if (langData.has(index))
-                   out = out.append(langData.optJSONObject(index)
+                   if (langData.optJSONObject(index).has(targetLanguage))
+                       out = out.append(langData.optJSONObject(index)
                                             .getJSONArray(targetLanguage)
                                             .getString(0));
+                   else
+                       out = out.append(ch);
                else
                    out = out.append(ch);
            } catch (JSONException e) {

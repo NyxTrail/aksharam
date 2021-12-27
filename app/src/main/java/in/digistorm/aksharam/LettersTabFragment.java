@@ -32,6 +32,7 @@ import android.widget.ExpandableListView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
+import android.widget.TableLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -52,7 +53,7 @@ public class LettersTabFragment extends Fragment {
     // The target language to transliterate to
     private static String targetLanguage = "ml";
 
-    private static Transliterator tr;
+    private static Transliterator transliterator;
 
     public static void setLettersTabFragmentLanguage(String lang) {
         // should add some sanity checks here
@@ -72,15 +73,15 @@ public class LettersTabFragment extends Fragment {
     }
 
     public static Transliterator getTransliterator() {
-        return tr;
+        return transliterator;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        if (tr == null)
-            tr = new Transliterator(language, getContext());
+        if (transliterator == null)
+            transliterator = new Transliterator(language, getContext());
 
         return inflater.inflate(R.layout.letters_layout, container, false);
     }
@@ -127,7 +128,8 @@ public class LettersTabFragment extends Fragment {
                 switch (parent.getItemAtPosition(position).toString()) {
                     case "Malayalam":
                         language = "ml";
-                        LangDataReader.initialise("malayalam.json", getContext());
+                        transliterator = new Transliterator("ml", getContext());
+                        // LangDataReader.initialise("malayalam.json", getContext());
                         categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
                         for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
                             categoriesList.expandGroup(i);
@@ -138,7 +140,8 @@ public class LettersTabFragment extends Fragment {
                         break;
                     case "Kannada":
                         language = "ka";
-                        LangDataReader.initialise("kannada.json", getContext());
+                        transliterator = new Transliterator("ka", getContext());
+                        // LangDataReader.initialise("kannada.json", getContext());
                         categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
                         for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
                             categoriesList.expandGroup(i);
@@ -176,6 +179,9 @@ public class LettersTabFragment extends Fragment {
                         break;
                     case "Hindi":
                         targetLanguage = "hi";
+                        break;
+                    case "Kannada":
+                        targetLanguage = "ka";
                         break;
                     default:
                         // Something went wrong

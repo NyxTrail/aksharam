@@ -23,6 +23,7 @@ package in.digistorm.aksharam;
 import android.content.Context;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
@@ -35,17 +36,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class LangDataReader {
     private static final String logTag = "LangDataReader";
-    // Data object from the langdata file
+    // Data object from the lang data file
     private static JSONObject langData;
+
+    // metadata about current file
+    private static String langCode;
+    private static String currentFile;
+    private static final ArrayList<String> transLangs = new ArrayList<>();
+
     // {"vowels": ["a", "e", "i"...], "consonants": ["b", "c", "d"...]...}
     private static LinkedHashMap<String, ArrayList<String>> categories;
 
     public static void initialise(String file, Context context) {
-        Log.d(logTag, "initialising lang data file: " + file);
-        langData = read(file, context);
+        Log.d(logTag, "Initialising lang data file: " + file);
+        langData = read(file, true, context);
         categories = new LinkedHashMap<>();
 
         findCategories();
@@ -65,10 +73,13 @@ public class LangDataReader {
         }
     }
 
-    private static JSONObject read(String file, Context context) {
+    // reset: reset class variables
+    private static JSONObject read(String file, boolean reset, Context context) {
         JSONObject langData = null;
 
         try {
+            if (reset)
+                currentFile = file;
             Log.d(logTag, "Reading language file " + "languages/" + file);
             InputStream is = context.getAssets().open("languages/" + file);
             InputStreamReader isr = new InputStreamReader(is);
@@ -79,24 +90,148 @@ public class LangDataReader {
             while ((s = br.readLine()) != null) {
                 sb.append(s);
             }
+            br.close();
+            is.close();
             langData = (JSONObject) new JSONTokener(sb.toString()).nextValue();
+            Log.d(logTag, "Lang data file " + file + " read: " + langData.toString());
+
+            // populate metadata about current file
+            if (reset)
+                langCode = langData.getString("code");
+
+            transLangs.clear();
+            JSONArray transLangJSONArray = langData.getJSONArray("trans_langs");
+            for (int i = 0; i < transLangJSONArray.length(); i++) {
+                transLangs.add(transLangJSONArray.getString(i));
+            }
+            return langData.optJSONObject("data");
         } catch (JSONException je) {
             Log.d (logTag, "Error reading JSON from lang data");
+            je.printStackTrace();
         } catch (IOException e) {
             Log.d(logTag, "Exception caught while trying to read lang file");
             e.printStackTrace();
         }
 
-        return langData.optJSONObject("data");
+        // This should not happen
+        Log.d(logTag, "Something bad happened");
+        return null;
     }
 
     public static JSONObject getLangData() {
         return langData;
     }
 
+    public static String detectLanguage(String input, Context context) {
+        Log.d(logTag, "Detecting language for " + input);
+
+        // use the current data file...
+        // get all keys
+        ArrayList<String> known_langs = transLangs;
+        known_langs.add(langCode);
+
+        // create a hashmap to store the characters for all known languages
+        HashMap<String, ArrayList<String>> languages = new HashMap<>();
+        // add characters of currently loaded language into the list
+        ArrayList<String> characters = new ArrayList<>();
+        for (Iterator<String> it = LangDataReader.langData.keys(); it.hasNext(); ) {
+            characters.add(it.next());
+        }
+        languages.put(langCode, (ArrayList<String>) characters.clone());
+
+        JSONObject langData = null;
+        Log.d(logTag, languages.toString());
+        try {
+            // for each lang file that is not currentFile, add its characters to the hashmap
+            for(String file: context.getAssets().list("languages/")) {
+                Log.d(logTag, "Reading file " + file);
+
+                // ignore the currently loaded file
+                if (file.equals(currentFile))
+                    continue;
+
+                // don't reset the class variables since we are only reading the files
+                langData = read(file, false, context);
+                characters.clear();
+                for(Iterator<String> it = langData.keys(); it.hasNext(); ) {
+                    characters.add(it.next());
+                }
+                // associate the hashmap with a clone of the value so that changes to the value
+                // in future iterations are not picked up in the hashmap
+                languages.put(getLangCode(file), (ArrayList<String>) characters.clone());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        Log.d(logTag, languages.toString());
+        // now, we attempt to detect the input language
+        String[] langs = languages.keySet().toArray(new String[0]);
+        HashMap<String, Integer> score = new HashMap<>();
+        for (char ch: input.toCharArray()) {
+            for (String lang: langs) {
+                if (languages.get(lang).contains(ch + "")) {
+                    Log.d(logTag, " " + ch + " matches a character in the " + lang + " set.");
+                    if (score.containsKey(lang)) {
+                        score.put(lang, score.get(lang) + 1);
+                    }
+                    else
+                        score.put(lang, 1);
+                }
+            }
+        }
+
+        String langCode = null;
+        int max_score = 0;
+        for (Map.Entry<String, Integer> entry: score.entrySet()) {
+            if (langCode == null) {
+                langCode = entry.getKey();
+                max_score = entry.getValue();
+                continue;
+            }
+            if (entry.getValue() > max_score) {
+                langCode = entry.getKey();
+                max_score = entry.getValue();
+            }
+        }
+        Log.d(logTag, "Detected " + langCode + " in input string with score " + max_score);
+
+        return langCode;
+    }
+
+    public static String getLangCode(String name) {
+        switch (name.toLowerCase()) {
+            case "kannada.json":
+            case "kannada":
+                return "ka";
+            case "malayalam.json":
+            case "malayalam":
+                return "ml";
+            case "hindi.json":
+            case "hindi":
+                return "hi";
+            default:
+                return null;
+        }
+    }
+
+    public static String getLangFile(String langCode) {
+        switch (langCode.toLowerCase()) {
+            case "ka":
+                return "kannada.json";
+            case "ml":
+                return "malayalam.json";
+            case "hi":
+                return "hindi.json";
+            default:
+                // let's send kannada.json as default instead of failing
+                return "kannada.json";
+        }
+    }
+
     // Read langdata from a file and return immediately
     public static JSONObject getLangData(String file, Context context) {
-        return read(file, context);
+        return read(file, false, context);
     }
 
     public static HashMap<String, ArrayList<String>> getCategories() {

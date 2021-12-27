@@ -21,6 +21,8 @@ package in.digistorm.aksharam;
  */
 
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,10 +42,9 @@ import androidx.fragment.app.Fragment;
 import org.json.JSONObject;
 
 public class TransliterateTabFragment extends Fragment {
-
     private String targetLanguage = "ml";
     private Transliterator tr;
-    public static final String ARG_OBJECT = "object";
+    private boolean sourceChanged = true;
 
     private String logTag = getClass().getName();
 
@@ -58,6 +59,24 @@ public class TransliterateTabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        ((EditText) view.findViewById(R.id.InputTextField)).addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                Log.d(logTag, "Input string has changed.");
+                sourceChanged = true;
+            }
+        });
+
         view.findViewById(R.id.TransliterateButton).setOnClickListener(
                 this::transliterateButtonOnClick
         );
@@ -67,9 +86,12 @@ public class TransliterateTabFragment extends Fragment {
     public void transliterateButtonOnClick(View view) {
         String inputString = ((EditText) ((View)view.getParent()).findViewById(R.id.InputTextField))
                 .getText().toString();
-        Log.d("TransliterateButton", inputString);
+        Log.d(logTag, "Transliterating " + inputString);
 
-        if(tr == null) {
+        if(sourceChanged) {
+            sourceChanged = false;
+            LangDataReader.initialise(LangDataReader.getLangFile(
+                    LangDataReader.detectLanguage(inputString, getContext())), getContext());
             tr = new Transliterator(LangDataReader.getLangData());
         }
 
@@ -90,19 +112,8 @@ public class TransliterateTabFragment extends Fragment {
         languageSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (parent.getItemAtPosition(position).toString()) {
-                    case "Malayalam":
-                        targetLanguage = "ml";
-                        break;
-                    case "Hindi":
-                        targetLanguage = "hi";
-                        break;
-                    default:
-                        // Something went wrong
-                        Toast.makeText(getContext(),
-                                "TransliterateTabFragment: Something went wrong!",
-                                Toast.LENGTH_LONG).show();
-                }
+                targetLanguage = LangDataReader.getLangCode(
+                        parent.getItemAtPosition(position).toString());
             }
 
             @Override
