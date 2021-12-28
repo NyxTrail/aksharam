@@ -357,6 +357,114 @@
       "ka": ["ಳ್"],
       "hi": ["ळ्"],
       "type": "chillu"
+    },
+    "ക്ക": {
+      "type": "ligatures"
+    },
+    "ച്ച": {
+      "type": "ligatures"
+    },
+    "ജ്ജ": {
+      "type": "ligatures"
+    },
+    "ത്ത": {
+      "type": "ligatures"
+    },
+    "മ്മ": {
+      "type": "ligatures"
+    },
+    "ന്ന": {
+      "type": "ligatures"
+    },
+    "ട്ട": {
+      "type": "ligatures"
+    },
+    "പ്പ": {
+      "type": "ligatures"
+    },
+    "ല്ല": {
+      "type": "ligatures"
+    },
+    "ള്ള": {
+      "type": "ligatures"
+    },
+    "ഞ്ഞ": {
+      "type": "ligatures"
+    },
+    "ണ്ണ": {
+      "type": "ligatures"
+    },
+    "ങ്ങ": {
+      "type": "ligatures"
+    },
+    "യ്യ": {
+      "type": "ligatures"
+    },
+    "ങ്ക": {
+      "type": "ligatures"
+    },
+    "മ്പ": {
+      "type": "ligatures"
+    },
+    "ക്ഷ": {
+      "type": "ligatures"
+    },
+    "ഞ്ജ": {
+      "type": "ligatures"
+    },
+    "ഞ്ച": {
+      "type": "ligatures"
+    },
+    "ണ്ട": {
+      "type": "ligatures"
+    },
+    "ന്ത": {
+      "type": "ligatures"
+    },
+    "ജ്ഞ": {
+      "type": "ligatures"
+    },
+    "ക്വ": {
+      "type": "ligatures"
+    },
+    "ത്വ": {
+      "type": "ligatures"
+    },
+    "പ്വ": {
+      "type": "ligatures"
+    },
+    "പ്ല": {
+      "type": "ligatures"
+    },
+    "ക്ല": {
+      "type": "ligatures"
+    },
+    "ശ്ല": {
+      "type": "ligatures"
+    },
+    "ക്യ": {
+      "type": "ligatures"
+    },
+    "പ്യ": {
+      "type": "ligatures"
+    },
+    "ത്യ": {
+      "type": "ligatures"
+    },
+    "ത്ര": {
+      "type": "ligatures"
+    },
+    "ക്ര": {
+      "type": "ligatures"
+    },
+    "പ്ര": {
+      "type": "ligatures"
+    },
+    "റ്റ": {
+      "type": "ligatures"
+    },
+    "ന്റ": {
+      "type": "ligatures"
     }
   }
 }
