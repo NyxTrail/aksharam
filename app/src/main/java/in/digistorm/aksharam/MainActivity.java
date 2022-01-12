@@ -59,8 +59,5 @@ public class MainActivity extends AppCompatActivity {
         new TabLayoutMediator(tabLayout, viewPager,
                 PageCollectionAdapter.tabConfigurationStrategy()
         ).attach();
-        // initialiseSpinner();
     }
-
-
 }

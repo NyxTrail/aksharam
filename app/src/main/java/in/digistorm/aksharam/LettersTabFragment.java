@@ -42,7 +42,6 @@ import androidx.fragment.app.Fragment;
 import java.util.ArrayList;
 
 public class LettersTabFragment extends Fragment {
-    public static final String ARG_OBJECT = "object";
     public ArrayList<String> categories;
     private String logTag = getClass().getName();
 
@@ -94,14 +93,6 @@ public class LettersTabFragment extends Fragment {
         initialiseLettersTabTransSpinner(view);
 
         Log.d(logTag, LangDataReader.getCategories().toString());
-        // First, create an ExpandableListView for the categories
-        /*
-        ScrollView sv = new ScrollView(getContext());
-        sv.setLayoutParams(new ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-        ));
-         */
         categoriesList = new ExpandableListView(getContext());
         categoriesList.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,

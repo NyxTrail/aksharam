@@ -21,6 +21,7 @@ package in.digistorm.aksharam;
  */
 
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -31,6 +32,7 @@ import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
 public class PageCollectionAdapter extends FragmentStateAdapter {
+    private final String logTag = getClass().toString();
 
     public PageCollectionAdapter(FragmentActivity fragmentActivity) {
         super(fragmentActivity);
@@ -52,13 +54,18 @@ public class PageCollectionAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
-        Fragment fragment = null;
+        Fragment fragment;
         switch (position) {
             case 0:
                 fragment = new LettersTabFragment();
                 break;
             case 1:
                 fragment = new TransliterateTabFragment();
+                break;
+            default:
+                // something bad happened
+                Log.d(logTag, "Invalid tab at position " + position);
+                fragment = new LettersTabFragment();
                 break;
         }
         return fragment;

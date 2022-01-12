@@ -46,31 +46,31 @@ public class Transliterator {
     // str is the string that needs to be converted
     // targetLanguage is the language to which the string needs to be converted
     public String transliterate(String str, String targetLanguage) {
-       StringBuilder out = new StringBuilder();
-       String index;
+        StringBuilder out = new StringBuilder();
+        String index;
 
-       Log.d(logTag, "Lang data: " + langData);
+        Log.d(logTag, "Lang data: " + langData);
         // Process the string character by character
-       for (char ch: str.toCharArray()) {
-           index = "" + ch;
-           // + "." + targetLanguage;
-           Log.d(logTag, "Looking for " + index);
-           try {
-               if (langData.has(index))
-                   if (langData.optJSONObject(index).has(targetLanguage))
-                       out = out.append(langData.optJSONObject(index)
-                                            .getJSONArray(targetLanguage)
-                                            .getString(0));
-                   else
-                       out = out.append(ch);
-               else
-                   out = out.append(ch);
-           } catch (JSONException e) {
-               Log.d(logTag, "Error while looking up transliteration data");
-               e.printStackTrace();
-           }
-       }
-       Log.d(logTag, "Constructed string: " + out.toString());
-       return out.toString();
+        for (char ch: str.toCharArray()) {
+            index = "" + ch;
+            // + "." + targetLanguage;
+            Log.d(logTag, "Looking for " + index);
+            try {
+                if (langData.has(index))
+                    if (langData.optJSONObject(index).has(targetLanguage))
+                        out = out.append(langData.optJSONObject(index)
+                                .getJSONArray(targetLanguage)
+                                .getString(0));
+                    else
+                        out = out.append(ch);
+                else
+                    out = out.append(ch);
+            } catch (JSONException e) {
+                Log.d(logTag, "Error while looking up transliteration data");
+                e.printStackTrace();
+            }
+        }
+        Log.d(logTag, "Constructed string: " + out.toString());
+        return out.toString();
     }
 }

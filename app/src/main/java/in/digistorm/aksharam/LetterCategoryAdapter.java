@@ -20,7 +20,6 @@ package in.digistorm.aksharam;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
@@ -36,18 +35,18 @@ import android.widget.BaseExpandableListAdapter;
 import android.widget.GridLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
+import androidx.fragment.app.FragmentActivity;
 
 public class LetterCategoryAdapter extends BaseExpandableListAdapter {
-    private Activity activity;
-    private String logTag = getClass().getName();
+    private final FragmentActivity activity;
+    private final String logTag = getClass().getName();
 
     private final String[] headers = LangDataReader.getCategories().keySet()
             .toArray(new String[0]);
 
-    public LetterCategoryAdapter(Activity activity) {
+    public LetterCategoryAdapter(FragmentActivity activity) {
         this.activity = activity;
     }
 
@@ -124,12 +123,6 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
         GridLayout gridLayout = convertView.findViewById(R.id.LetterGrid);
         gridLayout.removeAllViews();
         gridLayout.setClickable(true);
-        gridLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(v.getContext(), "grid layout clicked!", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         String[] letters = LangDataReader.getCategories()
                 .get(headers[groupPosition]).toArray(new String[0]);
@@ -158,13 +151,33 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
 
             linearLayout.setClickable(true);
+            linearLayout.setLongClickable(true);
+            linearLayout.setOnLongClickListener(v -> {
+                Log.d(logTag, letter + " long clicked!");
+
+                LetterInfoFragment letterInfoFragment = LetterInfoFragment.newInstance(letter);
+                letterInfoFragment.show(activity
+                            .getSupportFragmentManager()
+                            // In class FragmentStateAdapter (extended by PageCollectionAdapter)
+                            // the tag for each fragment is set as:
+                            // "f" + holder.getItemId()
+                            // Letters tab is item id 0. So....
+                            .findFragmentByTag("f0")
+                            .getChildFragmentManager(),
+                        LetterInfoFragment.TAG);
+
+                return true;
+            });
+
             linearLayout.setOnClickListener(v -> {
                 Log.d(logTag, letter + " linear layout clicked!");
-                if (tv.getText().toString() == letter)
-                    tv.setText(LettersTabFragment.getTransliterator().transliterate(
-                            letter,
-                            LettersTabFragment.getLettersTabFragmentTargetLanguage()
-                    ));
+                if (tv.getText().toString().equals(letter)) {
+                    if (!LettersTabFragment.getLettersTabFragmentLanguage().equalsIgnoreCase(
+                            LettersTabFragment.getLettersTabFragmentTargetLanguage()))
+                        tv.setText(LettersTabFragment.getTransliterator().transliterate(
+                                letter,
+                                LettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                }
                 else
                     tv.setText(letter);
             });
