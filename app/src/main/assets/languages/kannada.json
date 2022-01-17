@@ -848,14 +848,14 @@
     },
     "ಕ್ಕ": {
       "examples": {
-        "ಆಕ್ಕ": {
+        "ಅಕ್ಕ": {
           "en": "elder sister",
           "hi": "दीदी",
           "ml": "മൂത്ത സഹോദരി, ചേട്ടത്തി"
         }
       },
       "info": {
-        "en": "Many consonants can form conjuncts with itself or other consonants like ಕ್ + ಕ = ಕ್ಕ, ಪ್ + ಪ = ಪ್ಪ, ಚ್ + ಕ = ಚ್ಕ, ಕ್ + ವ = ಕ್ವ, ತ್ + ವ = ತ್ವ etc"
+        "en": "Many consonants can form conjuncts with itself or other consonants.<br/><br/> Some examples are:<div style=\"text-align: center\">ಕ್ + ಕ = ಕ್ಕ<br/>ಪ್ + ಪ = ಪ್ಪ<br/>ಚ್ + ಕ = ಚ್ಕ<br/>ಕ್ + ವ = ಕ್ವ<br/>ತ್ + ವ = ತ್ವ</div>"
       },
       "type": "ligatures"
     },
@@ -873,33 +873,46 @@
         }
       },
       "info": {
-        "en": "A half consonant (ಕ್, ಗ್, ತ್ ...) + ತ conjunct is written using the special form of ತ (ಕ್ತ, ಗ್ತ, ತ್ತ ...)."
+        "en": "A half consonant (ಕ್, ಗ್, ತ್ ...) + ತ conjunct is written using the special form of ತ: <br/>Examples: <div style=\"text-align\"> ಕ್ + ತ = ಕ್ತ<br/>ಗ್ + ತ = ಗ್ತ<br/>ತ್ + ತ = ತ್ತ</div>"
       },
       "type": "ligatures"
     },
     "ಕ್ಸ": {
       "type": "ligatures",
       "info": {
-        "en": "A half consonant (ಕ್, ಗ್, ಸ್ ...) + ಸ conjunct is written using the special form of ನ (ಕ್ಸ, ಗ್ಸ, ಸ್ಸ ...)."
+        "en": "A half consonant (ಕ್, ಗ್, ಸ್ ...) + ಸ conjunct is written using the special form of ನ: <br/>Examples: <div style=\"text=align\">ಕ್ + ಸ = ಕ್ಸ<br/>ಗ್ + ಸ = ಗ್ಸ<br/>ಸ್ + ಸ = ಸ್ಸ</div>"
       }
     },
     "ಖ್ಯ": {
       "examples": {
-        "ನ್ಯಾಯ": {},
-        "ಖ್ಯಾತಿ": {}
+        "ನ್ಯಾಯ": {
+        },
+        "ಖ್ಯಾತಿ": {
+          "en": "fame",
+          "hi": "ख्यात,प्रसिद्ध",
+          "ml": "ഖ്യാതി, പ്രസിദ്ധി"
+        }
       },
       "info": {
-        "en": "A half consonant (ಕ್, ಗ್, ಸ್ ...) + ಯ conjunct is written using the special form of ಯ (ಕ್ಯ, ಗ್ಯ, ಸ್ಯ ...)."
+        "en": "A half consonant (ಕ್, ಗ್, ಸ್ ...) + ಯ conjunct is written using the special form of ಯ.<br/> Examples: <div style=\"text-align: center\">ಕ್ + ಯ = ಕ್ಯ<br/>ಗ್ + ಯ = ಗ್ಯ<br/>ಸ್ + ಯ = ಸ್ಯ</div>"
       },
       "type": "ligatures"
     },
     "ಸ್ನ": {
       "examples": {
-        "ಸ್ನಾನ": {},
-        "ರತ್ನ": {}
+        "ಸ್ನಾನ": {
+          "en": "bath",
+          "hi": "नहाना",
+          "ml": "കുളി, സ്നാനം"
+        },
+        "ರತ್ನ": {
+          "en": "gem",
+          "hi": "रत्न",
+          "ml": "രത്നം"
+        }
       },
       "info": {
-        "en": "A half consonant (ಕ್, ಗ್, ಸ್ ...) + ನ conjunct is written using the special form of ಯ (ಕ್ನ, ಗ್ನ, ಸ್ನ ...)."
+        "en": "A half consonant (ಕ್, ಗ್, ಸ್ ...) + ನ conjunct is written using the special form of ನ.<br/>Examples: <div style=\"text-align: center\">ಕ್ + ನ = ಕ್ನ<br/>ಗ್ + ನ = ಗ್ನ<br/>ಸ್ + ನ = ಸ್ನ</div>"
       },
       "type": "ligatures"
     },
@@ -918,7 +931,7 @@
         "ಸರ್ಕಾರ": {
           "en": "government",
           "hi": "सर्कार",
-          "ml": "സര്‍കാര്‍"
+          "ml": "സർക്കാർ"
         },
         "ಚಕ್ರ": {
           "en": "wheel",
@@ -932,7 +945,7 @@
         }
       },
       "info": {
-        "en": "The character ರ್, when it appears in its half form in a word, is written using a special form that appears later in order than when spoken. Examples: ಪೂ + ರ್ + ವ = ಪೂರ್ವ (ರ್ + ವ = ರ್ವ), ಸ + ರ್ + ಕಾ + ರ = ಸರ್ಕಾರ (ರ್ + ಕಾ = ರ್ಕಾ), ಕ + ರ್ + ನಾ + ಟ + ಕ = ಕರ್ನಾಟಕ (ರ್ + ನಾ = ರ್ನಾ) ರ್ can also form conjuncts with other characters. In such cases, it is written in its ligature form (ಕ್ + ರ = ಕ್ರ, ತ್ + ರ = ತ್ರ, ಸ್ + ರ = ಸ್ರ, ...)."
+        "en": "The character ರ್, when it appears in its half form in a word, is written using a special form that appears later in order than when spoken.<br/><br/>Examples:<div style=\"text-align: center\">ಪೂ + ರ್ + ವ = ಪೂರ್ವ (ರ್ + ವ = ರ್ವ)<br/>ಸ + ರ್ + ಕಾ + ರ = ಸರ್ಕಾರ (ರ್ + ಕಾ = ರ್ಕಾ)<br/>ಕ + ರ್ + ನಾ + ಟ + ಕ = ಕರ್ನಾಟಕ (ರ್ + ನಾ = ರ್ನಾ)</div>ರ್ can also form conjuncts with other characters. In such cases, it is written in the conjunct form: <div style=\"text-align: center\">ಕ್ + ರ = ಕ್ರ<br/>ತ್ + ರ = ತ್ರ<br/>ಸ್ + ರ = ಸ್ರ</div>"
       },
       "type": "ligatures"
     }
