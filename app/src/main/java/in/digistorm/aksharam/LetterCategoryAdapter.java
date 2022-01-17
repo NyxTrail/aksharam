@@ -24,6 +24,7 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Build;
+import android.os.Bundle;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
@@ -156,6 +157,8 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                 Log.d(logTag, letter + " long clicked!");
 
                 LetterInfoFragment letterInfoFragment = LetterInfoFragment.newInstance(letter);
+                MainActivity.replaceTabFragment(0, letterInfoFragment);
+                /*
                 letterInfoFragment.show(activity
                             .getSupportFragmentManager()
                             // In class FragmentStateAdapter (extended by PageCollectionAdapter)
@@ -165,6 +168,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                             .findFragmentByTag("f0")
                             .getChildFragmentManager(),
                         LetterInfoFragment.TAG);
+                 */
 
                 return true;
             });

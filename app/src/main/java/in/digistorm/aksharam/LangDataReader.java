@@ -118,6 +118,28 @@ public class LangDataReader {
         return null;
     }
 
+    public static JSONObject getLetterExamples(String letter) {
+        try {
+            Log.d(logTag, "Getting examples for " + letter);
+            return langData.getJSONObject(letter).getJSONObject("examples");
+        } catch (JSONException je) {
+            Log.d(logTag, "JSON error reading examples from lang data for: " + letter);
+            je.printStackTrace();
+            return null;
+        }
+    }
+
+    public static String getLetterInfo(String letter) {
+        try {
+            Log.d(logTag, "Getting info text for " + letter);
+            return langData.getJSONObject(letter).getJSONObject("info").getString("en");
+        } catch(JSONException je) {
+            Log.d(logTag, "JSON error reading info from lang data for: " + letter);
+            je.printStackTrace();
+            return null;
+        }
+    }
+
     public static JSONObject getLangData() {
         return langData;
     }

@@ -27,12 +27,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.BaseExpandableListAdapter;
 import android.widget.ExpandableListView;
-import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.TableLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -122,7 +119,8 @@ public class LettersTabFragment extends Fragment {
                         transliterator = new Transliterator("ml", getContext());
                         // LangDataReader.initialise("malayalam.json", getContext());
                         categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
-                        for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
+                        for (int i = 0; i < categoriesList.getExpandableListAdapter()
+                                .getGroupCount(); i++) {
                             categoriesList.expandGroup(i);
                         }
                         break;
@@ -134,7 +132,8 @@ public class LettersTabFragment extends Fragment {
                         transliterator = new Transliterator("ka", getContext());
                         // LangDataReader.initialise("kannada.json", getContext());
                         categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
-                        for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
+                        for (int i = 0; i < categoriesList.getExpandableListAdapter()
+                                .getGroupCount(); i++) {
                             categoriesList.expandGroup(i);
                         }
                         break;
