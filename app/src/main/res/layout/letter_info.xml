@@ -46,6 +46,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
+        android:includeFontPadding="true"
+        android:padding="8dp"
         android:text="@string/test_text"
         android:textSize="40sp"
         app:layout_constraintBottom_toBottomOf="@+id/letterInfoHeadingTV"
@@ -53,7 +55,7 @@
         app:layout_constraintStart_toEndOf="@+id/letterInfoHeadingTV"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -78,7 +80,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <Space
+            <androidx.legacy.widget.Space
                 android:id="@+id/space2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -103,16 +105,11 @@
             <LinearLayout
                 android:id="@+id/letterInfoWordAndMeaningLL"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="8dp"
+                android:layout_height="match_parent"
                 android:orientation="vertical"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/letterInfoWordsTV">
-
-            </LinearLayout>
+                app:layout_constraintTop_toBottomOf="@id/letterInfoWordsTV" />
 
             <TextView
                 android:id="@+id/letterInfoInfoTV"
@@ -120,11 +117,47 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:padding="16dp"
-                android:text="@string/test_text"
+                android:text="@string/lorem_ipsum"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/letterInfoWordAndMeaningLL" />
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/letterInfoDiacriticExamplesCL"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/letterInfoInfoTV">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/diacriticSelectorHintTV"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/diacritic_selector_hint" />
+
+                    <androidx.gridlayout.widget.GridLayout
+                        android:id="@+id/diacriticExamplesGL"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:padding="8dp"
+                        app:columnCount="5"/>
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

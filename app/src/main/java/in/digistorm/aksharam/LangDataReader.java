@@ -124,9 +124,47 @@ public class LangDataReader {
             return langData.getJSONObject(letter).getJSONObject("examples");
         } catch (JSONException je) {
             Log.d(logTag, "JSON error reading examples from lang data for: " + letter);
-            je.printStackTrace();
             return null;
         }
+    }
+
+    public static String getCategory(String letter) {
+        try {
+            return langData.getJSONObject(letter).getString("type");
+        } catch (JSONException je) {
+            Log.d(logTag, "JSON error when finding category for: " + letter);
+            return null;
+        }
+    }
+
+    private static ArrayList<String> getAllOfType(String type) {
+        ArrayList<String> allOfType = new ArrayList<>();
+
+        for(Iterator<String> letters = langData.keys(); letters.hasNext();) {
+            String letter = letters.next();
+            try {
+                String langData_type = langData.getJSONObject(letter).getString("type");
+                if(langData_type.equalsIgnoreCase(type)) {
+                    allOfType.add(letter);
+                }
+            } catch (JSONException je) {
+                Log.d(logTag, "Error when getting " + type + " for " + langCode);
+                return null;
+            }
+        }
+        return allOfType;
+    }
+
+    public static ArrayList<String> getDiacritics() {
+        return getAllOfType("signs");
+    }
+
+    public static ArrayList<String> getConsonants() {
+        return getAllOfType("consonants");
+    }
+
+    public static ArrayList<String> getLigatures() {
+        return getAllOfType("ligatures");
     }
 
     public static String getLetterInfo(String letter) {
@@ -135,7 +173,6 @@ public class LangDataReader {
             return langData.getJSONObject(letter).getJSONObject("info").getString("en");
         } catch(JSONException je) {
             Log.d(logTag, "JSON error reading info from lang data for: " + letter);
-            je.printStackTrace();
             return null;
         }
     }
