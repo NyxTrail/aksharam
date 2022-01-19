@@ -950,7 +950,8 @@
       "info": {
         "en": "The character ರ್, when it appears in its half form before a consonant, it is written using a special form that appears later in order than when spoken.<br/>Examples:<div style=\"text-align: center\">ಪೂ + ರ್ + ವ = ಪೂರ್ವ (ರ್ + ವ = ರ್ವ)<br/>ಸ + ರ್ + ಕಾ + ರ = ಸರ್ಕಾರ (ರ್ + ಕಾ = ರ್ಕಾ)<br/>ಕ + ರ್ + ನಾ + ಟ + ಕ = ಕರ್ನಾಟಕ (ರ್ + ನಾ = ರ್ನಾ)</div>ರ can also form conjuncts with other characters when it appears second in sequence after a half consonant. In such cases, it is written as shown below: <div style=\"text-align: center\">ಕ್ + ರ = ಕ್ರ<br/>ತ್ + ರ = ತ್ರ<br/>ಸ್ + ರ = ಸ್ರ</div>"
       },
-      "type": "ligatures"
+      "type": "ligatures",
+      "excludeCombiExamples": true
     }
   }
 }

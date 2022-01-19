@@ -155,6 +155,16 @@ public class LangDataReader {
         return allOfType;
     }
 
+    // JSONException can occur frequently here because this option is mentioned
+    // only for letters or letter combinations that cannot form any meaningful combinations
+    public static boolean isExcludeCombiExamples(String letter) {
+        try {
+            return langData.getJSONObject(letter).getBoolean("excludeCombiExamples");
+        } catch(JSONException je) {
+            return false;
+        }
+    }
+
     public static ArrayList<String> getDiacritics() {
         return getAllOfType("signs");
     }

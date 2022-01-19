@@ -126,47 +126,19 @@ public class LetterInfoFragment extends Fragment {
             // For consonants and ligatures, show examples of how they can combine with
             // vowel diacritics.
             String category = LangDataReader.getCategory(currentLetter);
-            if(category != null && (category.equalsIgnoreCase("consonants")
-                                    || category.equalsIgnoreCase("ligatures"))) {
-                TextView diacriticSelectorHintTV = v.findViewById(R.id.diacriticSelectorHintTV);
-                diacriticSelectorHintTV.setText(getString(R.string.diacritic_selector_hint,
-                        currentLetter));
-
-                GridLayout diacriticExamplesGridLayout = v.findViewById(R.id.diacriticExamplesGL);
-                diacriticExamplesGridLayout.removeAllViews();
-                ArrayList<String> signs = LangDataReader.getDiacritics();
-                Log.d(logTag, "Diacritics obtained: " + signs.toString());
-                for(String sign: signs) {
-                    LinearLayout linearLayout = new LinearLayout(getContext());
-                    linearLayout.setOrientation(LinearLayout.VERTICAL);
-
-                    Display display = getActivity().getWindowManager().getDefaultDisplay();
-                    Point size = new Point();
-                    try {
-                        display.getRealSize(size);
-                    } catch (NoSuchMethodError err) {
-                        display.getSize(size);
-                    }
-                    LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                            size.x/6,
-                            LinearLayout.LayoutParams.WRAP_CONTENT);
-                    linearLayout.setLayoutParams(layoutParams);
-
-                    TextView textView = new TextView(getContext());
-                    textView.setText(currentLetter + sign);
-                    textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-
-                    ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(
-                            ViewGroup.LayoutParams.WRAP_CONTENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT
-                    );
-                    textView.setLayoutParams(tvParams);
-
-                    linearLayout.addView(textView);
-                    diacriticExamplesGridLayout.addView(linearLayout);
-                }
+            boolean showDiacriticExamples = true;
+            if(category != null && !LangDataReader.isExcludeCombiExamples(currentLetter)
+                    && (category.equalsIgnoreCase("consonants")
+                        || category.equalsIgnoreCase("ligatures"))) {
+                displaySignConsonantCombinations(v, category);
             }
             else
+                showDiacriticExamples = false;
+
+            // For a sign, display how it combines with each consonant
+            if(category != null && (category.equalsIgnoreCase("signs")))
+                displaySignConsonantCombinations(v, category);
+            else if(!showDiacriticExamples)
                 v.findViewById(R.id.letterInfoDiacriticExamplesCL).setVisibility(View.GONE);
         }
         catch (JSONException je) {
@@ -174,6 +146,70 @@ public class LetterInfoFragment extends Fragment {
                     + currentLetter + ", language: "
                     + LettersTabFragment.getLettersTabFragmentTargetLanguage());
             je.printStackTrace();
+        }
+    }
+
+    @SuppressLint("SetTextI18n")
+    public void displaySignConsonantCombinations(View v, String type) {
+        TextView diacriticSelectorHintTV = v.findViewById(R.id.diacriticSelectorHintTV);
+        ArrayList<String> items = null;
+        // We need to display examples for a sign
+        if(type.equalsIgnoreCase("signs")) {
+            diacriticSelectorHintTV.setText(getString(R.string.consonants_with_diacritic,
+                    currentLetter));
+            items = LangDataReader.getConsonants();
+            items.addAll(LangDataReader.getLigatures());
+        }
+        // we need to display examples for a consonant/ligature
+        else if(type.equalsIgnoreCase("consonants")
+                || type.equalsIgnoreCase("ligatures")) {
+            diacriticSelectorHintTV.setText(getString(R.string.diacritics_with_consonant));
+            items = LangDataReader.getDiacritics();
+        }
+
+        if(items == null)
+            return;
+
+        Log.d(logTag, "Items obtained: " + items.toString());
+
+        GridLayout diacriticExamplesGridLayout = v.findViewById(R.id.diacriticExamplesGL);
+        diacriticExamplesGridLayout.removeAllViews();
+
+        for(String item: items) {
+            LinearLayout linearLayout = new LinearLayout(getContext());
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+
+            Display display = getActivity().getWindowManager().getDefaultDisplay();
+            Point size = new Point();
+            try {
+                display.getRealSize(size);
+            } catch (NoSuchMethodError err) {
+                display.getSize(size);
+            }
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    size.x / 6,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            linearLayout.setLayoutParams(layoutParams);
+
+            TextView textView = new TextView(getContext());
+            if(type.equalsIgnoreCase("signs")
+                    && !LangDataReader.isExcludeCombiExamples(item)) {
+                    textView.setText(item + currentLetter);
+            }
+            else if((type.equalsIgnoreCase("consonants")
+                    || type.equalsIgnoreCase("ligatures"))
+                    && !LangDataReader.isExcludeCombiExamples(item))
+                textView.setText(currentLetter + item);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+
+            ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            textView.setLayoutParams(tvParams);
+
+            linearLayout.addView(textView);
+            diacriticExamplesGridLayout.addView(linearLayout);
         }
     }
 
