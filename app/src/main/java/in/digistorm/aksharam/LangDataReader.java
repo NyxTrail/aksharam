@@ -53,6 +53,8 @@ public class LangDataReader {
 
     public static void initialise(String file, Context context) {
         Log.d(logTag, "Initialising lang data file: " + file);
+        if(file == null)
+            return;
         langData = read(file, true, context);
         categories = new LinkedHashMap<>();
 
@@ -269,6 +271,8 @@ public class LangDataReader {
     }
 
     public static String getLangCode(String name) {
+        if(name == null)
+            return null;
         switch (name.toLowerCase()) {
             case "kannada.json":
             case "kannada":
@@ -285,6 +289,8 @@ public class LangDataReader {
     }
 
     public static String getLangFile(String langCode) {
+        if(langCode == null)
+            return null;
         switch (langCode.toLowerCase()) {
             case "ka":
                 return "kannada.json";
