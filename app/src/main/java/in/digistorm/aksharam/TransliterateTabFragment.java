@@ -46,7 +46,7 @@ public class TransliterateTabFragment extends Fragment {
     private Transliterator tr;
     private boolean sourceChanged = true;
 
-    private String logTag = getClass().getName();
+    private final String logTag = getClass().getName();
 
     @Nullable
     @Override

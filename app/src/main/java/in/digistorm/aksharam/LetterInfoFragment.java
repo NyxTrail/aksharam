@@ -22,15 +22,17 @@ package in.digistorm.aksharam;
 
 import android.annotation.SuppressLint;
 import android.graphics.Point;
+import android.graphics.Rect;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -44,8 +46,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class LetterInfoFragment extends Fragment {
-    private String logTag = getClass().getName();
-    public static final String TAG = "LetterInfoFragment";
+    private final String logTag = getClass().getName();
 
     private String currentLetter = "";
 
@@ -82,8 +83,8 @@ public class LetterInfoFragment extends Fragment {
         try {
             // If there are no examples, hide this section
             if (letterExamples == null || letterExamples.equals("")) {
-                v.findViewById(R.id.letterInfoWordsTV).setVisibility(View.INVISIBLE);
-                v.findViewById(R.id.letterInfoMeaningTV).setVisibility(View.INVISIBLE);
+                v.findViewById(R.id.letterInfoWordsTV).setVisibility(View.GONE);
+                v.findViewById(R.id.letterInfoMeaningTV).setVisibility(View.GONE);
             } else {
                 for (Iterator<String> it = letterExamples.keys(); it.hasNext(); ) {
                     String word = it.next();
@@ -92,6 +93,9 @@ public class LetterInfoFragment extends Fragment {
                     View wordsAndMeaningView = inflater.inflate(R.layout.word_and_meaning,
                             letterInfoWordAndMeaningLL, false);
 
+                    int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 4,
+                            getResources().getDisplayMetrics());
+                    wordsAndMeaningView.setPadding(px, px, px, px);
                     Log.d(logTag, ((TextView) wordsAndMeaningView.findViewById(
                             R.id.wordAndMeaningWordTV)).getText().toString());
                     String meaning = letterExamples.getJSONObject(word)
@@ -107,7 +111,6 @@ public class LetterInfoFragment extends Fragment {
                                     (word, LettersTabFragment
                                             .getLettersTabFragmentTargetLanguage()));
                     letterInfoWordAndMeaningLL.addView(wordsAndMeaningView);
-
                 }
             }
 
@@ -117,7 +120,7 @@ public class LetterInfoFragment extends Fragment {
             if(letterInfo == null || letterInfo.isEmpty()) {
                 Log.d(logTag, "No additional info for " + currentLetter
                         + " was found. Hiding UI element.");
-                letterInfoInfoTV.setVisibility(View.INVISIBLE);
+                letterInfoInfoTV.setVisibility(View.GONE);
             }
             else {
                 letterInfoInfoTV.setText(Html.fromHtml(letterInfo));
@@ -163,35 +166,46 @@ public class LetterInfoFragment extends Fragment {
         // we need to display examples for a consonant/ligature
         else if(type.equalsIgnoreCase("consonants")
                 || type.equalsIgnoreCase("ligatures")) {
-            diacriticSelectorHintTV.setText(getString(R.string.diacritics_with_consonant));
+            diacriticSelectorHintTV.setText(getString(R.string.diacritics_with_consonant,
+                    currentLetter));
             items = LangDataReader.getDiacritics();
         }
 
         if(items == null)
             return;
 
-        Log.d(logTag, "Items obtained: " + items.toString());
+        Log.d(logTag, "Items obtained: " + items);
 
         GridLayout diacriticExamplesGridLayout = v.findViewById(R.id.diacriticExamplesGL);
         diacriticExamplesGridLayout.removeAllViews();
 
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+
         for(String item: items) {
             LinearLayout linearLayout = new LinearLayout(getContext());
             linearLayout.setOrientation(LinearLayout.VERTICAL);
+            linearLayout.setGravity(Gravity.CENTER);
 
-            Display display = getActivity().getWindowManager().getDefaultDisplay();
             Point size = new Point();
             try {
                 display.getRealSize(size);
             } catch (NoSuchMethodError err) {
                 display.getSize(size);
             }
+
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                    size.x / 6,
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(10, 10, 10, 10);
             linearLayout.setLayoutParams(layoutParams);
 
             TextView textView = new TextView(getContext());
+            textView.setGravity(Gravity.CENTER);
+            ViewGroup.LayoutParams tvLayoutParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            textView.setPadding(4, 4, 4,4);
+            textView.setLayoutParams(tvLayoutParams);
             if(type.equalsIgnoreCase("signs")
                     && !LangDataReader.isExcludeCombiExamples(item)) {
                     textView.setText(item + currentLetter);
