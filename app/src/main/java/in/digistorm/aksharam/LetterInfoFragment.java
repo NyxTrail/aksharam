@@ -179,19 +179,10 @@ public class LetterInfoFragment extends Fragment {
         GridLayout diacriticExamplesGridLayout = v.findViewById(R.id.diacriticExamplesGL);
         diacriticExamplesGridLayout.removeAllViews();
 
-        Display display = getActivity().getWindowManager().getDefaultDisplay();
-
         for(String item: items) {
             LinearLayout linearLayout = new LinearLayout(getContext());
             linearLayout.setOrientation(LinearLayout.VERTICAL);
             linearLayout.setGravity(Gravity.CENTER);
-
-            Point size = new Point();
-            try {
-                display.getRealSize(size);
-            } catch (NoSuchMethodError err) {
-                display.getSize(size);
-            }
 
             LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.WRAP_CONTENT,
@@ -215,15 +206,17 @@ public class LetterInfoFragment extends Fragment {
                     && !LangDataReader.isExcludeCombiExamples(item))
                 textView.setText(currentLetter + item);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-
             ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
             );
             textView.setLayoutParams(tvParams);
 
-            linearLayout.addView(textView);
-            diacriticExamplesGridLayout.addView(linearLayout);
+            // Add the textView and its parent linear layout only if the textview has some content
+            if(textView.getText() != null && !textView.getText().equals("")) {
+                linearLayout.addView(textView);
+                diacriticExamplesGridLayout.addView(linearLayout);
+            }
         }
     }
 
