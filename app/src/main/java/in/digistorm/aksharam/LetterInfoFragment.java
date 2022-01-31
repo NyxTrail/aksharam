@@ -21,14 +21,10 @@ package in.digistorm.aksharam;
  */
 
 import android.annotation.SuppressLint;
-import android.graphics.Point;
-import android.graphics.Rect;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -63,9 +59,13 @@ public class LetterInfoFragment extends Fragment {
     // Set up the LetterInfo dialog
     @SuppressLint("SetTextI18n")
     private void setUp(View v, LayoutInflater inflater) {
-        Log.d(logTag, "Showing info dialog for: " + getArguments().getString("letter"));
-        currentLetter = getArguments().getString("letter");
-
+        if(getArguments() != null)
+            currentLetter = getArguments().getString("letter");
+        else {
+            Log.d(logTag, "Null arguments in Setup(View, LayoutInflater)");
+            return ;
+        }
+        Log.d(logTag, "Showing info dialog for: " + currentLetter);
         Transliterator tr = LettersTabFragment.getTransliterator();
         ((TextView) v.findViewById(R.id.letterInfoHeadingTV))
                 .setText(currentLetter);
@@ -82,7 +82,7 @@ public class LetterInfoFragment extends Fragment {
                  v.findViewById(R.id.letterInfoWordAndMeaningLL);
         try {
             // If there are no examples, hide this section
-            if (letterExamples == null || letterExamples.equals("")) {
+            if (letterExamples == null || letterExamples.toString().equals("")) {
                 v.findViewById(R.id.letterInfoWordsTV).setVisibility(View.GONE);
                 v.findViewById(R.id.letterInfoMeaningTV).setVisibility(View.GONE);
             } else {
