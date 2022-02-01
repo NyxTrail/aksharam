@@ -30,16 +30,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import java.util.ArrayList;
-
 public class LettersTabFragment extends Fragment {
-    public ArrayList<String> categories;
     private String logTag = getClass().getName();
 
     private ExpandableListView categoriesList;
@@ -87,7 +83,6 @@ public class LettersTabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initialiseLettersTabLangSpinner(view);
-        initialiseLettersTabTransSpinner(view);
 
         Log.d(logTag, LangDataReader.getCategories().toString());
         categoriesList = new ExpandableListView(getContext());
@@ -105,44 +100,24 @@ public class LettersTabFragment extends Fragment {
     public void initialiseLettersTabLangSpinner(@NonNull View view) {
         Spinner lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+                R.layout.spinner_item,
+                R.id.spinnerItemTV, LangDataReader.getAvailableSourceLanguages(getContext()));
+        adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabLangSpinner.setAdapter(adapter);
-        lettersTabLangSpinner.setSelection(2);
+        lettersTabLangSpinner.setSelection(0);
         lettersTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (parent.getItemAtPosition(position).toString()) {
-                    case "Malayalam":
-                        language = "ml";
-                        transliterator = new Transliterator("ml", getContext());
-                        // LangDataReader.initialise("malayalam.json", getContext());
-                        categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
-                        for (int i = 0; i < categoriesList.getExpandableListAdapter()
-                                .getGroupCount(); i++) {
-                            categoriesList.expandGroup(i);
-                        }
-                        break;
-                    case "Hindi":
-                        language = "hi";
-                        break;
-                    case "Kannada":
-                        language = "ka";
-                        transliterator = new Transliterator("ka", getContext());
-                        // LangDataReader.initialise("kannada.json", getContext());
-                        categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
-                        for (int i = 0; i < categoriesList.getExpandableListAdapter()
-                                .getGroupCount(); i++) {
-                            categoriesList.expandGroup(i);
-                        }
-                        break;
-                    default:
-                        // Something went wrong
-                        Toast.makeText(getContext(),
-                                "LettersTabFragment: Something went wrong!",
-                                Toast.LENGTH_LONG).show();
+                language = parent.getItemAtPosition(position).toString();
+                transliterator = new Transliterator(language, getContext());
+                categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
+                for (int i = 0; i < categoriesList.getExpandableListAdapter()
+                        .getGroupCount(); i++) {
+                    categoriesList.expandGroup(i);
                 }
+                // At this point, LangDataReader should be re-initialised
+                initialiseLettersTabTransSpinner();
             }
 
             @Override
@@ -152,33 +127,23 @@ public class LettersTabFragment extends Fragment {
         });
     }
 
-    public void initialiseLettersTabTransSpinner(@NonNull View view) {
-        Spinner lettersTabTransSpinner = view.findViewById(R.id.lettersTabTransSpinner);
+    public void initialiseLettersTabTransSpinner() {
+        Log.d(logTag, "setting up lettersTabTransSpinner");
+        Spinner lettersTabTransSpinner = getActivity().findViewById(R.id.lettersTabTransSpinner);
 
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        Log.d(logTag, LangDataReader.getTransLangs().toString());
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item,
+                R.id.spinnerItemTV,
+                LangDataReader.getTransLangs());
+        adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabTransSpinner.setAdapter(adapter);
+
         lettersTabTransSpinner.setSelection(0);
         lettersTabTransSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                switch (parent.getItemAtPosition(position).toString()) {
-                    case "Malayalam":
-                        targetLanguage = "ml";
-                        break;
-                    case "Hindi":
-                        targetLanguage = "hi";
-                        break;
-                    case "Kannada":
-                        targetLanguage = "ka";
-                        break;
-                    default:
-                        // Something went wrong
-                        Toast.makeText(getContext(),
-                                "LettersTabFragment: Something went wrong!",
-                                Toast.LENGTH_LONG).show();
-                }
+                Log.d(logTag, "item selected: " + parent.getItemAtPosition(position).toString());
+                targetLanguage = parent.getItemAtPosition(position).toString();
             }
 
             @Override

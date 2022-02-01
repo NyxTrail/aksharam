@@ -1,7 +1,7 @@
 {
   "comment": "Transliteration data for Malayalam. Order matters - within each type as well as among the types",
   "code": "ml",
-  "trans_langs": ["ka", "hi"],
+  "trans_langs": [{"kannada": "ka"}, {"hindi": "hi"}],
   "data": {
     "അ": {
       "ka": ["ಅ"],

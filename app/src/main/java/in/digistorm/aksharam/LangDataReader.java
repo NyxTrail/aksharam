@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class LangDataReader {
@@ -44,9 +45,15 @@ public class LangDataReader {
     private static JSONObject langData;
 
     // metadata about current file
-    private static String langCode;
+    private static String currentLang;
     private static String currentFile;
+    // code for the current lang data file
+    private static String langCode;
+    private static final ArrayList<String> sourceLangs = new ArrayList<>();
+    // transliteration languages suppported by the current data file
     private static final ArrayList<String> transLangs = new ArrayList<>();
+    // codes for the languages above
+    private static final Map<String, String> transLangCodes = new HashMap<>();
 
     // {"vowels": ["a", "e", "i"...], "consonants": ["b", "c", "d"...]...}
     private static LinkedHashMap<String, ArrayList<String>> categories;
@@ -98,13 +105,18 @@ public class LangDataReader {
             Log.d(logTag, "Lang data file " + file + " read: " + langData.toString());
 
             // populate metadata about current file
-            if (reset)
+            if (reset) {
+                currentLang = currentFile.replace(".json", "")
+                        .toLowerCase(Locale.ROOT);
+                transLangs.clear();
+                transLangCodes.clear();
                 langCode = langData.getString("code");
-
-            transLangs.clear();
-            JSONArray transLangJSONArray = langData.getJSONArray("trans_langs");
-            for (int i = 0; i < transLangJSONArray.length(); i++) {
-                transLangs.add(transLangJSONArray.getString(i));
+                JSONArray transLangJSONArray = langData.getJSONArray("trans_langs");
+                for (int i = 0; i < transLangJSONArray.length(); i++) {
+                    String lang = ((JSONObject) transLangJSONArray.get(i)).keys().next();
+                    transLangs.add(lang.substring(0, 1).toUpperCase(Locale.ROOT) + lang.substring(1));
+                    transLangCodes.put(lang, ((JSONObject) transLangJSONArray.get(i)).getString(lang));
+                }
             }
             return langData.optJSONObject("data");
         } catch (JSONException je) {
@@ -150,7 +162,7 @@ public class LangDataReader {
                     allOfType.add(letter);
                 }
             } catch (JSONException je) {
-                Log.d(logTag, "Error when getting " + type + " for " + langCode);
+                Log.d(logTag, "Error when getting " + type + " for " + currentLang);
                 return null;
             }
         }
@@ -165,6 +177,33 @@ public class LangDataReader {
         } catch(JSONException je) {
             return false;
         }
+    }
+
+    public static String getCurrentLang() {
+        return currentLang;
+    }
+
+    public static ArrayList<String> getAvailableSourceLanguages(Context context) {
+        Log.d(logTag, "finding all available lang data files");
+        try {
+            String[] files = context.getAssets().list("languages/");
+            sourceLangs.clear();
+            for(String file: files) {
+                Log.d(logTag, "found file " + file);
+                file = file.replace(".json", "");
+                sourceLangs.add(file.substring(0,1).toUpperCase(Locale.ROOT) + file.substring(1));
+            }
+            Log.d(logTag, "source languages found: " + sourceLangs);
+            return sourceLangs;
+        } catch (IOException e) {
+            Log.d(logTag, "Exception while iterating through lang data files:");
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public static ArrayList<String> getAvailableSourceLanguages() {
+        return sourceLangs;
     }
 
     public static ArrayList<String> getDiacritics() {
@@ -193,13 +232,10 @@ public class LangDataReader {
         return langData;
     }
 
+    public static ArrayList<String> getTransLangs() { return transLangs; }
+
     public static String detectLanguage(String input, Context context) {
         Log.d(logTag, "Detecting language for " + input);
-
-        // use the current data file...
-        // get all keys
-        ArrayList<String> known_langs = transLangs;
-        known_langs.add(langCode);
 
         // create a hashmap to store the characters for all known languages
         HashMap<String, ArrayList<String>> languages = new HashMap<>();
@@ -208,7 +244,7 @@ public class LangDataReader {
         for (Iterator<String> it = LangDataReader.langData.keys(); it.hasNext(); ) {
             characters.add(it.next());
         }
-        languages.put(langCode, (ArrayList<String>) characters.clone());
+        languages.put(getCurrentLang(), (ArrayList<String>) characters.clone());
 
         JSONObject langData = null;
         Log.d(logTag, languages.toString());
@@ -222,20 +258,21 @@ public class LangDataReader {
                     continue;
 
                 // don't reset the class variables since we are only reading the files
-                langData = read(file, false, context);
+                LangDataReader.initialise(file, context);
+                langData = getLangData();
                 characters.clear();
                 for(Iterator<String> it = langData.keys(); it.hasNext(); ) {
                     characters.add(it.next());
                 }
                 // associate the hashmap with a clone of the value so that changes to the value
                 // in future iterations are not picked up in the hashmap
-                languages.put(getLangCode(file), (ArrayList<String>) characters.clone());
+                languages.put(getCurrentLang(), (ArrayList<String>) characters.clone());
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        Log.d(logTag, languages.toString());
+        Log.d(logTag, "languages loaded: " + languages);
         // now, we attempt to detect the input language
         String[] langs = languages.keySet().toArray(new String[0]);
         HashMap<String, Integer> score = new HashMap<>();
@@ -252,56 +289,43 @@ public class LangDataReader {
             }
         }
 
-        String langCode = null;
+        String langDetected = null;
         int max_score = 0;
         for (Map.Entry<String, Integer> entry: score.entrySet()) {
-            if (langCode == null) {
-                langCode = entry.getKey();
+            if (langDetected == null) {
+                langDetected = entry.getKey();
                 max_score = entry.getValue();
                 continue;
             }
             if (entry.getValue() > max_score) {
-                langCode = entry.getKey();
+                langDetected = entry.getKey();
                 max_score = entry.getValue();
             }
         }
-        Log.d(logTag, "Detected " + langCode + " in input string with score " + max_score);
+        Log.d(logTag, "Detected " + langDetected + " in input string with score " + max_score);
 
+        return langDetected;
+    }
+
+    public static String getLangCode() {
         return langCode;
     }
 
-    public static String getLangCode(String name) {
+    public static String getTargetLangCode(String name) {
+        Log.d(logTag, "Getting code for " + name);
+        Log.d(logTag, "lang codes: " + transLangCodes);
         if(name == null)
             return null;
-        switch (name.toLowerCase()) {
-            case "kannada.json":
-            case "kannada":
-                return "ka";
-            case "malayalam.json":
-            case "malayalam":
-                return "ml";
-            case "hindi.json":
-            case "hindi":
-                return "hi";
-            default:
-                return null;
-        }
+        if(name.endsWith(".json"))
+            name = name.replace(".json", "");
+        return transLangCodes.get(name.toLowerCase(Locale.ROOT));
     }
 
-    public static String getLangFile(String langCode) {
-        if(langCode == null)
+    // This needs to be changed when interface for data file addition is added
+    public static String getLangFile(String langName) {
+        if(langName == null)
             return null;
-        switch (langCode.toLowerCase()) {
-            case "ka":
-                return "kannada.json";
-            case "ml":
-                return "malayalam.json";
-            case "hi":
-                return "hindi.json";
-            default:
-                // let's send kannada.json as default instead of failing
-                return "kannada.json";
-        }
+        return  langName.toLowerCase(Locale.ROOT) + ".json";
     }
 
     // Read langdata from a file and return immediately

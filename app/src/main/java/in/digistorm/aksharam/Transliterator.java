@@ -22,7 +22,6 @@ package in.digistorm.aksharam;
 
 import android.content.Context;
 import android.util.Log;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -38,6 +37,7 @@ public class Transliterator {
     }
 
     public Transliterator(String inputLang, Context context) {
+        Log.d(logTag, "Initialising transliterator for: " + inputLang);
         LangDataReader.initialise(LangDataReader.getLangFile(inputLang), context);
         this.langData = LangDataReader.getLangData();
     }
@@ -46,20 +46,24 @@ public class Transliterator {
     // str is the string that needs to be converted
     // targetLanguage is the language to which the string needs to be converted
     public String transliterate(String str, String targetLanguage) {
-        StringBuilder out = new StringBuilder();
-        String index;
+        String targetLangCode = LangDataReader.getTargetLangCode(targetLanguage);
+        Log.d(logTag, "Transliterating " + str
+                + " (" + LangDataReader.getCurrentLang() + ") to " + targetLanguage
+                + " code: " + targetLangCode);
 
-        Log.d(logTag, "Lang data: " + langData);
+        StringBuilder out = new StringBuilder();
+        String character;
+
         // Process the string character by character
         for (char ch: str.toCharArray()) {
-            index = "" + ch;
+            character = "" + ch;
             // + "." + targetLanguage;
-            Log.d(logTag, "Looking for " + index);
+            Log.d(logTag, "Looking for " + character);
             try {
-                if (langData.has(index))
-                    if (langData.optJSONObject(index).has(targetLanguage))
-                        out = out.append(langData.optJSONObject(index)
-                                .getJSONArray(targetLanguage)
+                if (langData.has(character))
+                    if (langData.optJSONObject(character).has(targetLangCode))
+                        out = out.append(langData.optJSONObject(character)
+                                .getJSONArray(targetLangCode)
                                 .getString(0));
                     else
                         out = out.append(ch);
@@ -70,7 +74,7 @@ public class Transliterator {
                 e.printStackTrace();
             }
         }
-        Log.d(logTag, "Constructed string: " + out.toString());
+        Log.d(logTag, "Constructed string: " + out);
         return out.toString();
     }
 }

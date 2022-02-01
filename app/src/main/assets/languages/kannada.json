@@ -1,7 +1,7 @@
 {
   "comment": "Transliteration data for Kannada. Order matters - within each type as well as among the types",
   "code": "ka",
-  "trans_langs": ["ml", "hi"],
+  "trans_langs": [{"malayalam": "ml"}, {"hindi": "hi"}],
   "info": "Ligatures In Kannada, most letters can form a ligature with another letter. In many cases, these are easily understood like ಕ್ಕ , ಕ್ವ , etc. Apart from these, some consonants (like ತ , ಯ , ರ, etc) change their shape when forming a ligature. Transliteration to Malayalam Malayalam has a few consonants that are used in special cases. These are usually ignored when transliterating to Malayalam (this makes it easier to code and the transliteration remains closer to the source).",
   "data": {
     "ಅ": {

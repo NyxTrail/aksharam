@@ -173,13 +173,15 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             });
 
             linearLayout.setOnClickListener(v -> {
-                Log.d(logTag, letter + " linear layout clicked!");
+                Log.d(logTag, letter + " clicked!");
                 if (tv.getText().toString().equals(letter)) {
                     if (!LettersTabFragment.getLettersTabFragmentLanguage().equalsIgnoreCase(
                             LettersTabFragment.getLettersTabFragmentTargetLanguage()))
                         tv.setText(LettersTabFragment.getTransliterator().transliterate(
                                 letter,
                                 LettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                    else
+                        Log.d(logTag, "source lang = target lang");
                 }
                 else
                     tv.setText(letter);

@@ -29,17 +29,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-
-import org.json.JSONObject;
 
 public class TransliterateTabFragment extends Fragment {
     private String targetLanguage = "ml";
@@ -90,9 +86,8 @@ public class TransliterateTabFragment extends Fragment {
 
         if(sourceChanged) {
             sourceChanged = false;
-            LangDataReader.initialise(LangDataReader.getLangFile(
-                    LangDataReader.detectLanguage(inputString, getContext())), getContext());
-            tr = new Transliterator(LangDataReader.getLangData());
+            tr = new Transliterator(LangDataReader.detectLanguage(inputString, getContext()), getContext());
+            initialiseSpinner(null);
         }
 
         // Now we are ready to transliterate
@@ -102,18 +97,26 @@ public class TransliterateTabFragment extends Fragment {
         tv.setText(outputString);
     }
 
-    public void initialiseSpinner(View view) {
-        Spinner languageSelectionSpinner = view.findViewById(R.id.LanguageSelectionSpinner);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    public void initialiseSpinner(View v) {
+        Spinner languageSelectionSpinner;
+        if(v == null)
+            languageSelectionSpinner = getActivity().findViewById(R.id.LanguageSelectionSpinner);
+        else
+            languageSelectionSpinner = v.findViewById(R.id.LanguageSelectionSpinner);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item,
+                // LangDataReader should be initialised now,
+                // no need to check what languages are available now
+                R.id.spinnerItemTV, LangDataReader.getTransLangs());
+//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
+//                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         languageSelectionSpinner.setAdapter(adapter);
 
         languageSelectionSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                targetLanguage = LangDataReader.getLangCode(
-                        parent.getItemAtPosition(position).toString());
+                targetLanguage = parent.getItemAtPosition(position).toString();
             }
 
             @Override
