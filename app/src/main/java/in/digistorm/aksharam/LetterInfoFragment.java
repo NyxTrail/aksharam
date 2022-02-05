@@ -99,7 +99,8 @@ public class LetterInfoFragment extends Fragment {
                     Log.d(logTag, ((TextView) wordsAndMeaningView.findViewById(
                             R.id.wordAndMeaningWordTV)).getText().toString());
                     String meaning = letterExamples.getJSONObject(word)
-                            .getString(LettersTabFragment.getLettersTabFragmentTargetLanguage());
+                            .getString(LangDataReader.getTargetLangCode(
+                                    LettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
                     ((TextView) wordsAndMeaningView.findViewById(R.id.wordAndMeaningWordTV))
                             .setText(word);
