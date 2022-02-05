@@ -36,12 +36,18 @@
     <string name="output_text_field">Output</string>
     <string name="letters_tab_header">Letters</string>
     <string name="transliterate_tab_header">Transliterate</string>
+    <string name="practice_tab_header">Practice</string>
+
     <string name="letters_tab_lang_input_hint">Language</string>
     <string name="letters_tab_trans_hint">Convert To</string>
+    <string name="transliterate_tab_trans_hint">Convert To</string>
     <string name="letter_info_example_words">Words</string>
     <string name="letter_info_example_meaning">Meaning</string>
     <string name="diacritics_with_consonant">%s with vowel signs:</string>
     <string name="consonants_with_diacritic">%s with consonants:</string>
+    <string name="practice_tab_lang_hint">Language</string>
+    <string name="practice_tab_practice_in_hint">Practice In</string>
+    <string name="practice_tab_practice_type_hint">Practice Type</string>
 
     <string-array name="language_selection_spinner">
         <item>Malayalam</item>

@@ -37,20 +37,29 @@
         android:layout_marginTop="8dp"
         android:contentDescription="@string/test_text"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"/>
 
     <Spinner
-        android:id="@+id/PracticeTabLessonTypeSpinner"
+        android:id="@+id/PracticeTabPracticeInSpinner"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:contentDescription="@string/test_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Spinner
+        android:id="@+id/PracticeTabPracticeTypeSpinner"
+        android:layout_width="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="@string/test_text"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/PracticeTabPracticeInSpinner" />
+
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/PracticeTabScoreTV"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
@@ -58,5 +67,15 @@
         android:gravity="center"
         android:text="@string/test_text"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/PracticeTabLessonTypeSpinner" />
+        app:layout_constraintTop_toBottomOf="@id/PracticeTabPracticeTypeSpinner" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/test_text"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/PracticeTabScoreTV" />
 </androidx.constraintlayout.widget.ConstraintLayout>

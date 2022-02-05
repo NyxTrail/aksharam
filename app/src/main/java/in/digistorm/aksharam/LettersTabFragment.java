@@ -100,9 +100,11 @@ public class LettersTabFragment extends Fragment {
     public void initialiseLettersTabLangSpinner(@NonNull View view) {
         Spinner lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(),
+        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
-                R.id.spinnerItemTV, LangDataReader.getAvailableSourceLanguages(getContext()));
+                R.id.spinnerItemTV,
+                LangDataReader.getAvailableSourceLanguages(getContext()),
+                R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabLangSpinner.setAdapter(adapter);
         lettersTabLangSpinner.setSelection(0);
@@ -132,9 +134,10 @@ public class LettersTabFragment extends Fragment {
         Spinner lettersTabTransSpinner = getActivity().findViewById(R.id.lettersTabTransSpinner);
 
         Log.d(logTag, LangDataReader.getTransLangs().toString());
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item,
-                R.id.spinnerItemTV,
-                LangDataReader.getTransLangs());
+        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
+                R.layout.spinner_item, R.id.spinnerItemTV,
+                LangDataReader.getTransLangs(),
+                R.id.spinnerLabelTV, getString(R.string.letters_tab_trans_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabTransSpinner.setAdapter(adapter);
 

@@ -104,10 +104,12 @@ public class TransliterateTabFragment extends Fragment {
         else
             languageSelectionSpinner = v.findViewById(R.id.LanguageSelectionSpinner);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.spinner_item,
+        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
+                R.layout.spinner_item,
                 // LangDataReader should be initialised now,
                 // no need to check what languages are available now
-                R.id.spinnerItemTV, LangDataReader.getTransLangs());
+                R.id.spinnerItemTV, LangDataReader.getTransLangs(),
+                R.id.spinnerLabelTV, getString(R.string.transliterate_tab_trans_hint));
 //        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
 //                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);

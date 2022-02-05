@@ -101,6 +101,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 case 1:
                     tab.setText(R.string.transliterate_tab_header);
                     break;
+                case 2:
+                    tab.setText(R.string.practice_tab_header);
+                    break;
             }
         };
     }
