@@ -41,7 +41,7 @@ public class LettersTabFragment extends Fragment {
     private ExpandableListView categoriesList;
 
     // The main language for which letters are displayed
-    private static String language = "ka";
+    private static String language = "Kannada";
     // The target language to transliterate to
     private static String targetLanguage = "ml";
 
