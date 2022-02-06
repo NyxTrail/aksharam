@@ -31,6 +31,7 @@
 
     <Spinner
         android:id="@+id/PracticeTabLangSpinner"
+        style="@style/drop_down_style"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
@@ -41,6 +42,7 @@
 
     <Spinner
         android:id="@+id/PracticeTabPracticeInSpinner"
+        style="@style/drop_down_style"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginEnd="16dp"
@@ -51,15 +53,18 @@
 
     <Spinner
         android:id="@+id/PracticeTabPracticeTypeSpinner"
+        style="@style/drop_down_style"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
         android:contentDescription="@string/test_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/PracticeTabPracticeInSpinner" />
 
     <TextView
         android:id="@+id/PracticeTabScoreTV"
+        style="@style/drop_down_style"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"

@@ -30,6 +30,7 @@
 
     <Spinner
         android:id="@+id/lettersTabLangSpinner"
+        style="@style/drop_down_style"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginStart="8dp"
@@ -46,6 +47,7 @@
 
     <Spinner
         android:id="@+id/lettersTabTransSpinner"
+        style="@style/drop_down_style"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
