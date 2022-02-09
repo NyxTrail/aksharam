@@ -57,8 +57,6 @@ public class Transliterator {
         // Process the string character by character
         for (char ch: str.toCharArray()) {
             character = "" + ch;
-            // + "." + targetLanguage;
-            Log.d(logTag, "Looking for " + character);
             try {
                 if (langData.has(character))
                     if (langData.optJSONObject(character).has(targetLangCode))

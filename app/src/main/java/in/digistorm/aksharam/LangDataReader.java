@@ -49,6 +49,7 @@ public class LangDataReader {
     private static String currentFile;
     // code for the current lang data file
     private static String langCode;
+    private static boolean randomiseLigatures;
     private static final ArrayList<String> sourceLangs = new ArrayList<>();
     // transliteration languages suppported by the current data file
     private static final ArrayList<String> transLangs = new ArrayList<>();
@@ -110,6 +111,10 @@ public class LangDataReader {
                         .toLowerCase(Locale.ROOT);
                 transLangs.clear();
                 transLangCodes.clear();
+                if(langData.has("randomise_ligatures"))
+                    randomiseLigatures = langData.getBoolean("randomise_ligatures");
+                else
+                    randomiseLigatures = false;
                 langCode = langData.getString("code");
                 JSONArray transLangJSONArray = langData.getJSONArray("trans_langs");
                 for (int i = 0; i < transLangJSONArray.length(); i++) {
@@ -228,6 +233,10 @@ public class LangDataReader {
         }
     }
 
+    public static boolean isRandomiseLigatures() {
+        return randomiseLigatures;
+    }
+
     public static JSONObject getLangData() {
         return langData;
     }
@@ -326,6 +335,27 @@ public class LangDataReader {
         if(langName == null)
             return null;
         return  langName.toLowerCase(Locale.ROOT) + ".json";
+    }
+
+    // get Virama for the current language
+    // returns empty string on error
+    public static String getVirama() {
+        if(categories.isEmpty())
+            return "";
+        // Virama is a "sign"
+        ArrayList<String> signs = categories.get("signs");
+        try {
+            for (String sign : signs) {
+                if (langData.getJSONObject(sign).has("isVirama"))
+                    if (langData.getJSONObject(sign).getBoolean("isVirama"))
+                        return sign;
+            }
+        } catch(JSONException je) {
+            Log.d(logTag, "JSONException while trying to find the Virama");
+            return "";
+        }
+
+        return "";
     }
 
     // Read langdata from a file and return immediately
