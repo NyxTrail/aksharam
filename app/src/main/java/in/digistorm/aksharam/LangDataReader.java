@@ -40,26 +40,34 @@ import java.util.Locale;
 import java.util.Map;
 
 public class LangDataReader {
-    private static final String logTag = "LangDataReader";
+    private final String logTag = "LangDataReader";
     // Data object from the lang data file
-    private static JSONObject langData;
+    private JSONObject langData;
 
     // metadata about current file
-    private static String currentLang;
-    private static String currentFile;
+    private String currentLang;
+    private String currentFile;
     // code for the current lang data file
-    private static String langCode;
-    private static boolean randomiseLigatures;
-    private static final ArrayList<String> sourceLangs = new ArrayList<>();
+    private String langCode;
+    private boolean randomiseLigatures;
+    private final ArrayList<String> sourceLangs = new ArrayList<>();
     // transliteration languages suppported by the current data file
-    private static final ArrayList<String> transLangs = new ArrayList<>();
+    private final ArrayList<String> transLangs = new ArrayList<>();
     // codes for the languages above
-    private static final Map<String, String> transLangCodes = new HashMap<>();
+    private final Map<String, String> transLangCodes = new HashMap<>();
 
     // {"vowels": ["a", "e", "i"...], "consonants": ["b", "c", "d"...]...}
-    private static LinkedHashMap<String, ArrayList<String>> categories;
+    private LinkedHashMap<String, ArrayList<String>> categories;
 
-    public static void initialise(String file, Context context) {
+    public String getCurrentFile() {
+        return currentFile;
+    }
+
+    public LangDataReader(Context context) {
+        this("kannada.json", context);
+    }
+
+    public LangDataReader(String file, Context context) {
         Log.d(logTag, "Initialising lang data file: " + file);
         if(file == null)
             return;
@@ -69,7 +77,7 @@ public class LangDataReader {
         findCategories();
     }
 
-    private static void findCategories() {
+    private void findCategories() {
         if (langData != null) {
             Iterator<String> keys = langData.keys();
             while(keys.hasNext()) {
@@ -84,7 +92,7 @@ public class LangDataReader {
     }
 
     // reset: reset class variables
-    private static JSONObject read(String file, boolean reset, Context context) {
+    private JSONObject read(String file, boolean reset, Context context) {
         JSONObject langData = null;
 
         try {
@@ -137,7 +145,7 @@ public class LangDataReader {
         return null;
     }
 
-    public static JSONObject getLetterExamples(String letter) {
+    public JSONObject getLetterExamples(String letter) {
         try {
             Log.d(logTag, "Getting examples for " + letter);
             return langData.getJSONObject(letter).getJSONObject("examples");
@@ -147,7 +155,7 @@ public class LangDataReader {
         }
     }
 
-    public static String getCategory(String letter) {
+    public String getCategory(String letter) {
         try {
             return langData.getJSONObject(letter).getString("type");
         } catch (JSONException je) {
@@ -156,7 +164,7 @@ public class LangDataReader {
         }
     }
 
-    private static ArrayList<String> getAllOfType(String type) {
+    private ArrayList<String> getAllOfType(String type) {
         ArrayList<String> allOfType = new ArrayList<>();
 
         for(Iterator<String> letters = langData.keys(); letters.hasNext();) {
@@ -176,7 +184,7 @@ public class LangDataReader {
 
     // JSONException can occur frequently here because this option is mentioned
     // only for letters or letter combinations that cannot form any meaningful combinations
-    public static boolean isExcludeCombiExamples(String letter) {
+    public boolean isExcludeCombiExamples(String letter) {
         try {
             return langData.getJSONObject(letter).getBoolean("excludeCombiExamples");
         } catch(JSONException je) {
@@ -184,11 +192,11 @@ public class LangDataReader {
         }
     }
 
-    public static String getCurrentLang() {
+    public String getCurrentLang() {
         return currentLang;
     }
 
-    public static ArrayList<String> getAvailableSourceLanguages(Context context) {
+    public ArrayList<String> getAvailableSourceLanguages(Context context) {
         Log.d(logTag, "finding all available lang data files");
         try {
             String[] files = context.getAssets().list("languages/");
@@ -207,23 +215,23 @@ public class LangDataReader {
         }
     }
 
-    public static ArrayList<String> getAvailableSourceLanguages() {
+    public ArrayList<String> getAvailableSourceLanguages() {
         return sourceLangs;
     }
 
-    public static ArrayList<String> getDiacritics() {
+    public ArrayList<String> getDiacritics() {
         return getAllOfType("signs");
     }
 
-    public static ArrayList<String> getConsonants() {
+    public ArrayList<String> getConsonants() {
         return getAllOfType("consonants");
     }
 
-    public static ArrayList<String> getLigatures() {
+    public ArrayList<String> getLigatures() {
         return getAllOfType("ligatures");
     }
 
-    public static String getLetterInfo(String letter) {
+    public String getLetterInfo(String letter) {
         try {
             Log.d(logTag, "Getting info text for " + letter);
             return langData.getJSONObject(letter).getJSONObject("info").getString("en");
@@ -233,94 +241,22 @@ public class LangDataReader {
         }
     }
 
-    public static boolean isRandomiseLigatures() {
+    public boolean isRandomiseLigatures() {
         return randomiseLigatures;
     }
 
-    public static JSONObject getLangData() {
+    public JSONObject getLangData() {
         return langData;
     }
 
-    public static ArrayList<String> getTransLangs() { return transLangs; }
+    public ArrayList<String> getTransLangs() { return transLangs; }
 
-    public static String detectLanguage(String input, Context context) {
-        Log.d(logTag, "Detecting language for " + input);
 
-        // create a hashmap to store the characters for all known languages
-        HashMap<String, ArrayList<String>> languages = new HashMap<>();
-        // add characters of currently loaded language into the list
-        ArrayList<String> characters = new ArrayList<>();
-        for (Iterator<String> it = LangDataReader.langData.keys(); it.hasNext(); ) {
-            characters.add(it.next());
-        }
-        languages.put(getCurrentLang(), (ArrayList<String>) characters.clone());
-
-        JSONObject langData = null;
-        Log.d(logTag, languages.toString());
-        try {
-            // for each lang file that is not currentFile, add its characters to the hashmap
-            for(String file: context.getAssets().list("languages/")) {
-                Log.d(logTag, "Reading file " + file);
-
-                // ignore the currently loaded file
-                if (file.equals(currentFile))
-                    continue;
-
-                // don't reset the class variables since we are only reading the files
-                LangDataReader.initialise(file, context);
-                langData = getLangData();
-                characters.clear();
-                for(Iterator<String> it = langData.keys(); it.hasNext(); ) {
-                    characters.add(it.next());
-                }
-                // associate the hashmap with a clone of the value so that changes to the value
-                // in future iterations are not picked up in the hashmap
-                languages.put(getCurrentLang(), (ArrayList<String>) characters.clone());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        Log.d(logTag, "languages loaded: " + languages);
-        // now, we attempt to detect the input language
-        String[] langs = languages.keySet().toArray(new String[0]);
-        HashMap<String, Integer> score = new HashMap<>();
-        for (char ch: input.toCharArray()) {
-            for (String lang: langs) {
-                if (languages.get(lang).contains(ch + "")) {
-                    Log.d(logTag, " " + ch + " matches a character in the " + lang + " set.");
-                    if (score.containsKey(lang)) {
-                        score.put(lang, score.get(lang) + 1);
-                    }
-                    else
-                        score.put(lang, 1);
-                }
-            }
-        }
-
-        String langDetected = null;
-        int max_score = 0;
-        for (Map.Entry<String, Integer> entry: score.entrySet()) {
-            if (langDetected == null) {
-                langDetected = entry.getKey();
-                max_score = entry.getValue();
-                continue;
-            }
-            if (entry.getValue() > max_score) {
-                langDetected = entry.getKey();
-                max_score = entry.getValue();
-            }
-        }
-        Log.d(logTag, "Detected " + langDetected + " in input string with score " + max_score);
-
-        return langDetected;
-    }
-
-    public static String getLangCode() {
+    public String getLangCode() {
         return langCode;
     }
 
-    public static String getTargetLangCode(String name) {
+    public String getTargetLangCode(String name) {
         Log.d(logTag, "Getting code for " + name);
         Log.d(logTag, "lang codes: " + transLangCodes);
         if(name == null)
@@ -339,7 +275,7 @@ public class LangDataReader {
 
     // get Virama for the current language
     // returns empty string on error
-    public static String getVirama() {
+    public String getVirama() {
         if(categories.isEmpty())
             return "";
         // Virama is a "sign"
@@ -359,11 +295,13 @@ public class LangDataReader {
     }
 
     // Read langdata from a file and return immediately
-    public static JSONObject getLangData(String file, Context context) {
+    /*
+    public JSONObject getLangData(String file, Context context) {
         return read(file, false, context);
     }
+    */
 
-    public static HashMap<String, ArrayList<String>> getCategories() {
+    public HashMap<String, ArrayList<String>> getCategories() {
         return categories;
     }
 }

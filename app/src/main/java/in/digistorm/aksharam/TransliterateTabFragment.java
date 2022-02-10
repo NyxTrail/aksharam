@@ -28,7 +28,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -86,7 +85,7 @@ public class TransliterateTabFragment extends Fragment {
 
         if(sourceChanged) {
             sourceChanged = false;
-            tr = new Transliterator(LangDataReader.detectLanguage(inputString, getContext()), getContext());
+            tr = new Transliterator(tr.detectLanguage(inputString, getContext()), getContext());
             initialiseSpinner(null);
         }
 
@@ -106,9 +105,9 @@ public class TransliterateTabFragment extends Fragment {
 
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
-                // LangDataReader should be initialised now,
-                // no need to check what languages are available now
-                R.id.spinnerItemTV, LangDataReader.getTransLangs(),
+                // Transliterator class' LangDataReader should be initialised now,
+                // no need to check what languages are available now; just fetch them
+                R.id.spinnerItemTV, Transliterator.getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.transliterate_tab_trans_hint));
 //        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
 //                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);

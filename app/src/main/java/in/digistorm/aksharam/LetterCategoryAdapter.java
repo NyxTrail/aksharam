@@ -43,16 +43,16 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     private final FragmentActivity activity;
     private final String logTag = getClass().getName();
 
-    private final String[] headers = LangDataReader.getCategories().keySet()
-            .toArray(new String[0]);
+    private final String[] headers;
 
     public LetterCategoryAdapter(FragmentActivity activity) {
+        headers = Transliterator.getLangDataReader().getCategories().keySet().toArray(new String[0]);
         this.activity = activity;
     }
 
     @Override
     public int getGroupCount() {
-        return LangDataReader.getCategories().size();
+        return Transliterator.getLangDataReader().getCategories().size();
     }
 
     @Override
@@ -68,7 +68,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return LangDataReader.getCategories().get(headers[groupPosition]);
+        return Transliterator.getLangDataReader().getCategories().get(headers[groupPosition]);
     }
 
     @Override
@@ -119,12 +119,13 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             convertView = layoutInflater.inflate(R.layout.letter_category_content, null);
         }
         Log.d(logTag, "creating grid for group: " + groupPosition);
-        Log.d(logTag, "group is: " + LangDataReader.getCategories().get(headers[groupPosition]));
+        Log.d(logTag, "group is: " + Transliterator.getLangDataReader()
+                .getCategories().get(headers[groupPosition]));
         GridLayout gridLayout = convertView.findViewById(R.id.LetterGrid);
         gridLayout.removeAllViews();
         gridLayout.setClickable(true);
 
-        String[] letters = LangDataReader.getCategories()
+        String[] letters = Transliterator.getLangDataReader().getCategories()
                 .get(headers[groupPosition]).toArray(new String[0]);
         for(String letter: letters) {
             LinearLayout linearLayout = new LinearLayout(activity);

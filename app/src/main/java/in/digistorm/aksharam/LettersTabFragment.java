@@ -26,7 +26,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ExpandableListView;
 import android.widget.ScrollView;
 import android.widget.Spinner;
@@ -84,7 +83,7 @@ public class LettersTabFragment extends Fragment {
 
         initialiseLettersTabLangSpinner(view);
 
-        Log.d(logTag, LangDataReader.getCategories().toString());
+        Log.d(logTag, Transliterator.getLangDataReader().getCategories().toString());
         categoriesList = new ExpandableListView(getContext());
         categoriesList.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -98,12 +97,13 @@ public class LettersTabFragment extends Fragment {
     }
 
     public void initialiseLettersTabLangSpinner(@NonNull View view) {
+        Log.d(logTag, "Initialising lettersTabLangSpinner spinner");
         Spinner lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
 
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                LangDataReader.getAvailableSourceLanguages(getContext()),
+                Transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
                 R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabLangSpinner.setAdapter(adapter);
@@ -118,7 +118,7 @@ public class LettersTabFragment extends Fragment {
                         .getGroupCount(); i++) {
                     categoriesList.expandGroup(i);
                 }
-                // At this point, LangDataReader should be re-initialised
+                // At this point, langDataReader should be re-initialised
                 initialiseLettersTabTransSpinner();
             }
 
@@ -130,13 +130,13 @@ public class LettersTabFragment extends Fragment {
     }
 
     public void initialiseLettersTabTransSpinner() {
-        Log.d(logTag, "setting up lettersTabTransSpinner");
+        Log.d(logTag, "Initialising lettersTabTransSpinner");
         Spinner lettersTabTransSpinner = getActivity().findViewById(R.id.lettersTabTransSpinner);
 
-        Log.d(logTag, LangDataReader.getTransLangs().toString());
+        Log.d(logTag, Transliterator.getLangDataReader().getTransLangs().toString());
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item, R.id.spinnerItemTV,
-                LangDataReader.getTransLangs(),
+                Transliterator.getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.letters_tab_trans_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabTransSpinner.setAdapter(adapter);

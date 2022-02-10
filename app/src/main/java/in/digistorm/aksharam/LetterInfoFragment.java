@@ -73,8 +73,7 @@ public class LetterInfoFragment extends Fragment {
                 .setText(tr.transliterate(currentLetter,
                         LettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
-        // Get the examples for this letter.
-        JSONObject letterExamples = LangDataReader.getLetterExamples(currentLetter);
+        JSONObject letterExamples = Transliterator.getLangDataReader().getLetterExamples(currentLetter);
 
         // We pack the examples into the Word and Meaning ConstraintLayout in
         // letter_info.xml layout file
@@ -99,7 +98,7 @@ public class LetterInfoFragment extends Fragment {
                     Log.d(logTag, ((TextView) wordsAndMeaningView.findViewById(
                             R.id.wordAndMeaningWordTV)).getText().toString());
                     String meaning = letterExamples.getJSONObject(word)
-                            .getString(LangDataReader.getTargetLangCode(
+                            .getString(Transliterator.getLangDataReader().getTargetLangCode(
                                     LettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
                     ((TextView) wordsAndMeaningView.findViewById(R.id.wordAndMeaningWordTV))
@@ -116,7 +115,7 @@ public class LetterInfoFragment extends Fragment {
             }
 
             // Check if extra info exists for this letter
-            String letterInfo = LangDataReader.getLetterInfo(currentLetter);
+            String letterInfo = Transliterator.getLangDataReader().getLetterInfo(currentLetter);
             TextView letterInfoInfoTV = v.findViewById(R.id.letterInfoInfoTV);
             if(letterInfo == null || letterInfo.isEmpty()) {
                 Log.d(logTag, "No additional info for " + currentLetter
@@ -129,9 +128,9 @@ public class LetterInfoFragment extends Fragment {
 
             // For consonants and ligatures, show examples of how they can combine with
             // vowel diacritics.
-            String category = LangDataReader.getCategory(currentLetter);
+            String category = Transliterator.getLangDataReader().getCategory(currentLetter);
             boolean showDiacriticExamples = true;
-            if(category != null && !LangDataReader.isExcludeCombiExamples(currentLetter)
+            if(category != null && !Transliterator.getLangDataReader().isExcludeCombiExamples(currentLetter)
                     && (category.equalsIgnoreCase("consonants")
                         || category.equalsIgnoreCase("ligatures"))) {
                 displaySignConsonantCombinations(v, category);
@@ -161,15 +160,15 @@ public class LetterInfoFragment extends Fragment {
         if(type.equalsIgnoreCase("signs")) {
             diacriticSelectorHintTV.setText(getString(R.string.consonants_with_diacritic,
                     currentLetter));
-            items = LangDataReader.getConsonants();
-            items.addAll(LangDataReader.getLigatures());
+            items = Transliterator.getLangDataReader().getConsonants();
+            items.addAll(Transliterator.getLangDataReader().getLigatures());
         }
         // we need to display examples for a consonant/ligature
         else if(type.equalsIgnoreCase("consonants")
                 || type.equalsIgnoreCase("ligatures")) {
             diacriticSelectorHintTV.setText(getString(R.string.diacritics_with_consonant,
                     currentLetter));
-            items = LangDataReader.getDiacritics();
+            items = Transliterator.getLangDataReader().getDiacritics();
         }
 
         if(items == null)
@@ -199,12 +198,12 @@ public class LetterInfoFragment extends Fragment {
             textView.setPadding(4, 4, 4,4);
             textView.setLayoutParams(tvLayoutParams);
             if(type.equalsIgnoreCase("signs")
-                    && !LangDataReader.isExcludeCombiExamples(item)) {
+                    && !Transliterator.getLangDataReader().isExcludeCombiExamples(item)) {
                     textView.setText(item + currentLetter);
             }
             else if((type.equalsIgnoreCase("consonants")
                     || type.equalsIgnoreCase("ligatures"))
-                    && !LangDataReader.isExcludeCombiExamples(item))
+                    && !Transliterator.getLangDataReader().isExcludeCombiExamples(item))
                 textView.setText(currentLetter + item);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(

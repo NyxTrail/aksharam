@@ -21,14 +21,11 @@
 package in.digistorm.aksharam;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.ActionMenuItem;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
-import android.app.Notification;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -56,7 +53,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        LangDataReader.initialise("kannada.json", getApplicationContext());
+        // Simple initialisation so that the app doesn't break on launch
+        new Transliterator(getApplicationContext());
 
         pageCollectionAdapter = new PageCollectionAdapter(this);
         viewPager = findViewById(R.id.pager);

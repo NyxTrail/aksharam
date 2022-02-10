@@ -136,7 +136,7 @@ public class PracticeTabFragment extends Fragment {
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                LangDataReader.getAvailableSourceLanguages(getContext()),
+                Transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_lang_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         practiceTabLangSpinner.setAdapter(adapter);
@@ -184,7 +184,7 @@ public class PracticeTabFragment extends Fragment {
         LabelledArrayAdapter<String> practiceInAdapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                LangDataReader.getTransLangs(),
+                Transliterator.getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_practice_in_hint));
         practiceInAdapter.setDropDownViewResource(R.layout.spinner_drop_down);
         practiceTabPracticeInSpinner.setAdapter(practiceInAdapter);
@@ -213,7 +213,7 @@ public class PracticeTabFragment extends Fragment {
                 R.id.PracticeTabPracticeTypeSpinner);
 
         ArrayList<String> practiceTypes = new ArrayList<>();
-        Set<String> categories = LangDataReader.getCategories().keySet();
+        Set<String> categories = Transliterator.getLangDataReader().getCategories().keySet();
         for(String category: categories) {
             practiceTypes.add(category.substring(0, 1).toUpperCase(Locale.ROOT)
                     + category.substring(1));
@@ -226,7 +226,7 @@ public class PracticeTabFragment extends Fragment {
         // Most of the combinations in these languages do not result in a meaningful ligature and
         // are usually represented using a half-consonant (with a virama). So, we will add random
         // ligatures only if the language's data file says we should.
-        if(LangDataReader.isRandomiseLigatures())
+        if(Transliterator.getLangDataReader().isRandomiseLigatures())
             practiceTypes.add("Random Ligatures");
         practiceTypes.add("Random Words");
 
@@ -263,7 +263,7 @@ public class PracticeTabFragment extends Fragment {
 
         // Then handle basic practice types (practice a plain letter category
         // get all letters of current language, category-wise
-        Map<String, ArrayList<String>> letters = LangDataReader.getCategories();
+        Map<String, ArrayList<String>> letters = Transliterator.getLangDataReader().getCategories();
         // select a random letter from the category that matches lang
         Random random = new Random();
         StringBuilder practiceString = new StringBuilder();
@@ -295,7 +295,7 @@ public class PracticeTabFragment extends Fragment {
 
                     // Special variable to hold the Virama.
                     // Useful to detect chillu letters in Malayalam
-                    String virama = LangDataReader.getVirama();
+                    String virama = Transliterator.getLangDataReader().getVirama();
 
                     for(int j = 1; j < wordLength; j++) {
                         ArrayList<String> categories = new ArrayList<>();
@@ -368,7 +368,7 @@ public class PracticeTabFragment extends Fragment {
                     // choose a random consonant
                     practiceString.append(letters.get("consonants")
                             .get(random.nextInt(numConsonants)));
-                    practiceString.append(LangDataReader.getVirama());
+                    practiceString.append(Transliterator.getLangDataReader().getVirama());
                     practiceString.append(letters.get("consonants")
                             .get(random.nextInt(numConsonants)));
                     practiceString.append(" ");
@@ -385,13 +385,13 @@ public class PracticeTabFragment extends Fragment {
                             do {
                                 predecessor = letters.get("consonants").get(random.nextInt(
                                         letters.get("consonants").size()));
-                            } while (LangDataReader.isExcludeCombiExamples(predecessor));
+                            } while (Transliterator.getLangDataReader().isExcludeCombiExamples(predecessor));
                             break;
                         case 1:
                             do {
                                 predecessor = letters.get("ligatures").get(random.nextInt(
                                         letters.get("ligatures").size()));
-                            } while (LangDataReader.isExcludeCombiExamples(predecessor));
+                            } while (Transliterator.getLangDataReader().isExcludeCombiExamples(predecessor));
                             break;
                     }
                     practiceString.append(predecessor + letters.get("signs")
