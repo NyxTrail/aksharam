@@ -54,7 +54,8 @@ public class TransliterateTabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        ((EditText) view.findViewById(R.id.InputTextField)).addTextChangedListener(new TextWatcher() {
+        ((EditText) view.findViewById(R.id.TransliterateTabInputTextField))
+                .addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
@@ -62,7 +63,14 @@ public class TransliterateTabFragment extends Fragment {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+                if(s.length() > 0) {
+                    view.findViewById(R.id.LanguageSelectionSpinner).setEnabled(true);
+                    view.findViewById(R.id.LanguageSelectionSpinner).setAlpha(1.0f);
+                }
+                else {
+                    view.findViewById(R.id.LanguageSelectionSpinner).setEnabled(false);
+                    view.findViewById(R.id.LanguageSelectionSpinner).setAlpha(0.3f);
+                }
             }
 
             @Override
@@ -76,23 +84,30 @@ public class TransliterateTabFragment extends Fragment {
                 this::transliterateButtonOnClick
         );
         initialiseSpinner(view);
+
+        Spinner languageSelectionSpinner = view.findViewById(R.id.LanguageSelectionSpinner);
+        languageSelectionSpinner.setEnabled(false);
+        languageSelectionSpinner.setAlpha(0.3f);
     }
 
     public void transliterateButtonOnClick(View view) {
-        String inputString = ((EditText) ((View)view.getParent()).findViewById(R.id.InputTextField))
-                .getText().toString();
+        String inputString = ((EditText) ((View)view.getParent())
+                .findViewById(R.id.TransliterateTabInputTextField)).getText().toString();
         Log.d(logTag, "Transliterating " + inputString);
 
         if(sourceChanged) {
             sourceChanged = false;
-            tr = new Transliterator(tr.detectLanguage(inputString, getContext()), getContext());
-            initialiseSpinner(null);
+            String lang = tr.detectLanguage(inputString, getContext());
+            if(lang != null) {
+                tr = new Transliterator(lang, getContext());
+                initialiseSpinner(null);
+            }
         }
 
         // Now we are ready to transliterate
         String outputString = tr.transliterate(inputString, targetLanguage);
 
-        TextView tv = ((View) view.getParent()).findViewById(R.id.OutputTextView);
+        TextView tv = ((View) view.getParent()).findViewById(R.id.TransliterateTabOutputTextView);
         tv.setText(outputString);
     }
 
@@ -109,8 +124,6 @@ public class TransliterateTabFragment extends Fragment {
                 // no need to check what languages are available now; just fetch them
                 R.id.spinnerItemTV, Transliterator.getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.transliterate_tab_trans_hint));
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getContext(),
-//                R.array.language_selection_spinner, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         languageSelectionSpinner.setAdapter(adapter);
 
@@ -125,5 +138,9 @@ public class TransliterateTabFragment extends Fragment {
 
             }
         });
+
+        if(tr == null) {
+            tr = new Transliterator(adapter.getItem(0), getContext());
+        }
     }
 }

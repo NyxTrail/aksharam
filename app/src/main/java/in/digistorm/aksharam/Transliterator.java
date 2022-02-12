@@ -90,7 +90,7 @@ public class Transliterator {
         initialise(inputLang, context);
     }
 
-    public static String detectLanguage(String input, Context context) {
+    public String detectLanguage(String input, Context context) {
         Log.d(logTag, "Detecting language for " + input);
 
         // create a hashmap to store the characters for all known languages
@@ -167,7 +167,7 @@ public class Transliterator {
     // Transliterate the input string using the mapping and return the transliterated string
     // str is the string that needs to be converted
     // targetLanguage is the language to which the string needs to be converted
-    public static String transliterate(String str, String targetLanguage) {
+    public String transliterate(String str, String targetLanguage) {
         String targetLangCode = langDataReader.getTargetLangCode(targetLanguage);
         Log.d(logTag, "Transliterating " + str
                 + " (" + langDataReader.getCurrentLang() + ") to " + targetLanguage

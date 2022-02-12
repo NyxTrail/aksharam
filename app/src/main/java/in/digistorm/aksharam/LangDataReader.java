@@ -262,6 +262,10 @@ public class LangDataReader {
         Log.d(logTag, "lang codes: " + transLangCodes);
         if(name == null)
             return null;
+
+        if(name.toLowerCase(Locale.ROOT).equals(currentLang.toLowerCase(Locale.ROOT)))
+            return langCode;
+
         if(name.endsWith(".json"))
             name = name.replace(".json", "");
         return transLangCodes.get(name.toLowerCase(Locale.ROOT));
