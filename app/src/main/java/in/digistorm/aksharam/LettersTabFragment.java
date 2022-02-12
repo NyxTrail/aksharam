@@ -34,6 +34,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.util.Locale;
+
 public class LettersTabFragment extends Fragment {
     private String logTag = getClass().getName();
 
@@ -47,6 +49,24 @@ public class LettersTabFragment extends Fragment {
     private Transliterator transliterator;
 
     private LabelledArrayAdapter<String> adapter;
+    private Spinner lettersTabLangSpinner;
+
+    public class AdapterNotifier implements OnLangDataReaderChanged{
+        @Override
+        public void onLangDataReaderChanged() {
+            Log.d(logTag, "onLangDataReaderChanged invoked!");
+
+            // First set LettersTabLangSpinner correctly
+            if(lettersTabLangSpinner != null) {
+                String currentLang = Transliterator.getLangDataReader().getCurrentLang();
+                currentLang = currentLang.substring(0, 1).toUpperCase(Locale.ROOT) +
+                        currentLang.substring(1);
+                Log.d(logTag, "onLangDataReaderChanged: current lang is " + currentLang);
+                int index = Transliterator.getLangDataReader().getAvailableSourceLanguages().indexOf(currentLang);
+                lettersTabLangSpinner.setSelection(index);
+            }
+        }
+    }
 
     public void setLettersTabFragmentLanguage(String lang) {
         // should add some sanity checks here
@@ -74,7 +94,7 @@ public class LettersTabFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         if (transliterator == null)
-            transliterator = new Transliterator(language, getContext());
+            transliterator = new Transliterator(language, new AdapterNotifier(), getContext());
 
         return inflater.inflate(R.layout.letters_layout, container, false);
     }
@@ -100,7 +120,7 @@ public class LettersTabFragment extends Fragment {
 
     public void initialiseLettersTabLangSpinner(@NonNull View view) {
         Log.d(logTag, "Initialising lettersTabLangSpinner spinner");
-        Spinner lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
+        lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
 
         adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
@@ -115,7 +135,16 @@ public class LettersTabFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 language = parent.getItemAtPosition(position).toString();
-                transliterator = new Transliterator(language, getContext());
+                // re-initialising Transliterator is not necessary if it already has been
+                // re-initialised. We can know this is the case by checking the currently loaded
+                // language
+                if(transliterator == null)
+                    transliterator = new Transliterator(language, getContext());
+
+                else if (!transliterator.getCurrentLang().toLowerCase(Locale.ROOT)
+                            .equals(language.toLowerCase(Locale.ROOT)))
+                        transliterator = new Transliterator(language, getContext());
+
                 // what is the right way to pass the object reference?
                 categoriesList.setAdapter(new LetterCategoryAdapter(getActivity(), ltf));
                 for (int i = 0; i < categoriesList.getExpandableListAdapter()

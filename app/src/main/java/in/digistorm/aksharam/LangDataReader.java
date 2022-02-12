@@ -74,6 +74,7 @@ public class LangDataReader {
         langData = read(file, true, context);
         categories = new LinkedHashMap<>();
 
+        getAvailableSourceLanguages(context);
         findCategories();
     }
 

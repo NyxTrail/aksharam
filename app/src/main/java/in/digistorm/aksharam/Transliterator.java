@@ -35,21 +35,46 @@ public class Transliterator {
     // The JSON mapping used to transliterate
     private static final String logTag = Transliterator.class.getName();
 
+    // The backing langDataReader for all tabs
     private static LangDataReader langDataReader;
+    // listeners for users of Transliterator so that they can adapt
+    // when backing LangDataReader changes
+    private static ArrayList<OnLangDataReaderChanged> listeners;
 
     public static LangDataReader getLangDataReader() {
         return langDataReader;
     }
 
+    public void registerListener(OnLangDataReaderChanged listener) {
+        if(listeners == null)
+            listeners = new ArrayList<>();
+
+        listeners.add(listener);
+    }
+
+    private static void invokeListeners() {
+        if(listeners == null)
+            return ;
+
+        for(OnLangDataReaderChanged listener: listeners) {
+            listener.onLangDataReaderChanged();
+        }
+    }
+
+    public String getCurrentLang() {
+        return Transliterator.getLangDataReader().getCurrentLang();
+    }
+
     // langDataReader should be set up using correct constructors for Transliterator
     // This method should be removed
-    public static void setLangDataReader(LangDataReader langDataReader) {
+    public void setLangDataReader(LangDataReader langDataReader) {
         Transliterator.langDataReader = langDataReader;
     }
 
     private void initialise(String inputLang, Context context) {
         Log.d(logTag, "Initialising transliterator for: " + inputLang);
         langDataReader = new LangDataReader(LangDataReader.getLangFile(inputLang), context);
+        invokeListeners();
     }
 
     public Transliterator(Context context) {
@@ -57,6 +82,11 @@ public class Transliterator {
     }
 
     public Transliterator(String inputLang, Context context) {
+        initialise(inputLang, context);
+    }
+
+    public Transliterator(String inputLang, OnLangDataReaderChanged listener, Context context) {
+        registerListener(listener);
         initialise(inputLang, context);
     }
 
@@ -84,6 +114,8 @@ public class Transliterator {
                     continue;
 
                 langDataReader = new LangDataReader(file, context);
+                invokeListeners();
+
                 langData = langDataReader.getLangData();
                 characters.clear();
                 for(Iterator<String> it = langData.keys(); it.hasNext(); ) {
