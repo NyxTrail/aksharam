@@ -45,9 +45,15 @@ public class LetterInfoFragment extends Fragment {
     private final String logTag = getClass().getName();
 
     private String currentLetter = "";
+    private LettersTabFragment lettersTabFragment;
 
-    public static LetterInfoFragment newInstance(String letter) {
-        LetterInfoFragment letterInfoFragment = new LetterInfoFragment();
+    public LetterInfoFragment(LettersTabFragment ltf) {
+        super();
+        lettersTabFragment = ltf;
+    }
+
+    public static LetterInfoFragment newInstance(String letter, LettersTabFragment ltf) {
+        LetterInfoFragment letterInfoFragment = new LetterInfoFragment(ltf);
 
         Bundle args = new Bundle();
         args.putString("letter", letter);
@@ -66,12 +72,12 @@ public class LetterInfoFragment extends Fragment {
             return ;
         }
         Log.d(logTag, "Showing info dialog for: " + currentLetter);
-        Transliterator tr = LettersTabFragment.getTransliterator();
+        Transliterator tr = lettersTabFragment.getTransliterator();
         ((TextView) v.findViewById(R.id.letterInfoHeadingTV))
                 .setText(currentLetter);
         ((TextView) v.findViewById(R.id.letterInfoTransliteratedHeadingTV))
                 .setText(tr.transliterate(currentLetter,
-                        LettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                        lettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
         JSONObject letterExamples = Transliterator.getLangDataReader().getLetterExamples(currentLetter);
 
@@ -99,7 +105,7 @@ public class LetterInfoFragment extends Fragment {
                             R.id.wordAndMeaningWordTV)).getText().toString());
                     String meaning = letterExamples.getJSONObject(word)
                             .getString(Transliterator.getLangDataReader().getTargetLangCode(
-                                    LettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                                    lettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
                     ((TextView) wordsAndMeaningView.findViewById(R.id.wordAndMeaningWordTV))
                             .setText(word);
@@ -107,8 +113,8 @@ public class LetterInfoFragment extends Fragment {
                             .setText(meaning);
                     ((TextView) wordsAndMeaningView
                             .findViewById(R.id.wordAndMeaningTransliterationTV))
-                            .setText(LettersTabFragment.getTransliterator().transliterate
-                                    (word, LettersTabFragment
+                            .setText(lettersTabFragment.getTransliterator().transliterate
+                                    (word, lettersTabFragment
                                             .getLettersTabFragmentTargetLanguage()));
                     letterInfoWordAndMeaningLL.addView(wordsAndMeaningView);
                 }
@@ -147,7 +153,7 @@ public class LetterInfoFragment extends Fragment {
         catch (JSONException je) {
             Log.d(logTag, "Exception caught while reading fetching info for "
                     + currentLetter + ", language: "
-                    + LettersTabFragment.getLettersTabFragmentTargetLanguage());
+                    + lettersTabFragment.getLettersTabFragmentTargetLanguage());
             je.printStackTrace();
         }
     }

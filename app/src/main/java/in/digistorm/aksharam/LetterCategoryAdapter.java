@@ -45,9 +45,13 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
 
     private final String[] headers;
 
-    public LetterCategoryAdapter(FragmentActivity activity) {
+    // The adapters copy of the parent fragment
+    private LettersTabFragment lettersTabFragment;
+
+    public LetterCategoryAdapter(FragmentActivity activity, LettersTabFragment ltf) {
         headers = Transliterator.getLangDataReader().getCategories().keySet().toArray(new String[0]);
         this.activity = activity;
+        lettersTabFragment = ltf;
     }
 
     @Override
@@ -156,7 +160,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             linearLayout.setOnLongClickListener(v -> {
                 Log.d(logTag, letter + " long clicked!");
 
-                LetterInfoFragment letterInfoFragment = LetterInfoFragment.newInstance(letter);
+                LetterInfoFragment letterInfoFragment = LetterInfoFragment.newInstance(letter, lettersTabFragment);
                 MainActivity.replaceTabFragment(0, letterInfoFragment);
                 /*
                 letterInfoFragment.show(activity
@@ -176,11 +180,11 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             linearLayout.setOnClickListener(v -> {
                 Log.d(logTag, letter + " clicked!");
                 if (tv.getText().toString().equals(letter)) {
-                    if (!LettersTabFragment.getLettersTabFragmentLanguage().equalsIgnoreCase(
-                            LettersTabFragment.getLettersTabFragmentTargetLanguage()))
-                        tv.setText(LettersTabFragment.getTransliterator().transliterate(
+                    if (!lettersTabFragment.getLettersTabFragmentLanguage().equalsIgnoreCase(
+                            lettersTabFragment.getLettersTabFragmentTargetLanguage()))
+                        tv.setText(lettersTabFragment.getTransliterator().transliterate(
                                 letter,
-                                LettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                                lettersTabFragment.getLettersTabFragmentTargetLanguage()));
                     else
                         Log.d(logTag, "source lang = target lang");
                 }

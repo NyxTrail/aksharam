@@ -40,30 +40,32 @@ public class LettersTabFragment extends Fragment {
     private ExpandableListView categoriesList;
 
     // The main language for which letters are displayed
-    private static String language = "Kannada";
+    private String language = "Kannada";
     // The target language to transliterate to
-    private static String targetLanguage = "ml";
+    private String targetLanguage = "ml";
 
-    private static Transliterator transliterator;
+    private Transliterator transliterator;
 
-    public static void setLettersTabFragmentLanguage(String lang) {
+    private LabelledArrayAdapter<String> adapter;
+
+    public void setLettersTabFragmentLanguage(String lang) {
         // should add some sanity checks here
         language = lang;
     }
 
-    public static String getLettersTabFragmentLanguage() {
+    public String getLettersTabFragmentLanguage() {
         return language;
     }
 
-    public static void setLettersTabFragmentTargetLanguage(String lang) {
+    public void setLettersTabFragmentTargetLanguage(String lang) {
         // should add some sanity checks here
         targetLanguage = lang;
     }
-    public static String getLettersTabFragmentTargetLanguage() {
+    public String getLettersTabFragmentTargetLanguage() {
         return targetLanguage;
     }
 
-    public static Transliterator getTransliterator() {
+    public Transliterator getTransliterator() {
         return transliterator;
     }
 
@@ -88,7 +90,7 @@ public class LettersTabFragment extends Fragment {
         categoriesList.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
+        categoriesList.setAdapter(new LetterCategoryAdapter(getActivity(), this));
         ScrollView sv = view.findViewById(R.id.LettersView);
         sv.addView(categoriesList);
         for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
@@ -100,7 +102,7 @@ public class LettersTabFragment extends Fragment {
         Log.d(logTag, "Initialising lettersTabLangSpinner spinner");
         Spinner lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
 
-        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
+        adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
                 Transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
@@ -108,12 +110,14 @@ public class LettersTabFragment extends Fragment {
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabLangSpinner.setAdapter(adapter);
         lettersTabLangSpinner.setSelection(0);
+        LettersTabFragment ltf = this;
         lettersTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 language = parent.getItemAtPosition(position).toString();
                 transliterator = new Transliterator(language, getContext());
-                categoriesList.setAdapter(new LetterCategoryAdapter(getActivity()));
+                // what is the right way to pass the object reference?
+                categoriesList.setAdapter(new LetterCategoryAdapter(getActivity(), ltf));
                 for (int i = 0; i < categoriesList.getExpandableListAdapter()
                         .getGroupCount(); i++) {
                     categoriesList.expandGroup(i);
