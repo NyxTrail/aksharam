@@ -31,6 +31,18 @@
         cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
     </string>
     <string name="back">Back</string>
+
+    <!-- Stuff for the InitialiseAppActivity -->
+    <string name="initialisation_check_data">Checking available data files online…</string>
+    <string name="initialisation_choice_hint">
+        Please choose language data you wish to download:
+    </string>
+    <string name="initialisation_no_file_selected">
+        Please select at least one file to download:
+    </string>
+    <string name="initialisation_downloading_data">Downloading data files…</string>
+    <string name="initialise_act_proceed_button">Proceed</string>
+
     <string name="input_text_field">Input Text</string>
     <string name="transliterate_button">Transliterate</string>
     <string name="output_text_field">Output</string>

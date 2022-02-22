@@ -112,6 +112,7 @@ public class TransliterateTabFragment extends Fragment {
     }
 
     public void initialiseSpinner(View v) {
+        Log.d(logTag, "Transliterate tab spinner initialising...");
         Spinner languageSelectionSpinner;
         if(v == null)
             languageSelectionSpinner = getActivity().findViewById(R.id.LanguageSelectionSpinner);

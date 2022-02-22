@@ -99,8 +99,9 @@ public class LangDataReader {
         try {
             if (reset)
                 currentFile = file;
-            Log.d(logTag, "Reading language file " + "languages/" + file);
-            InputStream is = context.getAssets().open("languages/" + file);
+            Log.d(logTag, "Reading language file " + file);
+            InputStream is = context.openFileInput(file);
+            // InputStream is = context.getAssets().open("languages/" + file);
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
             StringBuilder sb = new StringBuilder();
@@ -199,21 +200,19 @@ public class LangDataReader {
 
     public ArrayList<String> getAvailableSourceLanguages(Context context) {
         Log.d(logTag, "finding all available lang data files");
-        try {
-            String[] files = context.getAssets().list("languages/");
-            sourceLangs.clear();
-            for(String file: files) {
-                Log.d(logTag, "found file " + file);
-                file = file.replace(".json", "");
-                sourceLangs.add(file.substring(0,1).toUpperCase(Locale.ROOT) + file.substring(1));
-            }
-            Log.d(logTag, "source languages found: " + sourceLangs);
-            return sourceLangs;
-        } catch (IOException e) {
-            Log.d(logTag, "Exception while iterating through lang data files:");
-            e.printStackTrace();
+        String[] files = context.getFilesDir().list();
+
+        if(files == null)
             return null;
+
+        sourceLangs.clear();
+        for(String file: files) {
+            Log.d(logTag, "found file " + file);
+            file = file.replace(".json", "");
+            sourceLangs.add(file.substring(0,1).toUpperCase(Locale.ROOT) + file.substring(1));
         }
+        Log.d(logTag, "source languages found: " + sourceLangs);
+        return sourceLangs;
     }
 
     public ArrayList<String> getAvailableSourceLanguages() {

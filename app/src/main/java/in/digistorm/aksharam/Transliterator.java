@@ -21,6 +21,7 @@
 package in.digistorm.aksharam;
 
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -78,7 +79,18 @@ public class Transliterator {
     }
 
     public Transliterator(Context context) {
-        this("kannada", context);
+        // called the constructor without any input lang, find one
+        // files are downloaded, this constructor is called in MainActivity. Since no "default"
+        // language is chosen yet, we choose one from the files list
+        String[] fileList = context.getFilesDir().list();
+        if(fileList.length > 0)
+            initialise(fileList[0].substring(0, fileList.length - 5), context);
+        else {
+            // should this happen? don't know if i can test this
+            // if no files are available, we restart the Initialisation activity
+            Intent intent = new Intent(context, InitialiseAppActivity.class);
+            context.startActivity(intent);
+        }
     }
 
     public Transliterator(String inputLang, Context context) {

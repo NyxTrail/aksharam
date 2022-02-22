@@ -53,7 +53,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Simple initialisation so that the app doesn't break on launch
+        // Simple initialisation, Transiliter(context) picks a language from the downloaded
+        // selection
         new Transliterator(getApplicationContext());
 
         pageCollectionAdapter = new PageCollectionAdapter(this);
