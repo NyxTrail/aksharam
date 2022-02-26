@@ -71,7 +71,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:enabled="false"
-            android:text="@string/test_text" />
+            android:text="@string/initialise_act_proceed_button" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

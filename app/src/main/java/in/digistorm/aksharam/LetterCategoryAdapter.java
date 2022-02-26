@@ -41,7 +41,7 @@ import androidx.fragment.app.FragmentActivity;
 
 public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     private final FragmentActivity activity;
-    private final String logTag = getClass().getName();
+    private final String logTag = "LetterCategoryAdapter";
 
     private final String[] headers;
 

@@ -51,7 +51,7 @@ public class LanguageDataFileListAdapter extends RecyclerView.Adapter<LanguageDa
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Log.d(logTag, "Initialising adapter for Language Data File List...");
+        Log.d(logTag, "Initialising adapter for language data file list...");
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.language_data_file_list_item, parent, false);
         return new ViewHolder(view);

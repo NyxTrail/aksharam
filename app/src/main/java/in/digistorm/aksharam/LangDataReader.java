@@ -63,10 +63,6 @@ public class LangDataReader {
         return currentFile;
     }
 
-    public LangDataReader(Context context) {
-        this("kannada.json", context);
-    }
-
     public LangDataReader(String file, Context context) {
         Log.d(logTag, "Initialising lang data file: " + file);
         if(file == null)
@@ -212,11 +208,12 @@ public class LangDataReader {
             sourceLangs.add(file.substring(0,1).toUpperCase(Locale.ROOT) + file.substring(1));
         }
         Log.d(logTag, "source languages found: " + sourceLangs);
-        return sourceLangs;
+        // return a copy that clients can do whatever with
+        return new ArrayList<>(sourceLangs);
     }
 
     public ArrayList<String> getAvailableSourceLanguages() {
-        return sourceLangs;
+        return new ArrayList<>(sourceLangs);
     }
 
     public ArrayList<String> getDiacritics() {
@@ -298,7 +295,7 @@ public class LangDataReader {
         return "";
     }
 
-    // Read langdata from a file and return immediately
+    // Read langdata from a file and return the data immediately without loading it
     /*
     public JSONObject getLangData(String file, Context context) {
         return read(file, false, context);

@@ -72,7 +72,7 @@
             android:layout_height="wrap_content"
             android:text="@string/test_text"
             android:layout_marginTop="8dp"
-            android:src="@drawable/action_refresh"
+            android:src="@drawable/ic_baseline_refresh_24"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/PracticeTabPracticeTypeSpinner" />

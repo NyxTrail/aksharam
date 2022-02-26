@@ -20,6 +20,7 @@ package in.digistorm.aksharam;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -27,6 +28,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -35,6 +37,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import in.digistorm.aksharam.util.LanguageDataDownloader;
+import in.digistorm.aksharam.util.OnRequestCompleted;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -42,46 +45,17 @@ import org.json.JSONObject;
 
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 public class InitialiseAppActivity extends AppCompatActivity {
     private final String logTag = InitialiseAppActivity.class.getName();
 
-    // Remember, URLs must end in a '/' or Retrofit rebels
-    private static final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
-    private final BlockingDeque<Runnable> workQueue = new LinkedBlockingDeque<>();
-    // max idle time a thread is kept alive
-    private static final int KEEP_ALIVE_TIME = 20;
-    private static final TimeUnit KEEP_ALIVE_TIME_UNIT = TimeUnit.SECONDS;
-
-    ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(
-            NUMBER_OF_CORES,
-            NUMBER_OF_CORES,
-            KEEP_ALIVE_TIME,
-            KEEP_ALIVE_TIME_UNIT,
-            workQueue);
-
     private LanguageDataDownloader languageDataDownloader;
     private LanguageDataFileListAdapter adapter;
 
-    private class SimpleThreadFactory implements ThreadFactory {
-        private String name;
-
-        SimpleThreadFactory(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public Thread newThread(Runnable r) {
-            return new Thread(r, name);
-        }
-    }
-
     private void showLanguageDataSelectionList(JSONArray languageDataFiles) {
+        AppCompatActivity self = this;
+
         // This is called from the background thread; views can be updated only in the threads that
         // created them
         runOnUiThread(new Runnable() {
@@ -93,9 +67,9 @@ public class InitialiseAppActivity extends AppCompatActivity {
                 // Set the appropriate hint
                 ((TextView) findViewById(R.id.InitialiseAppHintTV)).setText(R.string.initialisation_choice_hint);
                 ConstraintLayout constraintLayout = findViewById(R.id.InitialiseAppCL);
-                RecyclerView languageDataListRV = new RecyclerView(getApplicationContext());
+                RecyclerView languageDataListRV = new RecyclerView(self);
                 languageDataListRV.setId("languageDataListRV".hashCode());
-                languageDataListRV.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+                languageDataListRV.setLayoutManager(new LinearLayoutManager(self));
                 adapter = new LanguageDataFileListAdapter(languageDataFiles);
                 languageDataListRV.setAdapter(adapter);
                 // RecyclerView.LayoutParams layoutParams = new RecyclerView.LayoutParams(0 , 0);
@@ -130,14 +104,15 @@ public class InitialiseAppActivity extends AppCompatActivity {
         });
     }
 
-    private void startMainActivity() {
+    private boolean startMainActivity() {
         Log.d(logTag, "Attempting to start main activity...");
         // First check if we have data files available
         // This cannot be null because, according to the doc list() returns null only if it is invoked
         // on a non-directory file
-        if(getApplicationContext().getFilesDir().list().length <= 0) {
+        if(getFilesDir().list().length <= 0) {
             Log.d(logTag, "No data files found!! Reverting to initialisation activity");
-            return;
+            // we cannot start the main activity
+            return false;
         }
 
         // Get a reference to current activity, to be passed to the intent
@@ -145,6 +120,8 @@ public class InitialiseAppActivity extends AppCompatActivity {
         Log.d(logTag, "Creating intent...");
         Intent intent = new Intent(activity, MainActivity.class);
         startActivity(intent);
+        // Main activity is started
+        return true;
     }
 
     public void proceed() {
@@ -160,29 +137,28 @@ public class InitialiseAppActivity extends AppCompatActivity {
             return ;
         }
 
-        Iterator<Integer> it = selectedFiles.keySet().iterator();
-        while(it.hasNext()) {
-            int index = it.next();
+        for (int index : selectedFiles.keySet()) {
             try {
-                if(selectedFiles.get(index)) {
+                if (selectedFiles.get(index)) {
                     JSONObject item = adapter.getItem(index);
                     Log.d(logTag, "Downloading " + item.getString("name"));
-                    threadPoolExecutor.execute(new Runnable() {
-                        @Override
-                        public void run() {
-                            try {
-                                languageDataDownloader.download(item.getString("name"),
-                                        item.getString("download_url"),
-                                        getApplicationContext());
-                                // start MainActivity
-                                startMainActivity();
-                            } catch (JSONException e) {
-                                Log.d(logTag, "JSONException caught while reading file "
-                                        + "list during download");
-                                e.printStackTrace();
-                            }
-                        }
-                    });
+                    Activity activity = this;
+                    languageDataDownloader.download(item.getString("name"),
+                            item.getString("download_url"),
+                            this, new OnRequestCompleted() {
+                                @Override
+                                public void onDownloadCompleted() {
+                                    startMainActivity();
+                                    finish();
+                                }
+
+                                @Override
+                                public void onDownloadFailed(Exception e) {
+                                    Toast.makeText(activity, R.string.could_not_download_file, Toast.LENGTH_LONG).show();
+                                    Log.d(logTag, "Download failed due to exception: " + e.getMessage());
+                                    e.printStackTrace();
+                                }
+                            });
                 }
             } catch (JSONException e) {
                 Log.d(logTag, "JSONException caught while reading file list during download");
@@ -196,20 +172,32 @@ public class InitialiseAppActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Log.d(logTag, "Starting app...");
+        GlobalSettings.createInstance();
         // Attempt to start main activity
-        startMainActivity();
+        boolean attempt = startMainActivity();
+        if(!attempt) {
+            // if we are not able to start the main activity...
+            // continue setting up the initialisation activity (current activity)
+            setContentView(R.layout.initialise_app_activity);
 
-        setContentView(R.layout.initialise_app_activity);
+            languageDataDownloader = new LanguageDataDownloader();
 
-        languageDataDownloader = new LanguageDataDownloader();
-
-        threadPoolExecutor.setThreadFactory(new SimpleThreadFactory("LanguageDataDownloader"));
-        threadPoolExecutor.execute(new Runnable() {
-            @Override
-            public void run() {
-                showLanguageDataSelectionList(languageDataDownloader.getLanguageDataFiles());
-            }
-        });
-        ((Button) findViewById(R.id.InitialiseAppProceedButton)).setOnClickListener(v -> proceed());
+            GlobalSettings.getInstance().getThreadPoolExecutor().execute(new Runnable() {
+                @Override
+                public void run() {
+                    showLanguageDataSelectionList(languageDataDownloader.getLanguageDataFiles());
+                }
+            });
+            ((Button) findViewById(R.id.InitialiseAppProceedButton)).setOnClickListener(v -> proceed());
+        }
+        else
+            finish();
     }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
+    }
+
 }

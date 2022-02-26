@@ -63,6 +63,18 @@
     <string name="practice_tab_practice_input_hint">Enter Text In %s</string>
     <string name="practice_tab_correct_text_entered">You got it!</string>
 
+    <!-- strings for settings activity -->
+    <string name="settings_activity_manage_languages_hint">Manage Languages</string>
+    <string name="could_not_download_file_list">
+        Could not download file list from the internet. Showing local files only.
+    </string>
+    <string name="could_not_download_file">
+        Could not download file from the internet. Please try again later.
+    </string>
+    <string name="delete_button">Delete button</string>
+    <string name="download_button">Download button</string>
+
+    <string name="settings">Settings</string>
     <string-array name="language_selection_spinner">
         <item>Malayalam</item>
         <item>Hindi</item>

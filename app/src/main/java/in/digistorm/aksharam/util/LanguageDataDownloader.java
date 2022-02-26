@@ -20,16 +20,17 @@ package in.digistorm.aksharam.util;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import in.digistorm.aksharam.GlobalSettings;
+
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -48,7 +49,7 @@ import retrofit2.http.GET;
 
 public class LanguageDataDownloader {
     private final String baseUrl = "https://git.digistorm.in/api/v1/repos/alan/aksharam-data/";
-    private final String logTag = LanguageDataDownloader.class.getName();
+    private final String logTag = "LanguageDataDownloader";
 
     private final OkHttpClient okHttpClient;
 
@@ -78,7 +79,9 @@ public class LanguageDataDownloader {
     }
 
     // returns true on success and false on failure
-    public boolean download(String fileName, String URL,@NonNull Context context) {
+    public void download(String fileName, String URL,
+                            @NonNull Activity activity,
+                            OnRequestCompleted callback) {
         Request request = new Request.Builder()
                 .url(URL)
                 .method("GET",  null)
@@ -88,26 +91,32 @@ public class LanguageDataDownloader {
                 .build();
         okhttp3.Call call = okHttpClient.newCall(request);
 
-        try {
-            Response response = call.execute();
-            String responseString = response.body().string();
-            // Let's log only first 100 characters of the file here
-            Log.d(logTag, "Obtained response: " + responseString.substring(0, 100) + "...");
+        GlobalSettings.getInstance().getThreadPoolExecutor().execute(() -> {
+            try {
+                Response response;
+                response = call.execute();
+                if(response.body() == null)
+                    throw new IOException("Obtained empty body.");
+                String responseString = response.body().string();
+                // Let's log only first 100 characters of the file here
+                Log.d(logTag, "Obtained response: " + responseString.substring(0, 100) + "...");
 
-            FileOutputStream fos = context.openFileOutput(fileName, Context.MODE_PRIVATE);
-            Log.d(logTag, "Saving file to " + context.getFilesDir().getName() + "/" + fileName);
-            fos.write(responseString.getBytes(StandardCharsets.UTF_8));
-            fos.close();
-        } catch (FileNotFoundException fe) {
-            Log.d(logTag, "FileNotFoundException caught while trying to save file: ");
-            fe.printStackTrace();
-        } catch (IOException e) {
-            Log.d(logTag, "IOException while downloading " + URL);
-            e.printStackTrace();
-        }
+                FileOutputStream fos = activity.openFileOutput(fileName, Context.MODE_PRIVATE);
+                Log.d(logTag, "Saving file to " + activity.getFilesDir().getName() + "/" + fileName);
+                fos.write(responseString.getBytes(StandardCharsets.UTF_8));
+                fos.close();
 
-        // File file = new File(context.getFilesDir(), )
-        return true;
+                activity.runOnUiThread(callback::onDownloadCompleted);
+            } catch (FileNotFoundException fe) {
+                Log.d(logTag, "FileNotFoundException caught while trying to save file: ");
+                fe.printStackTrace();
+                callback.onDownloadFailed(fe);
+            } catch (IOException ie) {
+                Log.d(logTag, "IOException while downloading " + URL);
+                ie.printStackTrace();
+                callback.onDownloadFailed(ie);
+            }
+        });
     }
 
     public LanguageDataDownloader() {
@@ -126,7 +135,6 @@ public class LanguageDataDownloader {
                 .build();
         GiteaAPI giteaAPI = retrofit.create(GiteaAPI.class);
 
-        Log.d(logTag, logTag);
         Log.d(logTag, " Fetching language data files from git repo.");
         String responseString;
         retrofit2.Response<ResponseBody> response = null;
@@ -134,14 +142,16 @@ public class LanguageDataDownloader {
             // response body from okhttp can be consumed only once:
             // https://square.github.io/okhttp/4.x/okhttp/okhttp3/-response-body/#the-response-body-can-be-consumed-only-once
             response = giteaAPI.getContents().execute();
+            if(response.body() == null)
+                throw new IOException("Obtained empty body.");
             responseString = response.body().string();
             Log.d(logTag, responseString);
             return new JSONArray(responseString);
         } catch (IOException | JSONException e) {
             if(e instanceof IOException)
-                Log.d(logTag, "IOException caught while making request to " + response.raw().request().url());
+                Log.d(logTag, "IOException caught while fetching language data file list.");
             else
-                Log.d(logTag, "JSONException caught while reading response from " + response.raw().request().url());
+                Log.d(logTag, "JSONException caught while fetching data file list.");
             e.printStackTrace();
             return null;
         }

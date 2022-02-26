@@ -47,7 +47,9 @@ import java.util.Random;
 import java.util.Set;
 
 public class PracticeTabFragment extends Fragment {
-    private final String logTag = this.getClass().getName();
+    private final String logTag = "PracticeTabFragment";
+
+    private Spinner practiceTabLangSpinner;
 
     private String language;
     private Transliterator transliterator;
@@ -131,7 +133,7 @@ public class PracticeTabFragment extends Fragment {
     }
 
     public void initialisePracticeTabLangSpinner(View v) {
-        Spinner practiceTabLangSpinner = v.findViewById(R.id.PracticeTabLangSpinner);
+        practiceTabLangSpinner = v.findViewById(R.id.PracticeTabLangSpinner);
 
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
@@ -139,9 +141,22 @@ public class PracticeTabFragment extends Fragment {
                 Transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_lang_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
+        adapter.setNotifyOnChange(true);
         practiceTabLangSpinner.setAdapter(adapter);
         practiceTabLangSpinner.setSelection(0);
 
+        GlobalSettings.getInstance().addDataFileListChangedListener(() -> {
+            Log.d(logTag, "Change in data files detected. Updating adapter.");
+            adapter.clear();
+            // Invoke getAvailableSourceLanguages without Context object so that it does not
+            // read the files again. The changed files have already been read into
+            // LangDataReader when it was changed by the SettingsLanguageListAdapter
+            adapter.addAll(Transliterator.getLangDataReader().getAvailableSourceLanguages());
+            // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
+            // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
+            // think of to fix this
+            practiceTabLangSpinner.setAdapter(adapter);
+        });
         practiceTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {

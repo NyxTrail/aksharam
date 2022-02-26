@@ -37,11 +37,11 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 public class TransliterateTabFragment extends Fragment {
-    private String targetLanguage = "ml";
+    private String targetLanguage;
     private Transliterator tr;
     private boolean sourceChanged = true;
 
-    private final String logTag = getClass().getName();
+    private final String logTag = "TransTabFragment";
 
     @Nullable
     @Override
@@ -88,6 +88,10 @@ public class TransliterateTabFragment extends Fragment {
         Spinner languageSelectionSpinner = view.findViewById(R.id.LanguageSelectionSpinner);
         languageSelectionSpinner.setEnabled(false);
         languageSelectionSpinner.setAlpha(0.3f);
+
+        GlobalSettings.getInstance().addDataFileListChangedListener(() -> {
+            initialiseSpinner(view);
+        });
     }
 
     public void transliterateButtonOnClick(View view) {
@@ -141,7 +145,7 @@ public class TransliterateTabFragment extends Fragment {
         });
 
         if(tr == null) {
-            tr = new Transliterator(adapter.getItem(0), getContext());
+            tr = Transliterator.getDefaultTransliterator(getContext());
         }
     }
 }

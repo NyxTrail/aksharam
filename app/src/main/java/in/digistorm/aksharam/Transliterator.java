@@ -34,32 +34,21 @@ import java.util.Map;
 // This class is responsible for the actual transliteration
 public class Transliterator {
     // The JSON mapping used to transliterate
-    private static final String logTag = Transliterator.class.getName();
+    private static final String logTag = "Transliterator";
 
     // The backing langDataReader for all tabs
     private static LangDataReader langDataReader;
     // listeners for users of Transliterator so that they can adapt
     // when backing LangDataReader changes
-    private static ArrayList<OnLangDataReaderChanged> listeners;
-
+    private static Transliterator  currentTransliterator;
     public static LangDataReader getLangDataReader() {
         return langDataReader;
     }
 
-    public void registerListener(OnLangDataReaderChanged listener) {
-        if(listeners == null)
-            listeners = new ArrayList<>();
-
-        listeners.add(listener);
-    }
-
-    private static void invokeListeners() {
-        if(listeners == null)
-            return ;
-
-        for(OnLangDataReaderChanged listener: listeners) {
-            listener.onLangDataReaderChanged();
-        }
+    public static Transliterator getDefaultTransliterator(Context context) {
+        if(currentTransliterator == null)
+            new Transliterator(context);
+        return currentTransliterator;
     }
 
     public String getCurrentLang() {
@@ -75,7 +64,7 @@ public class Transliterator {
     private void initialise(String inputLang, Context context) {
         Log.d(logTag, "Initialising transliterator for: " + inputLang);
         langDataReader = new LangDataReader(LangDataReader.getLangFile(inputLang), context);
-        invokeListeners();
+        currentTransliterator = this;
     }
 
     public Transliterator(Context context) {
@@ -83,12 +72,18 @@ public class Transliterator {
         // files are downloaded, this constructor is called in MainActivity. Since no "default"
         // language is chosen yet, we choose one from the files list
         String[] fileList = context.getFilesDir().list();
-        if(fileList.length > 0)
-            initialise(fileList[0].substring(0, fileList.length - 5), context);
+        if(fileList.length > 0) {
+            Log.d(logTag, "Found language file: " + fileList[0] + "... Initialising it.");
+            // fileList.length - ".json".length
+            initialise(fileList[0].substring(0, fileList[0].length() - 5), context);
+        }
         else {
             // should this happen? don't know if i can test this
             // if no files are available, we restart the Initialisation activity
+            // TODO: is this the right place to do this? in Transliterator class?
+            Log.d(logTag, "All files deleted. Starting InitialiseAppActivity");
             Intent intent = new Intent(context, InitialiseAppActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
     }
@@ -97,11 +92,7 @@ public class Transliterator {
         initialise(inputLang, context);
     }
 
-    public Transliterator(String inputLang, OnLangDataReaderChanged listener, Context context) {
-        registerListener(listener);
-        initialise(inputLang, context);
-    }
-
+    // TODO: move file reading stuff to LangDataReader, Transliterator shouldn't be reading files
     public String detectLanguage(String input, Context context) {
         Log.d(logTag, "Detecting language for " + input);
 
@@ -112,35 +103,30 @@ public class Transliterator {
         for (Iterator<String> it = langDataReader.getLangData().keys(); it.hasNext(); ) {
             characters.add(it.next());
         }
-        languages.put(langDataReader.getCurrentLang(), (ArrayList<String>) characters.clone());
+        languages.put(langDataReader.getCurrentLang(), new ArrayList<String>(characters));
 
         JSONObject langData = null;
         Log.d(logTag, languages.toString());
-        try {
-            // for each lang file that is not currentFile, add its characters to the hashmap
-            for(String file: context.getAssets().list("languages/")) {
-                Log.d(logTag, "Reading file " + file);
 
-                // ignore the currently loaded file
-                if (file.equals(langDataReader.getCurrentFile()))
-                    continue;
+        // for each lang file that is not currentFile, add its characters to the hashmap
+        for(String file: context.getFilesDir().list()) {
+            Log.d(logTag, "Reading file " + file);
 
-                langDataReader = new LangDataReader(file, context);
-                invokeListeners();
+            // ignore the currently loaded file
+            if (file.equals(langDataReader.getCurrentFile()))
+                continue;
 
-                langData = langDataReader.getLangData();
-                characters.clear();
-                for(Iterator<String> it = langData.keys(); it.hasNext(); ) {
-                    characters.add(it.next());
-                }
-                // associate the hashmap with a clone of the value so that changes to the value
-                // in future iterations are not picked up in the hashmap
-                languages.put(langDataReader.getCurrentLang(), (ArrayList<String>) characters.clone());
+            langDataReader = new LangDataReader(file, context);
+
+            langData = langDataReader.getLangData();
+            characters.clear();
+            for(Iterator<String> it = langData.keys(); it.hasNext(); ) {
+                characters.add(it.next());
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+            // associate the hashmap with a clone of the value so that changes to the value
+            // in future iterations are not picked up in the hashmap
+            languages.put(langDataReader.getCurrentLang(), new ArrayList<>(characters));
         }
-
         Log.d(logTag, "languages loaded: " + languages);
         // now, we attempt to detect the input language
         String[] langs = languages.keySet().toArray(new String[0]);

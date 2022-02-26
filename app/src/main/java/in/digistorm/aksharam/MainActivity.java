@@ -26,11 +26,13 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Spinner;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -39,13 +41,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private ViewPager2 viewPager;
     private static PageCollectionAdapter pageCollectionAdapter;
     private int tabPosition;
-    private String logTag = MainActivity.class.getName();
+    private String logTag = "MainActivity";
 
     public static void replaceTabFragment(int index, Fragment fragment) {
         pageCollectionAdapter.replaceFragment(index, fragment);
-    }
-
-    public static void setActionBarBackButton(boolean enabled) {
     }
 
     @Override
@@ -53,7 +52,8 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Simple initialisation, Transiliter(context) picks a language from the downloaded
+        Log.d(logTag, "Initialising transliterator...");
+        // Simple initialisation, Transliterator(context) picks a language from the downloaded
         // selection
         new Transliterator(getApplicationContext());
 
@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         );
         tabLayoutMediator.attach();
 
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar myToolbar = (Toolbar) findViewById(R.id.MainActivityToolbar);
         setSupportActionBar(myToolbar);
         // getSupportActionBar().setDisplayOptions(0, ActionBar.D);
         // ActionBar actionBar = getSupportActionBar();
@@ -83,10 +83,11 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        // getSupportActionBar().getDisplayOptions();
-        Log.d(logTag, "menuItem is: " + item.toString());
-        Log.d(logTag, "menuItem id is: " + item.getItemId());
-        // findViewById(ActionMenuItem).getS
+        Log.d(logTag, "menuItem clicked: " + item.toString() + " , id: " + item.getItemId());
+        if(item.getItemId() == R.id.action_bar_settings) {
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -111,6 +112,19 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     public void onBackPressed() {
         if (!pageCollectionAdapter.restoreFragment(tabPosition))
             super.onBackPressed();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // if there are no downloaded files, switch to Initialisation activity
+        if(getFilesDir().list().length == 0) {
+            Log.d(logTag, "No files found in data directory. Switching to initialisation activity.");
+            Intent intent = new Intent(this, InitialiseAppActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+            startActivity(intent);
+        }
     }
 
     @Override

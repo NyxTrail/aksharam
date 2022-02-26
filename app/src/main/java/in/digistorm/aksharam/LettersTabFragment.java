@@ -37,36 +37,20 @@ import androidx.fragment.app.Fragment;
 import java.util.Locale;
 
 public class LettersTabFragment extends Fragment {
-    private String logTag = getClass().getName();
+    private String logTag = "LettersTabFragment";
 
     private ExpandableListView categoriesList;
 
     // The main language for which letters are displayed
-    private String language = "Kannada";
+    private String language;
     // The target language to transliterate to
-    private String targetLanguage = "ml";
+    private String targetLanguage;
 
     private Transliterator transliterator;
 
     private LabelledArrayAdapter<String> adapter;
     private Spinner lettersTabLangSpinner;
-
-    public class AdapterNotifier implements OnLangDataReaderChanged{
-        @Override
-        public void onLangDataReaderChanged() {
-            Log.d(logTag, "onLangDataReaderChanged invoked!");
-
-            // First set LettersTabLangSpinner correctly
-            if(lettersTabLangSpinner != null) {
-                String currentLang = Transliterator.getLangDataReader().getCurrentLang();
-                currentLang = currentLang.substring(0, 1).toUpperCase(Locale.ROOT) +
-                        currentLang.substring(1);
-                Log.d(logTag, "onLangDataReaderChanged: current lang is " + currentLang);
-                int index = Transliterator.getLangDataReader().getAvailableSourceLanguages().indexOf(currentLang);
-                lettersTabLangSpinner.setSelection(index);
-            }
-        }
-    }
+    private boolean shouldUpdateSpinner = false;
 
     public void setLettersTabFragmentLanguage(String lang) {
         // should add some sanity checks here
@@ -94,7 +78,7 @@ public class LettersTabFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         if (transliterator == null)
-            transliterator = new Transliterator(language, new AdapterNotifier(), getContext());
+            transliterator = Transliterator.getDefaultTransliterator(getContext());
 
         return inflater.inflate(R.layout.letters_layout, container, false);
     }
@@ -128,13 +112,27 @@ public class LettersTabFragment extends Fragment {
                 Transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
                 R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
+        adapter.setNotifyOnChange(true);
         lettersTabLangSpinner.setAdapter(adapter);
         lettersTabLangSpinner.setSelection(0);
         LettersTabFragment ltf = this;
+        GlobalSettings.getInstance().addDataFileListChangedListener(() -> {
+            Log.d(logTag, "Marked shouldUpdateSpinner true");
+            adapter.clear();
+            // Invoke getAvailableSourceLanguages without Context object so that it does not
+            // read the files again. The changed files have already been read into
+            // LangDataReader when it was changed by the SettingsLanguageListAdapter
+            adapter.addAll(Transliterator.getLangDataReader().getAvailableSourceLanguages());
+            // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
+            // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
+            // think of to fix this
+            lettersTabLangSpinner.setAdapter(adapter);
+        });
         lettersTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 language = parent.getItemAtPosition(position).toString();
+                Log.d("LangSpinner", "Item selected " + language);
                 // re-initialising Transliterator is not necessary if it already has been
                 // re-initialised. We can know this is the case by checking the currently loaded
                 // language
@@ -178,7 +176,7 @@ public class LettersTabFragment extends Fragment {
         lettersTabTransSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Log.d(logTag, "item selected: " + parent.getItemAtPosition(position).toString());
+                Log.d("TransSpinner", "item selected: " + parent.getItemAtPosition(position).toString());
                 targetLanguage = parent.getItemAtPosition(position).toString();
             }
 
