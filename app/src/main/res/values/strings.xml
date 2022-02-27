@@ -73,6 +73,7 @@
     </string>
     <string name="delete_button">Delete button</string>
     <string name="download_button">Download button</string>
+    <string name="dark_light_mode">Dark/Light Mode</string>
 
     <string name="settings">Settings</string>
     <string-array name="language_selection_spinner">

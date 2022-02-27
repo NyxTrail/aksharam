@@ -2,7 +2,6 @@
 <resources>
     <style name="drop_down_style"
         parent="android:Widget.Material.Spinner">
-        <item name="android:popupBackground">@drawable/drop_down_background</item>
         <item name="android:textAlignment">center</item>
     </style>
 </resources>

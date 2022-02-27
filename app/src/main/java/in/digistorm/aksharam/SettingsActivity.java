@@ -81,8 +81,8 @@ public class SettingsActivity extends AppCompatActivity {
         Log.d(logTag, "Setting up the settings activity...");
         setContentView(R.layout.settings_activity);
 
-        Toolbar toolbar = findViewById(R.id.SettingsActivityToolbar);
-        setSupportActionBar(toolbar);
+        // Toolbar toolbar = findViewById(R.id.SettingsActivityToolbar);
+        // setSupportActionBar(toolbar);
 
         populateLanguageList();
     }

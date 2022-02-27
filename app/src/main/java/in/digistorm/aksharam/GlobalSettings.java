@@ -20,6 +20,9 @@ package in.digistorm.aksharam;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import android.content.Context;
+import android.preference.PreferenceManager;
+
 import java.util.ArrayList;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -29,6 +32,9 @@ import java.util.concurrent.TimeUnit;
 
 public class GlobalSettings {
     private static GlobalSettings globalSettings;
+
+    // Dark/Light mode
+    private boolean darkMode;
 
     // Remember, URLs must end in a '/' or Retrofit rebels
     private final int NUMBER_OF_CORES = Runtime.getRuntime().availableProcessors();
@@ -60,9 +66,10 @@ public class GlobalSettings {
 
     private final ArrayList<DataFileListChanged> dataFileListChangedListeners;
 
-    private GlobalSettings() {
+    private GlobalSettings(Context context) {
         threadPoolExecutor.setThreadFactory(new SimpleThreadFactory());
         dataFileListChangedListeners = new ArrayList<>();
+        darkMode = context.getSharedPreferences("dark_mode", Context.MODE_PRIVATE).getBoolean("dark_mode", false);
     }
 
     // this must be called at the point where there is a change in the data file list
@@ -77,13 +84,24 @@ public class GlobalSettings {
         dataFileListChangedListeners.add(l);
     }
 
+
+    public void setDarkMode(boolean v, Context context) {
+        darkMode = v;
+        context.getSharedPreferences("dark_mode", Context.MODE_PRIVATE).edit()
+                .putBoolean("dark_mode", v).apply();
+    }
+
+    public boolean getDarkMode() {
+        return darkMode;
+    }
+
     public ThreadPoolExecutor getThreadPoolExecutor() {
         return threadPoolExecutor;
     }
 
     // this method should be called only once in the entire project
-    public static GlobalSettings createInstance() {
-        globalSettings = new GlobalSettings();
+    public static GlobalSettings createInstance(Context context) {
+        globalSettings = new GlobalSettings(context);
         return globalSettings;
     }
 

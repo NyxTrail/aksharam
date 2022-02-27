@@ -34,18 +34,17 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".InitialiseAppActivity"
+        android:theme="@style/Theme.AksharamTheme">
+        <activity android:name="in.digistorm.aksharam.InitialiseAppActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity"
+        <activity android:name="in.digistorm.aksharam.MainActivity"
             android:windowSoftInputMode="adjustPan"/>
-        <activity android:name=".SettingsActivity"
+        <activity android:name="in.digistorm.aksharam.SettingsActivity"
             android:windowSoftInputMode="adjustPan"/>
     </application>
 </manifest>

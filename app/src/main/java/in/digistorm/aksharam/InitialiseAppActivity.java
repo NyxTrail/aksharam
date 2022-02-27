@@ -21,6 +21,7 @@ package in.digistorm.aksharam;
  */
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -172,7 +174,12 @@ public class InitialiseAppActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Log.d(logTag, "Starting app...");
-        GlobalSettings.createInstance();
+        GlobalSettings.createInstance(this);
+        if(GlobalSettings.getInstance().getDarkMode())
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+        else
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+
         // Attempt to start main activity
         boolean attempt = startMainActivity();
         if(!attempt) {

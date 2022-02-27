@@ -22,17 +22,17 @@ package in.digistorm.aksharam;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.viewpager2.widget.ViewPager2;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Spinner;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
@@ -52,6 +52,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if(GlobalSettings.getInstance() == null)
+            GlobalSettings.createInstance(this);
+
         Log.d(logTag, "Initialising transliterator...");
         // Simple initialisation, Transliterator(context) picks a language from the downloaded
         // selection
@@ -67,11 +70,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
                 tabConfigurationStrategy()
         );
         tabLayoutMediator.attach();
-
-        Toolbar myToolbar = (Toolbar) findViewById(R.id.MainActivityToolbar);
-        setSupportActionBar(myToolbar);
-        // getSupportActionBar().setDisplayOptions(0, ActionBar.D);
-        // ActionBar actionBar = getSupportActionBar();
     }
 
     @Override
@@ -83,10 +81,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(logTag, "menuItem clicked: " + item.toString() + " , id: " + item.getItemId());
+        Log.d(logTag, "menuItem clicked: " + item + " , id: " + item.getItemId());
         if(item.getItemId() == R.id.action_bar_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
+        } else if(item.getItemId() == R.id.dark_light_mode) {
+            GlobalSettings.getInstance().setDarkMode(!GlobalSettings.getInstance().getDarkMode(), this);
+            int mode = GlobalSettings.getInstance().getDarkMode() ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
+            AppCompatDelegate.setDefaultNightMode(mode);
         }
 
         return super.onOptionsItemSelected(item);

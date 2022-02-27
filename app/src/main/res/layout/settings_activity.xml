@@ -29,15 +29,6 @@
     android:orientation="vertical"
     android:fillViewport="true">
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/SettingsActivityToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-        app:menu="@menu/action_bar_menu"
-        android:background="@color/cardview_light_background"
-        android:elevation="4dp"/>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
