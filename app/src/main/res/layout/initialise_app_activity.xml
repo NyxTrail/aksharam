@@ -53,6 +53,17 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/InitialiseAppHintTV" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/InitialiseAppLangListRV"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintTop_toBottomOf="@+id/InitialiseAppProgressBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/InitialiseAppButtonsLL"/>
+
     <LinearLayout
         android:id="@+id/InitialiseAppButtonsLL"
         android:layout_width="0dp"

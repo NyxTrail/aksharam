@@ -56,7 +56,7 @@ public class InitialiseAppActivity extends AppCompatActivity {
     private LanguageDataFileListAdapter adapter;
 
     private void showLanguageDataSelectionList(JSONArray languageDataFiles) {
-        AppCompatActivity self = this;
+        InitialiseAppActivity self = this;
 
         // This is called from the background thread; views can be updated only in the threads that
         // created them
@@ -68,38 +68,11 @@ public class InitialiseAppActivity extends AppCompatActivity {
                 findViewById(R.id.InitialiseAppProgressBar).setVisibility(View.INVISIBLE);
                 // Set the appropriate hint
                 ((TextView) findViewById(R.id.InitialiseAppHintTV)).setText(R.string.initialisation_choice_hint);
-                ConstraintLayout constraintLayout = findViewById(R.id.InitialiseAppCL);
-                RecyclerView languageDataListRV = new RecyclerView(self);
-                languageDataListRV.setId("languageDataListRV".hashCode());
-                languageDataListRV.setLayoutManager(new LinearLayoutManager(self));
+
+                RecyclerView languageListRV = findViewById(R.id.InitialiseAppLangListRV);
                 adapter = new LanguageDataFileListAdapter(languageDataFiles);
-                languageDataListRV.setAdapter(adapter);
-                // RecyclerView.LayoutParams layoutParams = new RecyclerView.LayoutParams(0 , 0);
-                ConstraintLayout.LayoutParams layoutParams = new ConstraintLayout.LayoutParams(0, 0);
-
-                int marginLeftRight = (int) TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        16,
-                        getApplicationContext().getResources().getDisplayMetrics());
-                int marginTopBottom = (int) TypedValue.applyDimension(
-                        TypedValue.COMPLEX_UNIT_DIP,
-                        8,
-                        getApplicationContext().getResources().getDisplayMetrics());
-                layoutParams.setMargins(marginLeftRight, marginTopBottom, marginLeftRight, marginTopBottom);
-                languageDataListRV.setLayoutParams(layoutParams);
-                languageDataListRV.setVerticalScrollBarEnabled(true);
-                constraintLayout.addView(languageDataListRV);
-
-                ConstraintSet constraintSet = new ConstraintSet();
-                constraintSet.clone(constraintLayout);
-                // it is possible to add a margin here, as the last parameter
-                constraintSet.connect(languageDataListRV.getId(), ConstraintSet.TOP, R.id.InitialiseAppProgressBar, ConstraintSet.BOTTOM);
-                constraintSet.connect(languageDataListRV.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
-                constraintSet.connect(languageDataListRV.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
-                constraintSet.connect(languageDataListRV.getId(), ConstraintSet.BOTTOM, R.id.InitialiseAppButtonsLL, ConstraintSet.TOP);
-
-                constraintSet.applyTo(constraintLayout);
-                Log.d(logTag, languageDataListRV.getLayoutManager().toString());
+                languageListRV.setLayoutManager(new LinearLayoutManager(self));
+                languageListRV.setAdapter(adapter);
 
                 ((Button) findViewById(R.id.InitialiseAppProceedButton)).setEnabled(true);
             }
