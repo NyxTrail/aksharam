@@ -23,12 +23,12 @@
  -->
 
 <androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -69,25 +69,27 @@
             android:id="@+id/PracticeTabRefreshButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/test_text"
-            android:layout_marginTop="8dp"
-            android:src="@drawable/ic_baseline_refresh_24"
+            android:layout_marginEnd="16dp"
+            android:elevation="5dp"
+            android:minWidth="48dp"
+            android:minHeight="48dp"
+            android:theme="@style/RoundedImageButton"
+            android:src="@drawable/ic_outline_refresh_24"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/PracticeTabPracticeTypeSpinner" />
+            app:layout_constraintTop_toBottomOf="@+id/PracticeTabPracticeInSpinner" />
 
         <TextView
             android:id="@+id/PracticeTabPracticeTextTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
             android:gravity="center"
             android:padding="4dp"
-            android:textSize="20sp"
             android:text="@string/test_text"
+            android:textSize="20sp"
+            android:layout_marginTop="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/PracticeTabRefreshButton" />
+            app:layout_constraintTop_toBottomOf="@+id/PracticeTabPracticeTypeSpinner" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/PracticeTabInputTIL"

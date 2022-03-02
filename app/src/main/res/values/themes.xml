@@ -34,5 +34,12 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <!-- Shape for small components like buttons -->
+        <item name="materialButtonStyle">@style/RoundedImageButton</item>
+    </style>
+    <style name="RoundedImageButton" parent="Widget.MaterialComponents.Button">
+        <item name="theme">@style/Theme.AksharamTheme</item>
+        <item name="cornerFamily">cut</item>
+        <item name="cornerSize">4dp</item>
     </style>
 </resources>

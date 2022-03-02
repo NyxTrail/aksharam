@@ -76,17 +76,20 @@ public class PracticeTabFragment extends Fragment {
 
             if(transliteratedString.equals(s.toString())) {
                 clearInput();
+                practiceTextTV.setText(Html.fromHtml("<font color=\"#7FFF00\">"
+                        + practiceString + "</font>"));
                 Toast.makeText(getContext(), R.string.practice_tab_correct_text_entered,
                         Toast.LENGTH_SHORT).show();
-                startPractice();
+                getActivity().findViewById(R.id.PracticeTabInputTIET).setEnabled(false);
                 return;
             }
 
             int i;
+            markup.append("<font color=\"#7FFF00\">");
             for(i = 0; i < transliteratedString.length() && i < s.length(); i++) {
                 if(transliteratedString.charAt(i) == s.charAt(i)) {
                     if(!correctInProgress) {
-                        markup.append("</strong>");
+                        markup.append("</font><font color=\"#7FFF00\">");
                         correctInProgress = true;
                     }
                     markup.append(practiceString.charAt(i));
@@ -94,14 +97,14 @@ public class PracticeTabFragment extends Fragment {
                 else {
                     if(correctInProgress) {
                         correctInProgress = false;
-                        markup.append("<strong>");
+                        markup.append("</font><font color=\"#DC143C\">");
                     }
                     markup.append(practiceString.charAt(i));
                 }
             }
-            if(!correctInProgress)
-                markup.append("</strong>");
+            markup.append("</font>");
             markup.append(practiceString.substring(i));
+            Log.d(logTag, "Marked up string: " + markup);
 
             practiceTextTV.setText(Html.fromHtml(markup.toString()));
         }
@@ -127,6 +130,7 @@ public class PracticeTabFragment extends Fragment {
         view.findViewById(R.id.PracticeTabRefreshButton).setOnClickListener(v -> {
             clearInput();
             startPractice();
+            view.findViewById(R.id.PracticeTabInputTIET).setEnabled(true);
         });
 
         initialisePracticeTabLangSpinner(view);
@@ -378,7 +382,7 @@ public class PracticeTabFragment extends Fragment {
                 break;
             case "random ligatures":
                 int numConsonants = letters.get("consonants").size();
-                // get the sign for the virama
+                // get the sign for the Virama
                 for(int i = 0; i < 10; i++) {
                     // choose a random consonant
                     practiceString.append(letters.get("consonants")

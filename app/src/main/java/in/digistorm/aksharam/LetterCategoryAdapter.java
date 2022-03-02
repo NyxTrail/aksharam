@@ -162,18 +162,6 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
 
                 LetterInfoFragment letterInfoFragment = LetterInfoFragment.newInstance(letter, lettersTabFragment);
                 MainActivity.replaceTabFragment(0, letterInfoFragment);
-                /*
-                letterInfoFragment.show(activity
-                            .getSupportFragmentManager()
-                            // In class FragmentStateAdapter (extended by PageCollectionAdapter)
-                            // the tag for each fragment is set as:
-                            // "f" + holder.getItemId()
-                            // Letters tab is item id 0. So....
-                            .findFragmentByTag("f0")
-                            .getChildFragmentManager(),
-                        LetterInfoFragment.TAG);
-                 */
-
                 return true;
             });
 
