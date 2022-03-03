@@ -123,8 +123,11 @@ public class InitialiseAppActivity extends AppCompatActivity {
                             this, new OnRequestCompleted() {
                                 @Override
                                 public void onDownloadCompleted() {
-                                    startMainActivity();
-                                    finish();
+                                    // Start main activity only if all files have been downloaded
+                                    if(index == selectedFiles.size() - 1) {
+                                        startMainActivity();
+                                        finish();
+                                    }
                                 }
 
                                 @Override
@@ -154,8 +157,8 @@ public class InitialiseAppActivity extends AppCompatActivity {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
 
         // Attempt to start main activity
-        boolean attempt = startMainActivity();
-        if(!attempt) {
+        boolean mainActivityStarted = startMainActivity();
+        if(!mainActivityStarted) {
             // if we are not able to start the main activity...
             // continue setting up the initialisation activity (current activity)
             setContentView(R.layout.initialise_app_activity);

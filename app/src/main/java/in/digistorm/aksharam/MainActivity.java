@@ -126,6 +126,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             Intent intent = new Intent(this, InitialiseAppActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
             startActivity(intent);
+            finish();
         }
     }
 
