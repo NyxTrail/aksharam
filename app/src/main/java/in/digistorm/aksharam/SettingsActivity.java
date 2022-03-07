@@ -36,6 +36,7 @@ import in.digistorm.aksharam.util.LanguageDataDownloader;
 
 import org.json.JSONArray;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -56,21 +57,35 @@ public class SettingsActivity extends AppCompatActivity {
         // get files online
         GlobalSettings.getInstance().getThreadPoolExecutor().execute(() -> {
             LanguageDataDownloader languageDataDownloader = new LanguageDataDownloader();
-            JSONArray onlineFiles = languageDataDownloader.getLanguageDataFiles();
-
-            runOnUiThread(() -> {
-                if(onlineFiles == null) {
-                    // show Toast saying we could not download the files online
+            final JSONArray onlineFiles;
+            try {
+                onlineFiles = languageDataDownloader.getLanguageDataFiles();
+                runOnUiThread(() -> {
+                    if (onlineFiles == null) {
+                        // show Toast saying we could not download the files online
+                        Toast.makeText(self, R.string.could_not_download_file_list, Toast.LENGTH_LONG).show();
+                    }
+                    // hide the progress bar
+                    findViewById(R.id.SettingsActivityManageLanguagesPB).setVisibility(View.GONE);
+                    manageLanguagesRV.setVisibility(View.VISIBLE);
+                    Log.d(logTag, "Setting adapter for language list");
+                    manageLanguagesRV.setLayoutManager(new LinearLayoutManager(self));
+                    SettingsLanguageListAdapter manageLanguageListAdapter = new SettingsLanguageListAdapter(filesList, onlineFiles, this);
+                    manageLanguagesRV.setAdapter(manageLanguageListAdapter);
+                });
+            }
+            catch (IOException ie) {
+                runOnUiThread(() -> {
                     Toast.makeText(self, R.string.could_not_download_file_list, Toast.LENGTH_LONG).show();
-                }
-                // hide the progress bar
-                findViewById(R.id.SettingsActivityManageLanguagesPB).setVisibility(View.GONE);
-                manageLanguagesRV.setVisibility(View.VISIBLE);
-                Log.d(logTag, "Setting adapter for language list");
-                manageLanguagesRV.setLayoutManager(new LinearLayoutManager(self));
-                SettingsLanguageListAdapter manageLanguageListAdapter = new SettingsLanguageListAdapter(filesList, onlineFiles, this);
-                manageLanguagesRV.setAdapter(manageLanguageListAdapter);
-            });
+                    // hide the progress bar
+                    findViewById(R.id.SettingsActivityManageLanguagesPB).setVisibility(View.GONE);
+                    manageLanguagesRV.setVisibility(View.VISIBLE);
+                    Log.d(logTag, "Setting adapter for language list");
+                    manageLanguagesRV.setLayoutManager(new LinearLayoutManager(self));
+                    SettingsLanguageListAdapter manageLanguageListAdapter = new SettingsLanguageListAdapter(filesList, null, this);
+                    manageLanguagesRV.setAdapter(manageLanguageListAdapter);
+                });
+            }
         });
     }
 

@@ -71,6 +71,9 @@
     <string name="could_not_download_file">
         Could not download file from the internet. Please try again later.
     </string>
+    <string name="exit">exit</string>
+    <string name="retry_download">Retry Download</string>
+    <string name="no_internet">No Internet</string>
     <string name="delete_button">Delete button</string>
     <string name="download_button">Download button</string>
     <string name="dark_light_mode">Dark/Light Mode</string>

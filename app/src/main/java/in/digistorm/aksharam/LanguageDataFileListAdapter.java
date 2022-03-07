@@ -68,12 +68,22 @@ public class LanguageDataFileListAdapter extends RecyclerView.Adapter<LanguageDa
             holder.getCheckedTextView().setOnClickListener(v -> {
                 CheckedTextView checkedTextView = holder.getCheckedTextView();
                 checkedTextView.setChecked(!checkedTextView.isChecked());
-                selectedFiles.put(position, checkedTextView.isChecked());
+                try {
+                    dataFileList.getJSONObject(position).put("selected", checkedTextView.isChecked());
+                }
+                catch (JSONException je) {
+                    Log.d(logTag, "JSONException caught while inserting selection status into data file list");
+                    je.printStackTrace();
+                }
             });
         } catch (JSONException e) {
-            Log.d(logTag, "JSONException caught while processing data file list obtained from server");
+            Log.d(logTag, "JSONException caught while processing data file list obtained from server.");
             e.printStackTrace();
         }
+    }
+
+    public JSONArray getDataFileList() {
+        return dataFileList;
     }
 
     public JSONObject getItem(int position) throws JSONException {

@@ -22,6 +22,7 @@ package in.digistorm.aksharam;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -31,6 +32,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -45,15 +47,16 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Iterator;
+import java.io.IOException;
 import java.util.Map;
-import java.util.concurrent.ThreadFactory;
 
 public class InitialiseAppActivity extends AppCompatActivity {
     private final String logTag = InitialiseAppActivity.class.getName();
 
     private LanguageDataDownloader languageDataDownloader;
     private LanguageDataFileListAdapter adapter;
+
+    private AlertDialog dialog;
 
     private void showLanguageDataSelectionList(JSONArray languageDataFiles) {
         InitialiseAppActivity self = this;
@@ -85,7 +88,7 @@ public class InitialiseAppActivity extends AppCompatActivity {
         // This cannot be null because, according to the doc list() returns null only if it is invoked
         // on a non-directory file
         if(getFilesDir().list().length <= 0) {
-            Log.d(logTag, "No data files found!! Reverting to initialisation activity");
+            Log.d(logTag, "No data files found!! Continuing initialisation activity");
             // we cannot start the main activity
             return false;
         }
@@ -99,50 +102,106 @@ public class InitialiseAppActivity extends AppCompatActivity {
         return true;
     }
 
-    public void proceed() {
+    public void proceed(View v) {
         Log.d(logTag, "Proceed button clicked!");
 
         if(adapter == null || adapter.getItemCount() <= 0)
             return ;
 
-        Map<Integer, Boolean> selectedFiles = adapter.getSelectedFiles();
-        if(selectedFiles.size() <= 0) {
-            ((TextView) findViewById(R.id.InitialiseAppHintTV))
-                    .setText(R.string.initialisation_no_file_selected);
-            return ;
-        }
+        JSONArray dataFileList = adapter.getDataFileList();
+        for(int i = 0; i < dataFileList.length(); i++) {
+            if(dataFileList.optJSONObject(i).optBoolean("selected", false))
+                break;
 
-        for (int index : selectedFiles.keySet()) {
-            try {
-                if (selectedFiles.get(index)) {
-                    JSONObject item = adapter.getItem(index);
-                    Log.d(logTag, "Downloading " + item.getString("name"));
-                    Activity activity = this;
-                    languageDataDownloader.download(item.getString("name"),
-                            item.getString("download_url"),
-                            this, new OnRequestCompleted() {
-                                @Override
-                                public void onDownloadCompleted() {
-                                    // Start main activity only if all files have been downloaded
-                                    if(index == selectedFiles.size() - 1) {
-                                        startMainActivity();
-                                        finish();
-                                    }
-                                }
-
-                                @Override
-                                public void onDownloadFailed(Exception e) {
-                                    Toast.makeText(activity, R.string.could_not_download_file, Toast.LENGTH_LONG).show();
-                                    Log.d(logTag, "Download failed due to exception: " + e.getMessage());
-                                    e.printStackTrace();
-                                }
-                            });
-                }
-            } catch (JSONException e) {
-                Log.d(logTag, "JSONException caught while reading file list during download");
-                e.printStackTrace();
+            // if we have gone through all items in the list and not found a single item marked "selected"
+            if(i == dataFileList.length() - 1) {
+                // show a message
+                ((TextView) findViewById(R.id.InitialiseAppHintTV))
+                        .setText(R.string.initialisation_no_file_selected);
+                // and return
+                return ;
             }
         }
+
+        v.setEnabled(false);
+        findViewById(R.id.InitialiseAppProgressBar).setVisibility(View.VISIBLE);
+        languageDataDownloader.download(adapter.getDataFileList(),
+                this,
+                new OnRequestCompleted() {
+                    @Override
+                    public void onDownloadCompleted() {
+                        Log.d(logTag, "Download completed; starting MainActivity...");
+                        startMainActivity();
+                        Log.d(logTag, "InitialiseAppActivity finishing...");
+                        finish();
+                    }
+
+                    @Override
+                    public void onDownloadFailed(Exception e) {
+                        v.setEnabled(true);
+                        findViewById(R.id.InitialiseAppProgressBar).setVisibility(View.INVISIBLE);
+                        Toast.makeText(getApplicationContext(), R.string.could_not_download_file,
+                                Toast.LENGTH_LONG).show();
+                        Log.d(logTag, "Download failed due to exception " + e);
+                        e.printStackTrace();
+                    }
+                });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(logTag, "Activity destroying...");
+    }
+
+    public void showNoInternetDialog() {
+        Log.d("NoInternetDialog", "Showing NoInternetDialog.");
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        dialogBuilder.setMessage(R.string.could_not_download_file)
+                .setTitle(R.string.no_internet)
+                .setCancelable(false)
+                .setNegativeButton(R.string.exit, (dialog, which) -> {
+                    Log.d("NoInternetDialog", "Exit button was clicked");
+                    dialog.dismiss();
+                    finish();
+                })
+                .setPositiveButton(R.string.retry_download, (dialog, which) -> {
+                    setUpActivity();
+                })
+                .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        Log.d("NoInternetDialog", "Dialog dismissed!");
+                    }
+                });
+        dialog = dialogBuilder.create();
+        dialog.show();
+    }
+
+    protected void setUpActivity() {
+        // Attempt to start main activity
+        boolean mainActivityStarted = startMainActivity();
+        InitialiseAppActivity activity = this;
+        if(!mainActivityStarted) {
+            // if we are not able to start the main activity...
+            // continue setting up the initialisation activity (current activity)
+            setContentView(R.layout.initialise_app_activity);
+
+            languageDataDownloader = new LanguageDataDownloader();
+
+            GlobalSettings.getInstance().getThreadPoolExecutor().execute(() -> {
+                try {
+                    showLanguageDataSelectionList(languageDataDownloader.getLanguageDataFiles());
+                }
+                catch (IOException ie) {
+                    Log.d(logTag, "IOException caught while downloading language list");
+                    runOnUiThread(this::showNoInternetDialog);
+                }
+            });
+            findViewById(R.id.InitialiseAppProceedButton).setOnClickListener(v -> proceed(v));
+        }
+        else
+            finish();
     }
 
     @Override
@@ -151,30 +210,19 @@ public class InitialiseAppActivity extends AppCompatActivity {
 
         Log.d(logTag, "Starting app...");
         GlobalSettings.createInstance(this);
-        if(GlobalSettings.getInstance().getDarkMode())
+
+        if(GlobalSettings.getInstance().getDarkMode()) {
+            // which mode did the activity start in?
+            int nightMode = AppCompatDelegate.getDefaultNightMode();
+            // If dark mode is enabled, this causes activity to restart
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-        else
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-
-        // Attempt to start main activity
-        boolean mainActivityStarted = startMainActivity();
-        if(!mainActivityStarted) {
-            // if we are not able to start the main activity...
-            // continue setting up the initialisation activity (current activity)
-            setContentView(R.layout.initialise_app_activity);
-
-            languageDataDownloader = new LanguageDataDownloader();
-
-            GlobalSettings.getInstance().getThreadPoolExecutor().execute(new Runnable() {
-                @Override
-                public void run() {
-                    showLanguageDataSelectionList(languageDataDownloader.getLanguageDataFiles());
-                }
-            });
-            ((Button) findViewById(R.id.InitialiseAppProceedButton)).setOnClickListener(v -> proceed());
+            // continue activity initialisation only if activity started in night mode
+            if(nightMode == AppCompatDelegate.MODE_NIGHT_YES)
+                setUpActivity();
         }
-        else
-            finish();
+        else { // if light mode; nothing special, it should be light mode by default
+            setUpActivity();
+        }
     }
 
     @Override

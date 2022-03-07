@@ -30,6 +30,7 @@ import in.digistorm.aksharam.GlobalSettings;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -78,6 +79,63 @@ public class LanguageDataDownloader {
         }
     }
 
+    // accepts multiple files to download and downloads them one by one
+    // returns true on success and false on failure
+    public void download(JSONArray dataFileList,
+                         @NonNull Activity activity,
+                         OnRequestCompleted callback) {
+
+        GlobalSettings.getInstance().getThreadPoolExecutor().execute(() -> {
+            boolean downloadFailed = false;
+            for (int i = 0; i < dataFileList.length(); i++) {
+                JSONObject item = dataFileList.optJSONObject(i);
+                if (item != null && item.optBoolean("selected", false)) {
+                    Request request = new Request.Builder()
+                            .url(item.optString("download_url"))
+                            .method("GET", null)
+                            .headers(new Headers.Builder()
+                                    .add("accept: */*")
+                                    .build())
+                            .build();
+                    okhttp3.Call call = okHttpClient.newCall(request);
+                    try {
+                        Response response = call.execute();
+                        if (response.body() == null)
+                            throw new IOException("Obtained empty body.");
+                        String responseString = response.body().string();
+                        // Let's log only first 100 characters of the file here
+                        Log.d(logTag, "Obtained response: " + responseString.substring(0, 100) + "...");
+
+                        FileOutputStream fos = activity.openFileOutput(item.getString("name"),
+                                Context.MODE_PRIVATE);
+                        Log.d(logTag, "Saving file to " + activity.getFilesDir().getName()
+                                + "/" + item.getString("name"));
+                        fos.write(responseString.getBytes(StandardCharsets.UTF_8));
+                        fos.close();
+                    } catch (IOException ie) {
+                        Log.d(logTag, "IOException while downloading file");
+                        ie.printStackTrace();
+                        activity.runOnUiThread(() -> callback.onDownloadFailed(ie));
+                        downloadFailed = true;
+                        break;
+                    } catch (JSONException je) {
+                        Log.d(logTag, "JSONException while downloading file");
+                        je.printStackTrace();
+                        activity.runOnUiThread(() -> callback.onDownloadFailed(je));
+                        downloadFailed = true;
+                        break;
+                    }
+                }
+            }
+            // If we successfully iterated through everything and still reached here,
+            // our assigned tasks are complete (this does not necessarily mean we downloaded something
+            // since it is possible that we were passed in a list were nothing was marked as "selected")
+            // Still, we count this as success (if downloadFailed is not true) and call the success callback
+            if(!downloadFailed)
+                activity.runOnUiThread(callback::onDownloadCompleted);
+        });
+    }
+
     // returns true on success and false on failure
     public void download(String fileName, String URL,
                             @NonNull Activity activity,
@@ -93,8 +151,7 @@ public class LanguageDataDownloader {
 
         GlobalSettings.getInstance().getThreadPoolExecutor().execute(() -> {
             try {
-                Response response;
-                response = call.execute();
+                Response response = call.execute();
                 if(response.body() == null)
                     throw new IOException("Obtained empty body.");
                 String responseString = response.body().string();
@@ -110,11 +167,11 @@ public class LanguageDataDownloader {
             } catch (FileNotFoundException fe) {
                 Log.d(logTag, "FileNotFoundException caught while trying to save file: ");
                 fe.printStackTrace();
-                callback.onDownloadFailed(fe);
+                activity.runOnUiThread(() -> callback.onDownloadFailed(fe));
             } catch (IOException ie) {
                 Log.d(logTag, "IOException while downloading " + URL);
                 ie.printStackTrace();
-                callback.onDownloadFailed(ie);
+                activity.runOnUiThread(() -> callback.onDownloadFailed(ie));
             }
         });
     }
@@ -122,13 +179,15 @@ public class LanguageDataDownloader {
     public LanguageDataDownloader() {
         okHttpClient = new OkHttpClient.Builder()
                 .addNetworkInterceptor(new LoggingInterceptor())
-                .callTimeout(5, TimeUnit.SECONDS)
-                .connectTimeout(3, TimeUnit.SECONDS)
+                .callTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(20, TimeUnit.SECONDS)
+                .writeTimeout(20, TimeUnit.SECONDS)
+                .connectTimeout(10, TimeUnit.SECONDS)
                 .build();
     }
 
     // Fetch language data files from the repository
-    public JSONArray getLanguageDataFiles() {
+    public JSONArray getLanguageDataFiles() throws IOException {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(baseUrl)
                 .client(okHttpClient)
@@ -152,8 +211,7 @@ public class LanguageDataDownloader {
                 Log.d(logTag, "IOException caught while fetching language data file list.");
             else
                 Log.d(logTag, "JSONException caught while fetching data file list.");
-            e.printStackTrace();
-            return null;
+            throw new IOException("Could not download list of files from git.");
         }
     }
 }
