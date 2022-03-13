@@ -21,5 +21,5 @@ package in.digistorm.aksharam;
  */
 
 public interface DataFileListChanged {
-    public void onDataFileListChanged();
+     void onDataFileListChanged();
 }

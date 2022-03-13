@@ -116,7 +116,7 @@ public class LettersTabFragment extends Fragment {
         lettersTabLangSpinner.setAdapter(adapter);
         lettersTabLangSpinner.setSelection(0);
         LettersTabFragment ltf = this;
-        GlobalSettings.getInstance().addDataFileListChangedListener(() -> {
+        GlobalSettings.getInstance().addDataFileListChangedListener("LettersTabFragmentListener", () -> {
             Log.d(logTag, "Marked shouldUpdateSpinner true");
             adapter.clear();
             // Invoke getAvailableSourceLanguages without Context object so that it does not

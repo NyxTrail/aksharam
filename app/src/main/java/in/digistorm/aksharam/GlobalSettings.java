@@ -22,8 +22,13 @@ package in.digistorm.aksharam;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.BlockingDeque;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
@@ -32,6 +37,8 @@ import java.util.concurrent.TimeUnit;
 
 public class GlobalSettings {
     private static GlobalSettings globalSettings;
+
+    private String logTag = "GlobalSettings";
 
     // Dark/Light mode
     private boolean darkMode;
@@ -64,24 +71,28 @@ public class GlobalSettings {
         }
     }
 
-    private final ArrayList<DataFileListChanged> dataFileListChangedListeners;
+    // We will keep the listeners in a named map so that their owners can
+    // replace existing listeners (not so straight forward if this is an ArrayList)
+    private final Map<String, DataFileListChanged> dataFileListChangedListeners;
 
     private GlobalSettings(Context context) {
         threadPoolExecutor.setThreadFactory(new SimpleThreadFactory());
-        dataFileListChangedListeners = new ArrayList<>();
+        dataFileListChangedListeners = new HashMap<>();
         darkMode = context.getSharedPreferences("dark_mode", Context.MODE_PRIVATE).getBoolean("dark_mode", false);
     }
 
     // this must be called at the point where there is a change in the data file list
     // usually, the Settings activity
     public void invokeDataFileListChangedListeners() {
-        for(DataFileListChanged listener: dataFileListChangedListeners) {
-            listener.onDataFileListChanged();
+        Iterator<String> keys = dataFileListChangedListeners.keySet().iterator();
+        for(String key: dataFileListChangedListeners.keySet()) {
+            Log.d(logTag, "Invoking " + key);
+            Objects.requireNonNull(dataFileListChangedListeners.get(key)).onDataFileListChanged();
         }
     }
 
-    public void addDataFileListChangedListener(DataFileListChanged l) {
-        dataFileListChangedListeners.add(l);
+    public void addDataFileListChangedListener(String name, DataFileListChanged l) {
+        dataFileListChangedListeners.put(name, l);
     }
 
 

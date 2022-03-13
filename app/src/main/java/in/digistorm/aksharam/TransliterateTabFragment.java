@@ -89,7 +89,7 @@ public class TransliterateTabFragment extends Fragment {
         languageSelectionSpinner.setEnabled(false);
         languageSelectionSpinner.setAlpha(0.3f);
 
-        GlobalSettings.getInstance().addDataFileListChangedListener(() -> {
+        GlobalSettings.getInstance().addDataFileListChangedListener("TransliterateTabFragmentListener", () -> {
             initialiseSpinner(view);
         });
     }

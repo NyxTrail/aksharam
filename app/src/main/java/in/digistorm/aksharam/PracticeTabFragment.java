@@ -149,7 +149,7 @@ public class PracticeTabFragment extends Fragment {
         practiceTabLangSpinner.setAdapter(adapter);
         practiceTabLangSpinner.setSelection(0);
 
-        GlobalSettings.getInstance().addDataFileListChangedListener(() -> {
+        GlobalSettings.getInstance().addDataFileListChangedListener("PracticeTabFragmentListener", () -> {
             Log.d(logTag, "Change in data files detected. Updating adapter.");
             adapter.clear();
             // Invoke getAvailableSourceLanguages without Context object so that it does not
