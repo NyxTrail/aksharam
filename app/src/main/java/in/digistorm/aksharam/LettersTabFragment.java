@@ -34,6 +34,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import org.json.JSONObject;
+
 import java.util.Locale;
 
 public class LettersTabFragment extends Fragment {
@@ -88,6 +90,22 @@ public class LettersTabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         initialiseLettersTabLangSpinner(view);
+
+        // set up the info button
+        view.findViewById(R.id.lettersTabInfoButton).setOnClickListener(v -> {
+            Log.d(logTag, "Info button clicked!");
+            Spinner transSpinner = view.findViewById(R.id.lettersTabTransSpinner);
+            String transLanguage = (String) transSpinner.getItemAtPosition(transSpinner.getSelectedItemPosition());
+            Log.d(logTag, "Fetching info for " + transLanguage);
+            JSONObject infoJSON = Transliterator.getLangDataReader().getInfo(transLanguage, getContext());
+            Log.d(logTag, infoJSON.toString());
+
+            String info = infoJSON.optJSONObject("general").optString("en")
+                    + infoJSON.optJSONObject(transLanguage.toLowerCase(Locale.ROOT))
+                    .optString("en");
+            LanguageInfoFragment lif = LanguageInfoFragment.newInstance(info);
+            MainActivity.replaceTabFragment(0, lif);
+        });
 
         Log.d(logTag, Transliterator.getLangDataReader().getCategories().toString());
         categoriesList = new ExpandableListView(getContext());

@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 public class LetterInfoFragment extends Fragment {
-    private final String logTag = getClass().getName();
+    private final String logTag = "LetterInfoFragment";
 
     private String currentLetter = "";
     private LettersTabFragment lettersTabFragment;

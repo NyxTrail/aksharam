@@ -29,6 +29,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -88,14 +89,10 @@ public class LangDataReader {
         }
     }
 
-    // reset: reset class variables
-    private JSONObject read(String file, boolean reset, Context context) {
-        JSONObject langData = null;
-
+    // method reads JSON file and returns the entire file as a JSONObject
+    private JSONObject getJSONFile(String file, Context context) {
+        Log.d(logTag, "Reading language file " + file);
         try {
-            if (reset)
-                currentFile = file;
-            Log.d(logTag, "Reading language file " + file);
             InputStream is = context.openFileInput(file);
             // InputStream is = context.getAssets().open("languages/" + file);
             InputStreamReader isr = new InputStreamReader(is);
@@ -108,7 +105,29 @@ public class LangDataReader {
             }
             br.close();
             is.close();
-            langData = (JSONObject) new JSONTokener(sb.toString()).nextValue();
+            return  (JSONObject) new JSONTokener(sb.toString()).nextValue();
+        } catch(FileNotFoundException fnfe) {
+            Log.d(logTag, "FileNotFoundException caught while opening file: " + file);
+            fnfe.printStackTrace();
+        } catch (IOException ie) {
+            Log.d(logTag, "IOException caught while reading from file: " + file);
+            ie.printStackTrace();
+        } catch (JSONException je) {
+            Log.d(logTag, "JSONException caught while tokenizing json file: " + file);
+            je.printStackTrace();
+        }
+        return null;
+    }
+
+    // reset: reset class variables
+    private JSONObject read(String file, boolean reset, Context context) {
+        JSONObject langData = null;
+
+        try {
+            if (reset)
+                currentFile = file;
+
+            langData = getJSONFile(file, context);
             Log.d(logTag, "Lang data file " + file + " read: " + langData.toString());
 
             // populate metadata about current file
@@ -131,11 +150,8 @@ public class LangDataReader {
             }
             return langData.optJSONObject("data");
         } catch (JSONException je) {
-            Log.d (logTag, "Error reading JSON from lang data");
+            Log.d(logTag, "Error reading JSON from lang data");
             je.printStackTrace();
-        } catch (IOException e) {
-            Log.d(logTag, "Exception caught while trying to read lang file");
-            e.printStackTrace();
         }
 
         // This should not happen
@@ -160,6 +176,30 @@ public class LangDataReader {
             Log.d(logTag, "JSON error when finding category for: " + letter);
             return null;
         }
+    }
+
+    public JSONObject getInfo(String language, Context context) {
+        JSONObject langData = getJSONFile(currentFile, context);
+
+        if(langData == null)
+            return null;
+
+        JSONObject fullInfo = langData.optJSONObject("info");
+
+        if(fullInfo == null)
+            return null;
+
+        JSONObject filteredInfo = new JSONObject();
+
+        try {
+            filteredInfo.put("general", fullInfo.optJSONObject("general"));
+            filteredInfo.put(language.toLowerCase(Locale.ROOT), fullInfo.optJSONObject(language.toLowerCase(Locale.ROOT)));
+            return filteredInfo;
+        } catch(JSONException je) {
+            Log.d(logTag, "JSONException caught while trying to insert info for " + language);
+            je.printStackTrace();
+        }
+        return null;
     }
 
     private ArrayList<String> getAllOfType(String type) {
