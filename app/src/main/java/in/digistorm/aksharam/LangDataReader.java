@@ -50,6 +50,7 @@ public class LangDataReader {
     private String currentFile;
     // code for the current lang data file
     private String langCode;
+    private String virama;
     private boolean randomiseLigatures;
     private final ArrayList<String> sourceLangs = new ArrayList<>();
     // transliteration languages suppported by the current data file
@@ -141,6 +142,7 @@ public class LangDataReader {
                 else
                     randomiseLigatures = false;
                 langCode = langData.getString("code");
+                virama = langData.optString("virama");
                 JSONArray transLangJSONArray = langData.getJSONArray("trans_langs");
                 for (int i = 0; i < transLangJSONArray.length(); i++) {
                     String lang = ((JSONObject) transLangJSONArray.get(i)).keys().next();
@@ -314,25 +316,9 @@ public class LangDataReader {
         return  langName.toLowerCase(Locale.ROOT) + ".json";
     }
 
-    // get Virama for the current language
-    // returns empty string on error
+    // get virama for the current language
     public String getVirama() {
-        if(categories.isEmpty())
-            return "";
-        // Virama is a "sign"
-        ArrayList<String> signs = categories.get("signs");
-        try {
-            for (String sign : signs) {
-                if (langData.getJSONObject(sign).has("isVirama"))
-                    if (langData.getJSONObject(sign).getBoolean("isVirama"))
-                        return sign;
-            }
-        } catch(JSONException je) {
-            Log.d(logTag, "JSONException while trying to find the Virama");
-            return "";
-        }
-
-        return "";
+        return virama;
     }
 
     // Read langdata from a file and return the data immediately without loading it
