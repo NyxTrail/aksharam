@@ -81,8 +81,7 @@ public class LetterInfoFragment extends Fragment {
 
         JSONObject letterExamples = Transliterator.getLangDataReader().getLetterExamples(currentLetter);
 
-        // We pack the examples into the Word and Meaning ConstraintLayout in
-        // letter_info.xml layout file
+        // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
         LinearLayout letterInfoWordAndMeaningLL =
                  v.findViewById(R.id.letterInfoWordAndMeaningLL);
         try {
@@ -140,6 +139,8 @@ public class LetterInfoFragment extends Fragment {
                     && (category.equalsIgnoreCase("consonants")
                         || category.equalsIgnoreCase("ligatures"))) {
                 displaySignConsonantCombinations(v, category);
+                if(category.equalsIgnoreCase("consonants"))
+                    displayLigatures(v);
             }
             else
                 showDiacriticExamples = false;
@@ -155,6 +156,97 @@ public class LetterInfoFragment extends Fragment {
                     + currentLetter + ", language: "
                     + lettersTabFragment.getLettersTabFragmentTargetLanguage());
             je.printStackTrace();
+        }
+    }
+
+    // Lets try to combine current letter with all letters
+    public void displayLigatures(View v) {
+        /* ligatureAfterHintTV, ligaturesGLAfter, linearLayoutAfter, etc are all for
+         * ligatures formed when currentLetter appears *after* the virama.
+         * ligatureBeforeHintTV, ligaturesGLBefore, linearLayoutBefore, etc are all for
+         * ligatures formed when currentLetter appears *before* the virama.
+         * TODO: some way to reduce code duplication?
+         */
+        TextView ligatureAfterHintTV = v.findViewById(R.id.letterInfoLigaturesAfterTV);
+        TextView ligatureBeforeHintTV = v.findViewById(R.id.letterInfoLigaturesBeforeTV);
+
+        ArrayList<String> items = null;
+        items = Transliterator.getLangDataReader().getConsonants();
+        String virama = Transliterator.getLangDataReader().getVirama();
+
+        v.findViewById(R.id.letterInfoLigaturesCL).setVisibility(View.VISIBLE);
+        GridLayout ligaturesGLBefore = v.findViewById(R.id.letterInfoLigaturesBeforeGL);
+        ligaturesGLBefore.removeAllViews();
+        GridLayout ligaturesGLAfter = v.findViewById(R.id.letterInfoLigaturesAfterGL);
+        ligaturesGLAfter.removeAllViews();
+
+        ligatureBeforeHintTV.setText(getString(R.string.letter_info_ligature_consonant_before,
+                currentLetter, currentLetter, virama));
+        ligatureAfterHintTV.setText(getString(R.string.letter_info_ligature_consonant_after,
+                currentLetter, virama, currentLetter));
+
+        for(String item: items) {
+            String ligatureAfter = item + virama + currentLetter;
+            String ligatureBefore = currentLetter + virama + item;
+
+            // UI elements for ligatureBefore
+            LinearLayout linearLayout = new LinearLayout(getContext());
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            linearLayout.setGravity(Gravity.CENTER);
+            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(20, 20, 20, 20);
+            linearLayout.setLayoutParams(layoutParams);
+
+            TextView textView = new TextView(getContext());
+            textView.setGravity(Gravity.CENTER);
+            ViewGroup.LayoutParams tvLayoutParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            textView.setPadding(4, 4, 4,4);
+            textView.setLayoutParams(tvLayoutParams);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            textView.setLayoutParams(tvParams);
+
+            textView.setText(ligatureBefore);
+
+            linearLayout.addView(textView);
+            ligaturesGLBefore.addView(linearLayout);
+
+
+            // UI elements for ligatureAfter
+            linearLayout = new LinearLayout(getContext());
+            linearLayout.setOrientation(LinearLayout.VERTICAL);
+            linearLayout.setGravity(Gravity.CENTER);
+            layoutParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT);
+            layoutParams.setMargins(20, 20, 20, 20);
+            linearLayout.setLayoutParams(layoutParams);
+
+            textView = new TextView(getContext());
+            textView.setGravity(Gravity.CENTER);
+            tvLayoutParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            textView.setPadding(4, 4, 4,4);
+            textView.setLayoutParams(tvLayoutParams);
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
+            tvParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+            textView.setLayoutParams(tvParams);
+
+            textView.setText(ligatureAfter);
+
+            linearLayout.addView(textView);
+            ligaturesGLAfter.addView(linearLayout);
         }
     }
 
