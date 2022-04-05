@@ -245,7 +245,7 @@ public class PracticeTabFragment extends Fragment {
         // Most of the combinations in these languages do not result in a meaningful ligature and
         // are usually represented using a half-consonant (with a virama). So, we will add random
         // ligatures only if the language's data file says we should.
-        if(Transliterator.getLangDataReader().isRandomiseLigatures())
+        if(Transliterator.getLangDataReader().areLigaturesAutoGeneratable())
             practiceTypes.add("Random Ligatures");
         practiceTypes.add("Random Words");
 
@@ -278,18 +278,20 @@ public class PracticeTabFragment extends Fragment {
         if(practiceType == null || practiceType.equals(""))
             return;
 
-        // Handle complex practice types first
-
-        // Then handle basic practice types (practice a plain letter category
         // get all letters of current language, category-wise
         Map<String, ArrayList<String>> letters = Transliterator.getLangDataReader().getCategories();
-        // select a random letter from the category that matches lang
+
         Random random = new Random();
         StringBuilder practiceString = new StringBuilder();
 
         Log.d(logTag, "letters: " + letters.toString());
         Log.d(logTag, "letters[\"" + practiceType.toLowerCase(Locale.ROOT) + "\"]: "
                 + letters.get(practiceType.toLowerCase(Locale.ROOT)));
+
+        int numConsonants, numLigatures, numVowels, numSigns;
+        // Special variable to hold the Virama.
+        // Useful to detect chillu letters in Malayalam
+        String virama = Transliterator.getLangDataReader().getVirama();
 
         switch(practiceType.toLowerCase(Locale.ROOT)) {
             case "random words":
@@ -298,12 +300,14 @@ public class PracticeTabFragment extends Fragment {
                 // Second letter onwards can be a vowel sign or consonant (not a vowel)
                 for(int i = 0; i < 5; i++) {
                     // What should be the length of a word?
-                    int wordLength = random.nextInt(10) + 3;   // length is 3 to 10 + 3
+                    int wordLength = random.nextInt(6) + 3;   // length is 3 to 6 + 3
                     Log.d(logTag, "Constructing word of length " + wordLength);
 
-                    int numVowels = letters.get("vowels").size();
-                    int numConsonants = letters.get("consonants").size();
-                    int numSigns = letters.get("signs").size();
+                    numVowels = letters.get("vowels").size();
+                    numConsonants = letters.get("consonants").size();
+                    numLigatures = letters.get("ligatures").size();
+                    numSigns = letters.get("signs").size();
+
                     // Choose the first character
                     if(random.nextInt(2) == 0)
                         practiceString.append(letters.get("vowels").get(random.nextInt(numVowels)));
@@ -312,24 +316,35 @@ public class PracticeTabFragment extends Fragment {
                                 .get(random.nextInt(numConsonants)));
                     }
 
-                    // Special variable to hold the Virama.
-                    // Useful to detect chillu letters in Malayalam
-                    String virama = Transliterator.getLangDataReader().getVirama();
+                    ArrayList<String> categories = new ArrayList<>();
+                    categories.add("vowels");
+                    categories.add("consonants");
+                    categories.add("signs");
 
                     for(int j = 1; j < wordLength; j++) {
-                        ArrayList<String> categories = new ArrayList<>();
-                        categories.add("vowels");
-                        categories.add("consonants");
-                        categories.add("signs");
-
                         String category;
-
                         String nextChar = "";
 
-                        // if previous letter was a vowel or a sign...
                         String prevChar = practiceString.substring(practiceString.length() - 1,
                                 practiceString.length());
-                        if(letters.get("vowels").contains(prevChar) ||
+
+                        // 20% chance that the next character is a joint letter
+                        if(random.nextInt(100) < 21 && !prevChar.equals(virama)) {
+                            // for malayalam, there is also a chance the next character is a chillu
+                            if(language.equalsIgnoreCase("malayalam")) {
+                                if(random.nextInt(100) < 31)
+                                    nextChar = letters.get("chillu").get(random.nextInt(letters.get("chillu").size()));
+                                else
+                                    // Since it's malayalam, we can just get one of the ligatures at random
+                                    nextChar = letters.get("ligatures").get(random.nextInt(numLigatures));
+                            }
+                            else
+                                // construct ligature
+                                nextChar = letters.get("consonants").get(random.nextInt(numConsonants))
+                                        + virama + letters.get("consonants").get(random.nextInt(numConsonants));
+                        }
+                        // if previous letter was a vowel or a sign...
+                        else if(letters.get("vowels").contains(prevChar) ||
                                 letters.get("signs").contains(prevChar)) {
                             // ...next char must be a consonant
                             nextChar = letters.get("consonants").get(random.nextInt(numConsonants));
@@ -338,83 +353,124 @@ public class PracticeTabFragment extends Fragment {
                             // if previous character was a consonant, next character can be a
                             // consonant or a sign
                             category = categories.get(random.nextInt(2) + 1);
-                            nextChar = letters.get(category).get(random.nextInt(letters
-                                    .get(category).size()));
+                            do {
+                                nextChar = letters.get(category).get(random.nextInt(letters
+                                        .get(category).size()));
+                            } while (prevChar.equals(virama) && nextChar.equals(virama));
                         }
 
-                        // Special handling for the chillu letters in Malayalam
-                        if(language.equalsIgnoreCase("malayalam")) {
-                            if(nextChar.equals(virama)) {
-                                Log.d(logTag, "Virama " + virama + " detected in language: "
-                                        + language);
-
-                                practiceString = new StringBuilder(practiceString.substring(0,
-                                        practiceString.length() - 1));
-                                switch(prevChar) {
-                                    case "ര":
-                                        practiceString.append("ർ");
-                                        continue;
-                                    case "ല":
-                                        practiceString.append("ൽ");
-                                        continue;
-                                    case "ള":
-                                        practiceString.append("ൾ");
-                                        continue;
-                                    case "ണ":
-                                        practiceString.append("ൺ");
-                                        continue;
-                                    case "ന":
-                                        practiceString.append("ൻ");
-                                        continue;
-                                }
-                            }
-                            // since the previous way of getting Chillu is too rare,
-                            // let's add a small chance of the current char being a chillu
-                            if(random.nextInt(100) < 10) {
-                                nextChar = letters.get("chillu")
-                                        .get(random.nextInt(letters.get("chillu").size()));
-                            }
-                        }
                         practiceString.append(nextChar);
                     }
                     practiceString.append(" ");
                 }
                 break;
             case "random ligatures":
-                int numConsonants = letters.get("consonants").size();
-                // get the sign for the Virama
+                numConsonants = letters.get("consonants").size();
                 for(int i = 0; i < 10; i++) {
                     // choose a random consonant
                     practiceString.append(letters.get("consonants")
-                            .get(random.nextInt(numConsonants)));
-                    practiceString.append(Transliterator.getLangDataReader().getVirama());
-                    practiceString.append(letters.get("consonants")
-                            .get(random.nextInt(numConsonants)));
+                            .get(random.nextInt(numConsonants))
+                            + virama
+                            + letters.get("consonants").get(random.nextInt(numConsonants)));
                     practiceString.append(" ");
                 }
                 break;
             case "signs":
-                int numSigns = letters.get("signs").size();
+                numSigns = letters.get("signs").size();
+                numConsonants = letters.get("consonants").size();
                 String predecessor = "";
                 for(int i = 0; i < 10; i++) {
                     // choose a consonant or a ligature to combine the sign with
                     switch (random.nextInt(2)) {
                         // choose a consonant
                         case 0:
-                            do {
-                                predecessor = letters.get("consonants").get(random.nextInt(
-                                        letters.get("consonants").size()));
-                            } while (Transliterator.getLangDataReader().isExcludeCombiExamples(predecessor));
+                            predecessor = letters.get("consonants").get(random.nextInt(numConsonants));
                             break;
+                        // choose a ligature
                         case 1:
                             do {
                                 predecessor = letters.get("ligatures").get(random.nextInt(
                                         letters.get("ligatures").size()));
+
+                                // Following for predecessor ligatures that have combining rules
+                                boolean isCombineAfter = Transliterator.getLangDataReader().isCombineAfter(predecessor);
+                                boolean isCombineBefore = Transliterator.getLangDataReader().isCombineBefore(predecessor);
+
+                                Log.d(logTag, "predecessor: " + predecessor);
+
+                                predecessor = Transliterator.getLangDataReader().getBase(predecessor);
+                                Log.d(logTag, "base: " + predecessor);
+
+                                if(isCombineAfter && isCombineBefore) {
+                                    switch(random.nextInt(2)) {
+                                        // combine before
+                                        case 0:
+                                            predecessor = letters.get("consonants").get(random.nextInt(numConsonants))
+                                                    + virama + predecessor;
+                                            break;
+                                        // combine after
+                                        case 1:
+                                            predecessor = predecessor + virama + letters.get("consonants").get(
+                                                    random.nextInt(numConsonants));
+                                            break;
+                                    }
+                                } else if(isCombineAfter) {
+                                    predecessor = letters.get("consonants").get(random.nextInt(numConsonants))
+                                            + virama + predecessor;
+                                } else if(isCombineBefore) {
+                                    predecessor = predecessor + virama + letters.get("consonants")
+                                            .get(random.nextInt(numConsonants));
+                                }
                             } while (Transliterator.getLangDataReader().isExcludeCombiExamples(predecessor));
                             break;
                     }
-                    practiceString.append(predecessor + letters.get("signs")
-                            .get(random.nextInt(numSigns))).append(" ");
+                    String sign;
+                    // Virama not supported in practice type for signs
+                    // TODO: support it!
+                    do {
+                        sign = letters.get("signs").get(random.nextInt(numSigns));
+                    } while(sign.equals(Transliterator.getLangDataReader().getVirama()));
+
+                    practiceString.append(predecessor).append(sign).append(" ");
+                }
+                break;
+            case "ligatures":
+                numLigatures = letters.get("ligatures").size();
+                numConsonants = letters.get("consonants").size();
+                for (int i = 0; i < 10; i++) {
+                    String ligature = letters.get("ligatures").get(random.nextInt(numLigatures));
+                    // nextChar is base char if a base exists in the data file.
+                    // if there is no base in the data file, nextChar equals ligature (variable above)
+                    String nextChar = Transliterator.getLangDataReader().getBase(ligature);
+
+                    // get the rules for combining this letter if such rule exists
+                    boolean isCombineAfter = Transliterator.getLangDataReader().isCombineAfter(ligature);
+                    boolean isCombineBefore = Transliterator.getLangDataReader().isCombineBefore(ligature);
+                    if (isCombineAfter && isCombineBefore) {
+                        // randomly select either combineBefore or combineAfter
+                        switch (random.nextInt(2)) {
+                            //combineBefore
+                            case 0:
+                                // assumption: virama is required for the joining
+                                practiceString.append(letters.get("consonants").get(random.nextInt(numConsonants))
+                                        + virama + nextChar + " ");
+                                break;
+                            // combineAfter
+                            case 1:
+                                // assumption: virama is required for the joining
+                                practiceString.append(nextChar + virama
+                                        + letters.get("consonants").get(random.nextInt(numConsonants)) + " ");
+                                break;
+                        }
+                    } else if (isCombineAfter) {
+                        practiceString.append(nextChar + virama
+                                + letters.get("consonants").get(random.nextInt(numConsonants)) + " ");
+                    } else if (isCombineBefore) {
+                        practiceString.append(letters.get("consonants").get(random.nextInt(numConsonants))
+                                + virama + nextChar + " ");
+                    } else {
+                        practiceString.append(nextChar + " ");
+                    }
                 }
                 break;
             default:

@@ -140,14 +140,15 @@ public class LetterInfoFragment extends Fragment {
                         || category.equalsIgnoreCase("ligatures"))) {
                 displaySignConsonantCombinations(v, category);
                 if(category.equalsIgnoreCase("consonants"))
-                    displayLigatures(v);
+                    if(Transliterator.getLangDataReader().areLigaturesAutoGeneratable())
+                        displayLigatures(v);
             }
             else
                 showDiacriticExamples = false;
 
             // For a sign, display how it combines with each consonant
             if(category != null && (category.equalsIgnoreCase("signs")))
-                displaySignConsonantCombinations(v, category);
+                    displaySignConsonantCombinations(v, category);
             else if(!showDiacriticExamples)
                 v.findViewById(R.id.letterInfoDiacriticExamplesCL).setVisibility(View.GONE);
         }

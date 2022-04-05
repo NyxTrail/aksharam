@@ -51,7 +51,7 @@ public class LangDataReader {
     // code for the current lang data file
     private String langCode;
     private String virama;
-    private boolean randomiseLigatures;
+    private boolean ligaturesAutoGeneratable;
     private final ArrayList<String> sourceLangs = new ArrayList<>();
     // transliteration languages suppported by the current data file
     private final ArrayList<String> transLangs = new ArrayList<>();
@@ -137,10 +137,10 @@ public class LangDataReader {
                         .toLowerCase(Locale.ROOT);
                 transLangs.clear();
                 transLangCodes.clear();
-                if(langData.has("randomise_ligatures"))
-                    randomiseLigatures = langData.getBoolean("randomise_ligatures");
+                if(langData.has("ligatures_auto_generatable"))
+                    ligaturesAutoGeneratable = langData.getBoolean("ligatures_auto_generatable");
                 else
-                    randomiseLigatures = false;
+                    ligaturesAutoGeneratable = false;
                 langCode = langData.getString("code");
                 virama = langData.optString("virama");
                 JSONArray transLangJSONArray = langData.getJSONArray("trans_langs");
@@ -232,6 +232,20 @@ public class LangDataReader {
         }
     }
 
+    public boolean isCombineAfter(String letter) {
+        JSONObject letterObj = langData.optJSONObject(letter);
+
+        return (letterObj != null) &&
+                (letterObj.optBoolean("combine_after", false));
+    }
+
+    public boolean isCombineBefore(String letter) {
+        JSONObject letterObj = langData.optJSONObject(letter);
+
+        return (letterObj != null) &&
+                (letterObj.optBoolean("combine_before", false));
+    }
+
     public String getCurrentLang() {
         return currentLang;
     }
@@ -280,8 +294,8 @@ public class LangDataReader {
         }
     }
 
-    public boolean isRandomiseLigatures() {
-        return randomiseLigatures;
+    public boolean areLigaturesAutoGeneratable() {
+        return ligaturesAutoGeneratable;
     }
 
     public JSONObject getLangData() {
@@ -307,6 +321,16 @@ public class LangDataReader {
         if(name.endsWith(".json"))
             name = name.replace(".json", "");
         return transLangCodes.get(name.toLowerCase(Locale.ROOT));
+    }
+
+    // return the base of a ligature if it exists, if not return the ligature itself
+    public String getBase(String ligature) {
+        JSONObject ligatureObj = langData.optJSONObject(ligature);
+        if(ligatureObj == null)
+            return null;
+
+        String base = ligatureObj.optString("base");
+        return base.equals("") ? ligature : base;
     }
 
     // This needs to be changed when interface for data file addition is added
