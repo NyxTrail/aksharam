@@ -88,6 +88,17 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         } else if(item.getItemId() == R.id.dark_light_mode) {
             GlobalSettings.getInstance().setDarkMode(!GlobalSettings.getInstance().getDarkMode(), this);
             int mode = GlobalSettings.getInstance().getDarkMode() ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
+            for(Fragment t: getSupportFragmentManager().getFragments()) {
+                /* LetterInfoFragment is be re-initialised correctly when the uiMode     *
+                 * configuration change happens due to switching light/dark modes.       *
+                 * We will simply close LetterInfoFragment if it is open. This should    *
+                 * land us in Letters tab, if we were in LetterInfo when dark/light mode *
+                 * was pressed.
+                 */
+                if(t instanceof LetterInfoFragment)
+                    getSupportFragmentManager().beginTransaction().remove(t).commit();
+            }
+
             AppCompatDelegate.setDefaultNightMode(mode);
         }
 

@@ -30,7 +30,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 public class PageCollectionAdapter extends FragmentStateAdapter {
-    private final String logTag = getClass().toString();
+    private final String logTag = "PageCollectionAdatper";
     private MainActivity mainActivity;
 
     private ArrayList<Fragment> fragments = new ArrayList<>();
@@ -43,6 +43,10 @@ public class PageCollectionAdapter extends FragmentStateAdapter {
     public PageCollectionAdapter(FragmentActivity fragmentActivity) {
         super(fragmentActivity);
         this.mainActivity = (MainActivity) fragmentActivity;
+
+        Log.d(logTag, "Setting up fragments");
+
+        // there is a separate back stack for each tab
         fragments.add(new LettersTabFragment());
         backStack.add(new Stack<>());
         fragments.add(new TransliterateTabFragment());
@@ -73,6 +77,8 @@ public class PageCollectionAdapter extends FragmentStateAdapter {
     @NonNull
     @Override
     public Fragment createFragment(int position) {
+        Log.d(logTag, "position: " + position);
+        Log.d(logTag, fragments.get(position).getClass().getName());
         switch(position) {
             case 0:
                 return fragments.get(0);
@@ -88,6 +94,7 @@ public class PageCollectionAdapter extends FragmentStateAdapter {
     }
 
     public void replaceFragment(int index, Fragment fragment) {
+        Log.d(logTag, "replacing fragment at index " + index);
         backStack.get(index).push(fragments.get(index));
         fragments.set(index, fragment);
         notifyItemChanged(index);
@@ -98,6 +105,7 @@ public class PageCollectionAdapter extends FragmentStateAdapter {
        else returns false
     */
     public boolean restoreFragment(int index) {
+        Log.d(logTag, "Restoring fragment at index: " + index);
         if(!backStack.get(index).isEmpty()) {
             fragments.set(index, backStack.get(index).pop());
             notifyItemChanged(index);

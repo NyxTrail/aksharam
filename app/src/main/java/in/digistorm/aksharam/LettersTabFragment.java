@@ -39,7 +39,7 @@ import org.json.JSONObject;
 import java.util.Locale;
 
 public class LettersTabFragment extends Fragment {
-    private String logTag = "LettersTabFragment";
+    private final String logTag = "LettersTabFragment";
 
     private ExpandableListView categoriesList;
 
@@ -52,7 +52,6 @@ public class LettersTabFragment extends Fragment {
 
     private LabelledArrayAdapter<String> adapter;
     private Spinner lettersTabLangSpinner;
-    private boolean shouldUpdateSpinner = false;
 
     public void setLettersTabFragmentLanguage(String lang) {
         // should add some sanity checks here

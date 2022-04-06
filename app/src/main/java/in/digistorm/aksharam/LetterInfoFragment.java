@@ -100,8 +100,6 @@ public class LetterInfoFragment extends Fragment {
                     int px = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, 4,
                             getResources().getDisplayMetrics());
                     wordsAndMeaningView.setPadding(px, px, px, px);
-                    Log.d(logTag, ((TextView) wordsAndMeaningView.findViewById(
-                            R.id.wordAndMeaningWordTV)).getText().toString());
                     String meaning = letterExamples.getJSONObject(word)
                             .getString(Transliterator.getLangDataReader().getTargetLangCode(
                                     lettersTabFragment.getLettersTabFragmentTargetLanguage()));
@@ -323,7 +321,7 @@ public class LetterInfoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View v = inflater.inflate(R.layout.letter_info, container, false);
+        View v = inflater.inflate(R.layout.letter_info, container, true);
 
         setUp(v, inflater);
 

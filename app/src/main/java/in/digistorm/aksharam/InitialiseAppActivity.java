@@ -51,7 +51,7 @@ import java.io.IOException;
 import java.util.Map;
 
 public class InitialiseAppActivity extends AppCompatActivity {
-    private final String logTag = InitialiseAppActivity.class.getName();
+    private final String logTag = "InitialiseAppActivity";
 
     private LanguageDataDownloader languageDataDownloader;
     private LanguageDataFileListAdapter adapter;

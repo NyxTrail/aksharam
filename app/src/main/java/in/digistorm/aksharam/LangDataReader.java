@@ -226,7 +226,7 @@ public class LangDataReader {
     // only for letters or letter combinations that cannot form any meaningful combinations
     public boolean isExcludeCombiExamples(String letter) {
         try {
-            return langData.getJSONObject(letter).getBoolean("excludeCombiExamples");
+            return langData.getJSONObject(letter).getBoolean("exclude_combi_examples");
         } catch(JSONException je) {
             return false;
         }
