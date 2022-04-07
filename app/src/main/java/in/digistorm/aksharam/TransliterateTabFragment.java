@@ -54,6 +54,10 @@ public class TransliterateTabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        if(tr == null) {
+            tr = Transliterator.getDefaultTransliterator(getContext());
+        }
+
         ((EditText) view.findViewById(R.id.TransliterateTabInputTextField))
                 .addTextChangedListener(new TextWatcher() {
             @Override
@@ -127,7 +131,7 @@ public class TransliterateTabFragment extends Fragment {
                 R.layout.spinner_item,
                 // Transliterator class' LangDataReader should be initialised now,
                 // no need to check what languages are available now; just fetch them
-                R.id.spinnerItemTV, Transliterator.getLangDataReader().getTransLangs(),
+                R.id.spinnerItemTV, tr.getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.transliterate_tab_trans_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         languageSelectionSpinner.setAdapter(adapter);
@@ -144,8 +148,5 @@ public class TransliterateTabFragment extends Fragment {
             }
         });
 
-        if(tr == null) {
-            tr = Transliterator.getDefaultTransliterator(getContext());
-        }
     }
 }

@@ -38,7 +38,7 @@ import java.util.concurrent.TimeUnit;
 public class GlobalSettings {
     private static GlobalSettings globalSettings;
 
-    private String logTag = "GlobalSettings";
+    private final String logTag = "GlobalSettings";
 
     // Dark/Light mode
     private boolean darkMode;
@@ -84,7 +84,6 @@ public class GlobalSettings {
     // this must be called at the point where there is a change in the data file list
     // usually, the Settings activity
     public void invokeDataFileListChangedListeners() {
-        Iterator<String> keys = dataFileListChangedListeners.keySet().iterator();
         for(String key: dataFileListChangedListeners.keySet()) {
             Log.d(logTag, "Invoking " + key);
             Objects.requireNonNull(dataFileListChangedListeners.get(key)).onDataFileListChanged();
@@ -95,6 +94,9 @@ public class GlobalSettings {
         dataFileListChangedListeners.put(name, l);
     }
 
+    public void clearDataFileListChangedListeners() {
+        dataFileListChangedListeners.clear();
+    }
 
     public void setDarkMode(boolean v, Context context) {
         darkMode = v;

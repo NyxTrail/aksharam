@@ -73,7 +73,7 @@ public class SettingsLanguageListAdapter extends RecyclerView.Adapter<SettingsLa
                         deleteIV.setVisibility(View.VISIBLE);
                         DeleteClickListener deleteClickListener = new DeleteClickListener(holder, true, adapter);
                         deleteIV.setOnClickListener(deleteClickListener);
-                        Transliterator.getLangDataReader().getAvailableSourceLanguages(activity);
+                        // transliterator.getLangDataReader().getAvailableSourceLanguages(activity);
                         GlobalSettings.getInstance().invokeDataFileListChangedListeners();
                     }
 
@@ -111,8 +111,10 @@ public class SettingsLanguageListAdapter extends RecyclerView.Adapter<SettingsLa
                 activity.deleteFile(fileName);
                 fileList.remove(fileName);
                 adapter.notifyItemRemoved(pos);
-                Transliterator.getLangDataReader().getAvailableSourceLanguages(activity);
-                GlobalSettings.getInstance().invokeDataFileListChangedListeners();
+                if(activity.getFilesDir().list().length  > 0)
+                    GlobalSettings.getInstance().invokeDataFileListChangedListeners();
+                else
+                    GlobalSettings.getInstance().clearDataFileListChangedListeners();
                 return;
             }
 
@@ -125,8 +127,11 @@ public class SettingsLanguageListAdapter extends RecyclerView.Adapter<SettingsLa
                 downloadIV.setVisibility(View.VISIBLE);
                 DownloadClickListener downloadClickListener = new DownloadClickListener(holder, adapter);
                 downloadIV.setOnClickListener(downloadClickListener);
-                Transliterator.getLangDataReader().getAvailableSourceLanguages(activity);
-                GlobalSettings.getInstance().invokeDataFileListChangedListeners();
+                // Transliterator.getLangDataReader().getAvailableSourceLanguages(activity);
+                if(activity.getFilesDir().list().length  > 0)
+                    GlobalSettings.getInstance().invokeDataFileListChangedListeners();
+                else
+                    GlobalSettings.getInstance().clearDataFileListChangedListeners();
             } catch(JSONException je) {
                 Log.d("DeleteClickListener", "JSONException when fetching file from online files list");
                 je.printStackTrace();

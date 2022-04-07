@@ -49,14 +49,16 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     private LettersTabFragment lettersTabFragment;
 
     public LetterCategoryAdapter(FragmentActivity activity, LettersTabFragment ltf) {
-        headers = Transliterator.getLangDataReader().getCategories().keySet().toArray(new String[0]);
-        this.activity = activity;
         lettersTabFragment = ltf;
+        headers = lettersTabFragment.getTransliterator().getLangDataReader()
+                .getCategories().keySet().toArray(new String[0]);
+        this.activity = activity;
     }
 
     @Override
     public int getGroupCount() {
-        return Transliterator.getLangDataReader().getCategories().size();
+        return lettersTabFragment.getTransliterator().getLangDataReader()
+                .getCategories().size();
     }
 
     @Override
@@ -72,7 +74,8 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return Transliterator.getLangDataReader().getCategories().get(headers[groupPosition]);
+        return lettersTabFragment.getTransliterator().getLangDataReader()
+                .getCategories().get(headers[groupPosition]);
     }
 
     @Override
@@ -123,14 +126,14 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             convertView = layoutInflater.inflate(R.layout.letter_category_content, null);
         }
         Log.d(logTag, "creating grid for group: " + groupPosition);
-        Log.d(logTag, "group is: " + Transliterator.getLangDataReader()
-                .getCategories().get(headers[groupPosition]));
+        Log.d(logTag, "group is: " + lettersTabFragment.getTransliterator()
+                .getLangDataReader().getCategories().get(headers[groupPosition]));
         GridLayout gridLayout = convertView.findViewById(R.id.LetterGrid);
         gridLayout.removeAllViews();
         gridLayout.setClickable(true);
 
-        String[] letters = Transliterator.getLangDataReader().getCategories()
-                .get(headers[groupPosition]).toArray(new String[0]);
+        String[] letters = lettersTabFragment.getTransliterator().getLangDataReader()
+                .getCategories().get(headers[groupPosition]).toArray(new String[0]);
         for(String letter: letters) {
             LinearLayout linearLayout = new LinearLayout(activity);
             linearLayout.setOrientation(LinearLayout.VERTICAL);

@@ -127,6 +127,8 @@ public class PracticeTabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        transliterator = new Transliterator(getContext());
+
         view.findViewById(R.id.PracticeTabRefreshButton).setOnClickListener(v -> {
             clearInput();
             startPractice();
@@ -142,7 +144,7 @@ public class PracticeTabFragment extends Fragment {
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                Transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
+                transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_lang_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         adapter.setNotifyOnChange(true);
@@ -150,12 +152,13 @@ public class PracticeTabFragment extends Fragment {
         practiceTabLangSpinner.setSelection(0);
 
         GlobalSettings.getInstance().addDataFileListChangedListener("PracticeTabFragmentListener", () -> {
-            Log.d(logTag, "Change in data files detected. Updating adapter.");
+            Log.d("PTFListener", "Change in data files detected. Updating adapter.");
+            transliterator = new Transliterator(getContext());
             adapter.clear();
             // Invoke getAvailableSourceLanguages without Context object so that it does not
             // read the files again. The changed files have already been read into
             // LangDataReader when it was changed by the SettingsLanguageListAdapter
-            adapter.addAll(Transliterator.getLangDataReader().getAvailableSourceLanguages());
+            adapter.addAll(transliterator.getLangDataReader().getAvailableSourceLanguages());
             // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
             // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
             // think of to fix this
@@ -203,7 +206,7 @@ public class PracticeTabFragment extends Fragment {
         LabelledArrayAdapter<String> practiceInAdapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                Transliterator.getLangDataReader().getTransLangs(),
+                transliterator.getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_practice_in_hint));
         practiceInAdapter.setDropDownViewResource(R.layout.spinner_drop_down);
         practiceTabPracticeInSpinner.setAdapter(practiceInAdapter);
@@ -232,7 +235,7 @@ public class PracticeTabFragment extends Fragment {
                 R.id.PracticeTabPracticeTypeSpinner);
 
         ArrayList<String> practiceTypes = new ArrayList<>();
-        Set<String> categories = Transliterator.getLangDataReader().getCategories().keySet();
+        Set<String> categories = transliterator.getLangDataReader().getCategories().keySet();
         for(String category: categories) {
             practiceTypes.add(category.substring(0, 1).toUpperCase(Locale.ROOT)
                     + category.substring(1));
@@ -245,7 +248,7 @@ public class PracticeTabFragment extends Fragment {
         // Most of the combinations in these languages do not result in a meaningful ligature and
         // are usually represented using a half-consonant (with a virama). So, we will add random
         // ligatures only if the language's data file says we should.
-        if(Transliterator.getLangDataReader().areLigaturesAutoGeneratable())
+        if(transliterator.getLangDataReader().areLigaturesAutoGeneratable())
             practiceTypes.add("Random Ligatures");
         practiceTypes.add("Random Words");
 
@@ -279,7 +282,7 @@ public class PracticeTabFragment extends Fragment {
             return;
 
         // get all letters of current language, category-wise
-        Map<String, ArrayList<String>> letters = Transliterator.getLangDataReader().getCategories();
+        Map<String, ArrayList<String>> letters = transliterator.getLangDataReader().getCategories();
 
         Random random = new Random();
         StringBuilder practiceString = new StringBuilder();
@@ -291,7 +294,7 @@ public class PracticeTabFragment extends Fragment {
         int numConsonants, numLigatures, numVowels, numSigns;
         // Special variable to hold the Virama.
         // Useful to detect chillu letters in Malayalam
-        String virama = Transliterator.getLangDataReader().getVirama();
+        String virama = transliterator.getLangDataReader().getVirama();
 
         switch(practiceType.toLowerCase(Locale.ROOT)) {
             case "random words":
@@ -393,12 +396,12 @@ public class PracticeTabFragment extends Fragment {
                                         letters.get("ligatures").size()));
 
                                 // Following for predecessor ligatures that have combining rules
-                                boolean isCombineAfter = Transliterator.getLangDataReader().isCombineAfter(predecessor);
-                                boolean isCombineBefore = Transliterator.getLangDataReader().isCombineBefore(predecessor);
+                                boolean isCombineAfter = transliterator.getLangDataReader().isCombineAfter(predecessor);
+                                boolean isCombineBefore = transliterator.getLangDataReader().isCombineBefore(predecessor);
 
                                 Log.d(logTag, "predecessor: " + predecessor);
 
-                                predecessor = Transliterator.getLangDataReader().getBase(predecessor);
+                                predecessor = transliterator.getLangDataReader().getBase(predecessor);
                                 Log.d(logTag, "base: " + predecessor);
 
                                 if(isCombineAfter && isCombineBefore) {
@@ -421,7 +424,7 @@ public class PracticeTabFragment extends Fragment {
                                     predecessor = predecessor + virama + letters.get("consonants")
                                             .get(random.nextInt(numConsonants));
                                 }
-                            } while (Transliterator.getLangDataReader().isExcludeCombiExamples(predecessor));
+                            } while (transliterator.getLangDataReader().isExcludeCombiExamples(predecessor));
                             break;
                     }
                     String sign;
@@ -429,7 +432,7 @@ public class PracticeTabFragment extends Fragment {
                     // TODO: support it!
                     do {
                         sign = letters.get("signs").get(random.nextInt(numSigns));
-                    } while(sign.equals(Transliterator.getLangDataReader().getVirama()));
+                    } while(sign.equals(transliterator.getLangDataReader().getVirama()));
 
                     practiceString.append(predecessor).append(sign).append(" ");
                 }
@@ -441,11 +444,11 @@ public class PracticeTabFragment extends Fragment {
                     String ligature = letters.get("ligatures").get(random.nextInt(numLigatures));
                     // nextChar is base char if a base exists in the data file.
                     // if there is no base in the data file, nextChar equals ligature (variable above)
-                    String nextChar = Transliterator.getLangDataReader().getBase(ligature);
+                    String nextChar = transliterator.getLangDataReader().getBase(ligature);
 
                     // get the rules for combining this letter if such rule exists
-                    boolean isCombineAfter = Transliterator.getLangDataReader().isCombineAfter(ligature);
-                    boolean isCombineBefore = Transliterator.getLangDataReader().isCombineBefore(ligature);
+                    boolean isCombineAfter = transliterator.getLangDataReader().isCombineAfter(ligature);
+                    boolean isCombineBefore = transliterator.getLangDataReader().isCombineBefore(ligature);
                     if (isCombineAfter && isCombineBefore) {
                         // randomly select either combineBefore or combineAfter
                         switch (random.nextInt(2)) {

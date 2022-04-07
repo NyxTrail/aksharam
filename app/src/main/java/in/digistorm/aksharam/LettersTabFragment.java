@@ -96,7 +96,7 @@ public class LettersTabFragment extends Fragment {
             Spinner transSpinner = view.findViewById(R.id.lettersTabTransSpinner);
             String transLanguage = (String) transSpinner.getItemAtPosition(transSpinner.getSelectedItemPosition());
             Log.d(logTag, "Fetching info for " + transLanguage);
-            JSONObject infoJSON = Transliterator.getLangDataReader().getInfo(transLanguage, getContext());
+            JSONObject infoJSON = transliterator.getLangDataReader().getInfo(transLanguage, getContext());
             Log.d(logTag, infoJSON.toString());
 
             String info = infoJSON.optJSONObject("general").optString("en")
@@ -106,7 +106,7 @@ public class LettersTabFragment extends Fragment {
             MainActivity.replaceTabFragment(0, lif);
         });
 
-        Log.d(logTag, Transliterator.getLangDataReader().getCategories().toString());
+        Log.d(logTag, transliterator.getLangDataReader().getCategories().toString());
         categoriesList = new ExpandableListView(getContext());
         categoriesList.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -126,7 +126,7 @@ public class LettersTabFragment extends Fragment {
         adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                Transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
+                transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
                 R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         adapter.setNotifyOnChange(true);
@@ -134,12 +134,13 @@ public class LettersTabFragment extends Fragment {
         lettersTabLangSpinner.setSelection(0);
         LettersTabFragment ltf = this;
         GlobalSettings.getInstance().addDataFileListChangedListener("LettersTabFragmentListener", () -> {
-            Log.d(logTag, "Marked shouldUpdateSpinner true");
+            Log.d("LTFListener", "Refreshing LettersTabFragment adapter");
+            transliterator = new Transliterator(getContext());
             adapter.clear();
             // Invoke getAvailableSourceLanguages without Context object so that it does not
             // read the files again. The changed files have already been read into
             // LangDataReader when it was changed by the SettingsLanguageListAdapter
-            adapter.addAll(Transliterator.getLangDataReader().getAvailableSourceLanguages());
+            adapter.addAll(transliterator.getLangDataReader().getAvailableSourceLanguages());
             // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
             // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
             // think of to fix this
@@ -181,10 +182,10 @@ public class LettersTabFragment extends Fragment {
         Log.d(logTag, "Initialising lettersTabTransSpinner");
         Spinner lettersTabTransSpinner = getActivity().findViewById(R.id.lettersTabTransSpinner);
 
-        Log.d(logTag, Transliterator.getLangDataReader().getTransLangs().toString());
+        Log.d(logTag, transliterator.getLangDataReader().getTransLangs().toString());
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item, R.id.spinnerItemTV,
-                Transliterator.getLangDataReader().getTransLangs(),
+                transliterator.getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.letters_tab_trans_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabTransSpinner.setAdapter(adapter);

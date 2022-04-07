@@ -37,11 +37,11 @@ public class Transliterator {
     private static final String logTag = "Transliterator";
 
     // The backing langDataReader for all tabs
-    private static LangDataReader langDataReader;
+    private LangDataReader langDataReader;
     // listeners for users of Transliterator so that they can adapt
     // when backing LangDataReader changes
     private static Transliterator  currentTransliterator;
-    public static LangDataReader getLangDataReader() {
+    public LangDataReader getLangDataReader() {
         return langDataReader;
     }
 
@@ -52,13 +52,13 @@ public class Transliterator {
     }
 
     public String getCurrentLang() {
-        return Transliterator.getLangDataReader().getCurrentLang();
+        return langDataReader.getCurrentLang();
     }
 
     // langDataReader should be set up using correct constructors for Transliterator
     // This method should be removed
     public void setLangDataReader(LangDataReader langDataReader) {
-        Transliterator.langDataReader = langDataReader;
+        this.langDataReader = langDataReader;
     }
 
     private void initialise(String inputLang, Context context) {
@@ -81,7 +81,7 @@ public class Transliterator {
             // should this happen? don't know if i can test this
             // if no files are available, we restart the Initialisation activity
             // TODO: is this the right place to do this? in Transliterator class?
-            Log.d(logTag, "All files deleted. Starting InitialiseAppActivity");
+            Log.d(logTag, "Starting InitialiseAppActivity...");
             Intent intent = new Intent(context, InitialiseAppActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);

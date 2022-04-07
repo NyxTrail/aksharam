@@ -79,7 +79,8 @@ public class LetterInfoFragment extends Fragment {
                 .setText(tr.transliterate(currentLetter,
                         lettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
-        JSONObject letterExamples = Transliterator.getLangDataReader().getLetterExamples(currentLetter);
+        JSONObject letterExamples = lettersTabFragment.getTransliterator().getLangDataReader()
+                .getLetterExamples(currentLetter);
 
         // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
         LinearLayout letterInfoWordAndMeaningLL =
@@ -101,8 +102,8 @@ public class LetterInfoFragment extends Fragment {
                             getResources().getDisplayMetrics());
                     wordsAndMeaningView.setPadding(px, px, px, px);
                     String meaning = letterExamples.getJSONObject(word)
-                            .getString(Transliterator.getLangDataReader().getTargetLangCode(
-                                    lettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                            .getString(lettersTabFragment.getTransliterator().getLangDataReader()
+                                    .getTargetLangCode(lettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
                     ((TextView) wordsAndMeaningView.findViewById(R.id.wordAndMeaningWordTV))
                             .setText(word);
@@ -118,7 +119,8 @@ public class LetterInfoFragment extends Fragment {
             }
 
             // Check if extra info exists for this letter
-            String letterInfo = Transliterator.getLangDataReader().getLetterInfo(currentLetter);
+            String letterInfo = lettersTabFragment.getTransliterator().getLangDataReader()
+                    .getLetterInfo(currentLetter);
             TextView letterInfoInfoTV = v.findViewById(R.id.letterInfoInfoTV);
             if(letterInfo == null || letterInfo.isEmpty()) {
                 Log.d(logTag, "No additional info for " + currentLetter
@@ -131,14 +133,17 @@ public class LetterInfoFragment extends Fragment {
 
             // For consonants and ligatures, show examples of how they can combine with
             // vowel diacritics.
-            String category = Transliterator.getLangDataReader().getCategory(currentLetter);
+            String category = lettersTabFragment.getTransliterator().getLangDataReader()
+                    .getCategory(currentLetter);
             boolean showDiacriticExamples = true;
-            if(category != null && !Transliterator.getLangDataReader().isExcludeCombiExamples(currentLetter)
+            if(category != null && !lettersTabFragment.getTransliterator().getLangDataReader()
+                    .isExcludeCombiExamples(currentLetter)
                     && (category.equalsIgnoreCase("consonants")
                         || category.equalsIgnoreCase("ligatures"))) {
                 displaySignConsonantCombinations(v, category);
                 if(category.equalsIgnoreCase("consonants"))
-                    if(Transliterator.getLangDataReader().areLigaturesAutoGeneratable())
+                    if(lettersTabFragment.getTransliterator().getLangDataReader()
+                            .areLigaturesAutoGeneratable())
                         displayLigatures(v);
             }
             else
@@ -170,8 +175,8 @@ public class LetterInfoFragment extends Fragment {
         TextView ligatureBeforeHintTV = v.findViewById(R.id.letterInfoLigaturesBeforeTV);
 
         ArrayList<String> items = null;
-        items = Transliterator.getLangDataReader().getConsonants();
-        String virama = Transliterator.getLangDataReader().getVirama();
+        items = lettersTabFragment.getTransliterator().getLangDataReader().getConsonants();
+        String virama = lettersTabFragment.getTransliterator().getLangDataReader().getVirama();
 
         v.findViewById(R.id.letterInfoLigaturesCL).setVisibility(View.VISIBLE);
         GridLayout ligaturesGLBefore = v.findViewById(R.id.letterInfoLigaturesBeforeGL);
@@ -263,15 +268,15 @@ public class LetterInfoFragment extends Fragment {
         if(type.equalsIgnoreCase("signs")) {
             diacriticSelectorHintTV.setText(getString(R.string.consonants_with_diacritic,
                     currentLetter));
-            items = Transliterator.getLangDataReader().getConsonants();
-            items.addAll(Transliterator.getLangDataReader().getLigatures());
+            items = lettersTabFragment.getTransliterator().getLangDataReader().getConsonants();
+            items.addAll(lettersTabFragment.getTransliterator().getLangDataReader().getLigatures());
         }
         // we need to display examples for a consonant/ligature
         else if(type.equalsIgnoreCase("consonants")
                 || type.equalsIgnoreCase("ligatures")) {
             diacriticSelectorHintTV.setText(getString(R.string.diacritics_with_consonant,
                     currentLetter));
-            items = Transliterator.getLangDataReader().getDiacritics();
+            items = lettersTabFragment.getTransliterator().getLangDataReader().getDiacritics();
         }
 
         if(items == null)
@@ -301,12 +306,14 @@ public class LetterInfoFragment extends Fragment {
             textView.setPadding(4, 4, 4,4);
             textView.setLayoutParams(tvLayoutParams);
             if(type.equalsIgnoreCase("signs")
-                    && !Transliterator.getLangDataReader().isExcludeCombiExamples(item)) {
+                    && !lettersTabFragment.getTransliterator().getLangDataReader()
+                    .isExcludeCombiExamples(item)) {
                     textView.setText(item + currentLetter);
             }
             else if((type.equalsIgnoreCase("consonants")
                     || type.equalsIgnoreCase("ligatures"))
-                    && !Transliterator.getLangDataReader().isExcludeCombiExamples(item))
+                    && !lettersTabFragment.getTransliterator().getLangDataReader()
+                    .isExcludeCombiExamples(item))
                 textView.setText(currentLetter + item);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(
