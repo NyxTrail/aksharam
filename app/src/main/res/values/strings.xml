@@ -66,7 +66,7 @@
     <string name="practice_tab_lang_hint">Language</string>
     <string name="practice_tab_practice_in_hint">Practice In</string>
     <string name="practice_tab_practice_type_hint">Practice Type</string>
-    <string name="practice_tab_practice_input_hint">Enter Text In %s</string>
+    <string name="practice_tab_practice_input_hint">Practice in %s</string>
     <string name="practice_tab_correct_text_entered">You got it!</string>
 
     <!-- strings for settings activity -->

@@ -34,14 +34,8 @@
         android:layout_height="48dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Space
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
         app:layout_constraintEnd_toStartOf="@+id/lettersTabTransSpinner"
-        app:layout_constraintStart_toEndOf="@+id/lettersTabLangSpinner"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Spinner
@@ -50,19 +44,20 @@
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginEnd="4dp"
         app:layout_constraintEnd_toStartOf="@+id/lettersTabInfoButton"
+        app:layout_constraintStart_toEndOf="@id/lettersTabLangSpinner"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/lettersTabInfoButton"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:theme="@style/RoundedImageButton"
         app:layout_constraintBottom_toTopOf="@+id/LettersView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:theme="@style/RoundedImageButton"
         app:srcCompat="@drawable/ic_baseline_info_24" />
 
     <ScrollView

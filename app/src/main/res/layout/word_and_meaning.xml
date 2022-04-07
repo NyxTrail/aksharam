@@ -33,7 +33,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/test_text"
-        android:textSize="20sp"
+        android:textSize="@dimen/letter_info_word_size"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -42,6 +42,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="4dp"
+        android:textSize="@dimen/letter_info_transliteration_size"
         android:text="@string/test_text"
         app:layout_constraintStart_toStartOf="@+id/wordAndMeaningWordTV"
         app:layout_constraintTop_toBottomOf="@+id/wordAndMeaningWordTV" />
@@ -58,7 +59,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/test_text"
-        android:textSize="20sp"
+        android:textSize="@dimen/letter_info_meaning"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

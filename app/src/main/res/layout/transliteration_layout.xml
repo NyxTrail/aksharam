@@ -53,6 +53,7 @@
                 android:layout_height="match_parent"
                 android:ems="10"
                 android:hint="@string/input_text_field"
+                android:textSize="@dimen/text_normal_size"
                 android:inputType="text|textMultiLine" />
         </LinearLayout>
     </ScrollView>
@@ -106,6 +107,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:hint="@string/output_text_field"
+                android:textSize="@dimen/text_normal_size"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.40"
                 app:layout_constraintStart_toStartOf="parent"/>

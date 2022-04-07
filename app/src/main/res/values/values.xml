@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="text_normal_size">20sp</dimen>
+
+    <dimen name="text_hint_size">20sp</dimen>
+    <dimen name="text_clickable_size">20sp</dimen>
+    <dimen name="text_info_size">20sp</dimen>
+    <dimen name="text_category_header">24sp</dimen>
+
+    <!-- Letter info view stuff !-->
+    <dimen name="letter_info_heading">60sp</dimen>
+    <dimen name="letter_info_transliterated_heading">40sp</dimen>
+    <dimen name="letter_info_word_size">22sp</dimen>
+    <dimen name="letter_info_transliteration_size">16sp</dimen>
+    <dimen name="letter_info_meaning">22sp</dimen>
+
+    <!-- dimensions for grid-related stuff -->
+    <dimen name="letter_grid_margin">2dp</dimen>
+    <dimen name="letter_grid_padding">4dp</dimen>
+
+    <!-- spinner drop down config !-->
+    <dimen name="spinner_text">18sp</dimen>
+    <dimen name="spinner_drop_down">18sp</dimen>
+    <dimen name="spinner_hint">12sp</dimen>
+
+    <!-- this thing is not used yet. should be used in LetterCategoryAdapter.java around line 161 !-->
+    <dimen name="letter_grid_text_size">22dp</dimen>
+</resources>

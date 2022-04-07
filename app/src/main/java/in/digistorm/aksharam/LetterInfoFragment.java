@@ -200,11 +200,14 @@ public class LetterInfoFragment extends Fragment {
 
             TextView textView = new TextView(getContext());
             textView.setGravity(Gravity.CENTER);
-            ViewGroup.LayoutParams tvLayoutParams = new ViewGroup.LayoutParams(
+            ViewGroup.MarginLayoutParams tvLayoutParams = new ViewGroup.MarginLayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            textView.setPadding(4, 4, 4,4);
             textView.setLayoutParams(tvLayoutParams);
+            int px = getResources().getDimensionPixelSize(R.dimen.letter_grid_margin);
+            tvLayoutParams.setMargins(px, px, px, px);
+            px = getResources().getDimensionPixelSize(R.dimen.letter_grid_padding);
+            textView.setPadding(px, px, px, px);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -230,11 +233,14 @@ public class LetterInfoFragment extends Fragment {
 
             textView = new TextView(getContext());
             textView.setGravity(Gravity.CENTER);
-            tvLayoutParams = new ViewGroup.LayoutParams(
+            tvLayoutParams = new ViewGroup.MarginLayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            textView.setPadding(4, 4, 4,4);
+            px = getResources().getDimensionPixelSize(R.dimen.letter_grid_margin);
+            tvLayoutParams.setMargins(px, px, px, px);
             textView.setLayoutParams(tvLayoutParams);
+            px = getResources().getDimensionPixelSize(R.dimen.letter_grid_padding);
+            textView.setPadding(px, px, px, px);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
             tvParams = new ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.WRAP_CONTENT,
