@@ -156,10 +156,10 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                     ViewGroup.LayoutParams.WRAP_CONTENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
 
-            int pixels = lettersTabFragment.getResources().getDimensionPixelSize(R.dimen.letter_grid_margin);
+            int pixels = lettersTabFragment.getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
             tvLayoutParams.setMargins(pixels, pixels, pixels, pixels);
             tv.setLayoutParams(tvLayoutParams);
-            pixels = lettersTabFragment.getResources().getDimensionPixelSize(R.dimen.letter_grid_padding);
+            pixels = lettersTabFragment.getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_padding);
             tv.setPadding(pixels, pixels, pixels, pixels);
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
 
