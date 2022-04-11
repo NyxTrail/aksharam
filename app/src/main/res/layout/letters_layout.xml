@@ -44,19 +44,21 @@
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="4dp"
         app:layout_constraintEnd_toStartOf="@+id/lettersTabInfoButton"
         app:layout_constraintStart_toEndOf="@id/lettersTabLangSpinner"
         app:layout_constraintTop_toTopOf="parent" />
 
     <ImageButton
         android:id="@+id/lettersTabInfoButton"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:theme="@style/RoundedImageButton"
+        android:layout_marginEnd="4dp"
+        android:foregroundTintMode="add"
+        android:minWidth="30dp"
+        style="@style/RoundedImageButton"
         app:layout_constraintBottom_toTopOf="@+id/LettersView"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/lettersTabTransSpinner"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/ic_baseline_info_24" />
 

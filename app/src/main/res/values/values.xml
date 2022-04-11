@@ -19,7 +19,7 @@
     <dimen name="letter_grid_padding">4dp</dimen>
 
     <!-- spinner drop down config !-->
-    <dimen name="spinner_text">18sp</dimen>
+    <dimen name="spinner_text">16sp</dimen>
     <dimen name="spinner_drop_down">18sp</dimen>
     <dimen name="spinner_hint">12sp</dimen>
 
