@@ -20,7 +20,6 @@ package in.digistorm.aksharam;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,6 +35,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import in.digistorm.aksharam.util.Log;
 
 public class LanguageDataFileListAdapter extends RecyclerView.Adapter<LanguageDataFileListAdapter.ViewHolder> {
     // apparently log tag can at most be 23 characters

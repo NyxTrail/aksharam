@@ -24,7 +24,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,6 +44,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
+
+import in.digistorm.aksharam.util.Log;
 
 public class PracticeTabFragment extends Fragment {
     private final String logTag = "PracticeTabFragment";

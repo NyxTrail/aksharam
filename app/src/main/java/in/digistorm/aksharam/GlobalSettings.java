@@ -21,12 +21,8 @@ package in.digistorm.aksharam;
  */
 
 import android.content.Context;
-import android.preference.PreferenceManager;
-import android.util.Log;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.BlockingDeque;
@@ -34,6 +30,8 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import in.digistorm.aksharam.util.Log;
 
 public class GlobalSettings {
     private static GlobalSettings globalSettings;

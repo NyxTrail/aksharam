@@ -2,10 +2,11 @@ package in.digistorm.aksharam;
 
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import in.digistorm.aksharam.util.Log;
 
 public class HelpActivity extends AppCompatActivity {
     String logTag = "HelpActivity";

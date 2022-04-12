@@ -21,8 +21,6 @@
 package in.digistorm.aksharam;
 
 import android.content.Context;
-import android.util.Log;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +37,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import in.digistorm.aksharam.util.Log;
 
 public class LangDataReader {
     private final String logTag = "LangDataReader";

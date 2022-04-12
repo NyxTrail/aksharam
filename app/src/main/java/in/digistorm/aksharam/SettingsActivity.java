@@ -21,7 +21,6 @@ package in.digistorm.aksharam;
  */
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
@@ -31,6 +30,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import in.digistorm.aksharam.util.LanguageDataDownloader;
+import in.digistorm.aksharam.util.Log;
 
 import org.json.JSONArray;
 

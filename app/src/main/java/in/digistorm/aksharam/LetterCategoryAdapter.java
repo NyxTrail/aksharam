@@ -24,7 +24,6 @@ import android.content.Context;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Build;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -38,6 +37,7 @@ import android.widget.TextView;
 import androidx.annotation.RequiresApi;
 
 import in.digistorm.aksharam.util.AutoAdjustingTextView;
+import in.digistorm.aksharam.util.Log;
 
 public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     private final String logTag = "LetterCategoryAdapter";

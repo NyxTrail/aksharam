@@ -22,7 +22,6 @@ package in.digistorm.aksharam;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,6 +29,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+
+import in.digistorm.aksharam.util.Log;
 
 // This class is responsible for the actual transliteration
 public class Transliterator {

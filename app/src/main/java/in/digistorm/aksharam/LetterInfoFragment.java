@@ -24,7 +24,6 @@ import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.os.Bundle;
 import android.text.Html;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.Display;
 import android.view.Gravity;
@@ -46,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import in.digistorm.aksharam.util.AutoAdjustingTextView;
+import in.digistorm.aksharam.util.Log;
 
 public class LetterInfoFragment extends Fragment {
     private final String logTag = "LetterInfoFragment";

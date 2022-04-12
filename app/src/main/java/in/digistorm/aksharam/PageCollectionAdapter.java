@@ -20,7 +20,6 @@ package in.digistorm.aksharam;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -28,6 +27,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 
 import java.util.ArrayList;
 import java.util.Stack;
+
+import in.digistorm.aksharam.util.Log;
 
 public class PageCollectionAdapter extends FragmentStateAdapter {
     private final String logTag = "PageCollectionAdatper";

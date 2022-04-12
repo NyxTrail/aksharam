@@ -21,7 +21,6 @@ package in.digistorm.aksharam;
  */
 
 import android.app.Activity;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -34,6 +33,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
 import in.digistorm.aksharam.util.LanguageDataDownloader;
+import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.OnRequestCompleted;
 
 import org.json.JSONArray;

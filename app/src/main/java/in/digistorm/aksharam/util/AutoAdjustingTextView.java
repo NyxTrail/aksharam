@@ -3,7 +3,6 @@ package in.digistorm.aksharam.util;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.TypedValue;
 
 import androidx.annotation.NonNull;
