@@ -26,21 +26,20 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
+
 import androidx.gridlayout.widget.GridLayout;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
-import androidx.fragment.app.FragmentActivity;
+
+import in.digistorm.aksharam.util.AutoAdjustingTextView;
 
 public class LetterCategoryAdapter extends BaseExpandableListAdapter {
-    private final FragmentActivity activity;
     private final String logTag = "LetterCategoryAdapter";
 
     private final String[] headers;
@@ -48,11 +47,10 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     // The adapters copy of the parent fragment
     private LettersTabFragment lettersTabFragment;
 
-    public LetterCategoryAdapter(FragmentActivity activity, LettersTabFragment ltf) {
+    public LetterCategoryAdapter(LettersTabFragment ltf) {
         lettersTabFragment = ltf;
         headers = lettersTabFragment.getTransliterator().getLangDataReader()
                 .getCategories().keySet().toArray(new String[0]);
-        this.activity = activity;
     }
 
     @Override
@@ -98,7 +96,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                              ViewGroup parent) {
         Log.d(logTag, "getting groupview for position " + groupPosition);
         if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) this.activity
+            LayoutInflater layoutInflater = (LayoutInflater) lettersTabFragment.getActivity()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.letter_category_header, null);
         }
@@ -121,7 +119,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
         if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) this.activity
+            LayoutInflater layoutInflater = (LayoutInflater) lettersTabFragment.getActivity()
                     .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             convertView = layoutInflater.inflate(R.layout.letter_category_content, null);
         }
@@ -134,28 +132,19 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
 
         String[] letters = lettersTabFragment.getTransliterator().getLangDataReader()
                 .getCategories().get(headers[groupPosition]).toArray(new String[0]);
+
+        Point size = new Point();
+        lettersTabFragment.getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+        int i = 0, cols = 5;
         for(String letter: letters) {
-            LinearLayout linearLayout = new LinearLayout(activity);
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            Display display = activity.getWindowManager().getDefaultDisplay();
-            Point size = new Point();
-            try {
-                display.getRealSize(size);
-            } catch (NoSuchMethodError err) {
-                display.getSize(size);
-            }
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                    size.x/6,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            linearLayout.setLayoutParams(layoutParams);
-            linearLayout.setGravity(Gravity.CENTER);
+            GridLayout.Spec rowSpec = GridLayout.spec(i / cols, GridLayout.CENTER);
+            GridLayout.Spec colSpec = GridLayout.spec(i % cols, GridLayout.CENTER);
 
-            TextView tv = new TextView(activity);
+            AutoAdjustingTextView tv = new AutoAdjustingTextView(lettersTabFragment.getContext());
+            tv.setGravity(Gravity.CENTER);
             tv.setText(letter);
-            ViewGroup.MarginLayoutParams tvLayoutParams = new ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-
+            GridLayout.LayoutParams tvLayoutParams = new GridLayout.LayoutParams(rowSpec, colSpec);
+            tvLayoutParams.width = size.x / 6;
             int pixels = lettersTabFragment.getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
             tvLayoutParams.setMargins(pixels, pixels, pixels, pixels);
             tv.setLayoutParams(tvLayoutParams);
@@ -163,9 +152,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             tv.setPadding(pixels, pixels, pixels, pixels);
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
 
-            linearLayout.setClickable(true);
-            linearLayout.setLongClickable(true);
-            linearLayout.setOnLongClickListener(v -> {
+            tv.setOnLongClickListener(v -> {
                 Log.d(logTag, letter + " long clicked!");
 
                 LetterInfoFragment letterInfoFragment = LetterInfoFragment.newInstance(letter, lettersTabFragment);
@@ -173,7 +160,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                 return true;
             });
 
-            linearLayout.setOnClickListener(v -> {
+            tv.setOnClickListener(v -> {
                 Log.d(logTag, letter + " clicked!");
                 if (tv.getText().toString().equals(letter)) {
                     if (!lettersTabFragment.getLettersTabFragmentLanguage().equalsIgnoreCase(
@@ -188,8 +175,9 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
                     tv.setText(letter);
             });
 
-            linearLayout.addView(tv);
-            gridLayout.addView(linearLayout);
+            gridLayout.addView(tv, tvLayoutParams);
+
+            i++;
         }
         return convertView;
     }

@@ -17,7 +17,8 @@
     <!-- dimensions for grid-related stuff -->
     <dimen name="letter_grid_tv_margin">2dp</dimen>
     <dimen name="letter_grid_ll_margin">5dp</dimen>
-    <dimen name="letter_grid_tv_padding">4dp</dimen>
+    <dimen name="letter_grid_tv_padding">2dp</dimen>
+    <dimen name="letter_grid_height">40dp</dimen>
 
     <!-- spinner drop down config !-->
     <dimen name="spinner_text">16sp</dimen>

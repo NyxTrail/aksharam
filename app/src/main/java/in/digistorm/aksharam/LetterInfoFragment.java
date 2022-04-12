@@ -21,10 +21,12 @@ package in.digistorm.aksharam;
  */
 
 import android.annotation.SuppressLint;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Display;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +34,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.gridlayout.widget.GridLayout;
 
@@ -40,6 +43,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+
+import in.digistorm.aksharam.util.AutoAdjustingTextView;
 
 public class LetterInfoFragment extends Fragment {
     private final String logTag = "LetterInfoFragment";
@@ -73,10 +78,9 @@ public class LetterInfoFragment extends Fragment {
         }
         Log.d(logTag, "Showing info dialog for: " + currentLetter);
         Transliterator tr = lettersTabFragment.getTransliterator();
-        ((TextView) v.findViewById(R.id.letterInfoHeadingTV))
-                .setText(currentLetter);
-        ((TextView) v.findViewById(R.id.letterInfoTransliteratedHeadingTV))
-                .setText(tr.transliterate(currentLetter,
+        setText(v.findViewById(R.id.letterInfoHeadingTV), currentLetter);
+        setText(v.findViewById(R.id.letterInfoTransliteratedHeadingTV),
+                tr.transliterate(currentLetter,
                         lettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
         JSONObject letterExamples = lettersTabFragment.getTransliterator().getLangDataReader()
@@ -105,15 +109,11 @@ public class LetterInfoFragment extends Fragment {
                             .getString(lettersTabFragment.getTransliterator().getLangDataReader()
                                     .getTargetLangCode(lettersTabFragment.getLettersTabFragmentTargetLanguage()));
 
-                    ((TextView) wordsAndMeaningView.findViewById(R.id.wordAndMeaningWordTV))
-                            .setText(word);
-                    ((TextView) wordsAndMeaningView.findViewById(R.id.wordAndMeaningMeaningTV))
-                            .setText(meaning);
-                    ((TextView) wordsAndMeaningView
-                            .findViewById(R.id.wordAndMeaningTransliterationTV))
-                            .setText(lettersTabFragment.getTransliterator().transliterate
-                                    (word, lettersTabFragment
-                                            .getLettersTabFragmentTargetLanguage()));
+                    setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningWordTV), word);
+                    setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningMeaningTV), meaning);
+                    setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningTransliterationTV),
+                            lettersTabFragment.getTransliterator().transliterate(word,
+                                    lettersTabFragment.getLettersTabFragmentTargetLanguage()));
                     letterInfoWordAndMeaningLL.addView(wordsAndMeaningView);
                 }
             }
@@ -153,8 +153,10 @@ public class LetterInfoFragment extends Fragment {
             // For a sign, display how it combines with each consonant
             if(category != null && (category.equalsIgnoreCase("signs")))
                     displaySignConsonantCombinations(v, category);
-            else if(!showDiacriticExamples)
-                v.findViewById(R.id.diacriticExamplesLL).setVisibility(View.GONE);
+            else if(!showDiacriticExamples) {
+                v.findViewById(R.id.diacriticSelectorHintTV).setVisibility(View.GONE);
+                v.findViewById(R.id.diacriticExamplesGL).setVisibility(View.GONE);
+            }
         }
         catch (JSONException je) {
             Log.d(logTag, "Exception caught while reading fetching info for "
@@ -173,94 +175,65 @@ public class LetterInfoFragment extends Fragment {
          * TODO: some way to reduce code duplication?
          */
         TextView ligatureAfterHintTV = v.findViewById(R.id.letterInfoLigaturesAfterTV);
+        ligatureAfterHintTV.setVisibility(View.VISIBLE);
         TextView ligatureBeforeHintTV = v.findViewById(R.id.letterInfoLigaturesBeforeTV);
+        ligatureBeforeHintTV.setVisibility(View.VISIBLE);
 
         ArrayList<String> items;
         items = lettersTabFragment.getTransliterator().getLangDataReader().getConsonants();
         String virama = lettersTabFragment.getTransliterator().getLangDataReader().getVirama();
 
-        v.findViewById(R.id.letterInfoLigaturesLL).setVisibility(View.VISIBLE);
+        // v.findViewById(R.id.letterInfoLigaturesLL).setVisibility(View.VISIBLE);
         GridLayout ligaturesGLBefore = v.findViewById(R.id.letterInfoLigaturesBeforeGL);
         ligaturesGLBefore.removeAllViews();
+        ligaturesGLBefore.setVisibility(View.VISIBLE);
         GridLayout ligaturesGLAfter = v.findViewById(R.id.letterInfoLigaturesAfterGL);
         ligaturesGLAfter.removeAllViews();
+        ligaturesGLAfter.setVisibility(View.VISIBLE);
 
         ligatureBeforeHintTV.setText(getString(R.string.letter_info_ligature_consonant_before,
                 currentLetter, currentLetter, virama));
         ligatureAfterHintTV.setText(getString(R.string.letter_info_ligature_consonant_after,
                 currentLetter, virama, currentLetter));
 
+        Point size = new Point();
+        getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+        int i = 0, cols = 5;
         for(String item: items) {
             String ligatureAfter = item + virama + currentLetter;
             String ligatureBefore = currentLetter + virama + item;
 
+            // Can we use the same row, col specs for both GridLayouts?
+            GridLayout.Spec rowSpec = GridLayout.spec(i / cols, GridLayout.CENTER);
+            GridLayout.Spec colSpec = GridLayout.spec(i % cols, GridLayout.CENTER);
+
             // UI elements for ligatureBefore
-            LinearLayout linearLayout = new LinearLayout(getContext());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setGravity(Gravity.CENTER);
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-
-            int px = getResources().getDimensionPixelSize(R.dimen.letter_grid_ll_margin);
-            layoutParams.setMargins(px, px, px, px);
-            linearLayout.setLayoutParams(layoutParams);
-
-            TextView textView = new TextView(getContext());
+            AutoAdjustingTextView textView = new AutoAdjustingTextView(getContext());
             textView.setGravity(Gravity.CENTER);
-            ViewGroup.MarginLayoutParams tvLayoutParams = new ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
+            GridLayout.LayoutParams tvLayoutParams = new GridLayout.LayoutParams(rowSpec, colSpec);
+            tvLayoutParams.width = size.x / 6;
             textView.setLayoutParams(tvLayoutParams);
-            px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
+            int px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
             tvLayoutParams.setMargins(px, px, px, px);
             px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_padding);
             textView.setPadding(px, px, px, px);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            ViewGroup.LayoutParams tvParams = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            textView.setLayoutParams(tvParams);
-
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
             textView.setText(ligatureBefore);
-
-            linearLayout.addView(textView);
-            ligaturesGLBefore.addView(linearLayout);
+            ligaturesGLBefore.addView(textView, tvLayoutParams);
 
             // UI elements for ligatureAfter
-            linearLayout = new LinearLayout(getContext());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setGravity(Gravity.CENTER);
-            layoutParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-
-            px = getResources().getDimensionPixelSize(R.dimen.letter_grid_ll_margin);
-            layoutParams.setMargins(px, px, px, px);
-            linearLayout.setLayoutParams(layoutParams);
-
-            textView = new TextView(getContext());
+            textView = new AutoAdjustingTextView(getContext());
             textView.setGravity(Gravity.CENTER);
-            tvLayoutParams = new ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
             px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
             tvLayoutParams.setMargins(px, px, px, px);
             textView.setLayoutParams(tvLayoutParams);
             px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_padding);
             textView.setPadding(px, px, px, px);
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
-            tvParams = new ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            );
-            textView.setLayoutParams(tvParams);
-
             textView.setText(ligatureAfter);
+            ligaturesGLAfter.addView(textView, tvLayoutParams);
 
-            linearLayout.addView(textView);
-            ligaturesGLAfter.addView(linearLayout);
+            i++;
         }
     }
 
@@ -291,24 +264,20 @@ public class LetterInfoFragment extends Fragment {
         GridLayout diacriticExamplesGridLayout = v.findViewById(R.id.diacriticExamplesGL);
         diacriticExamplesGridLayout.removeAllViews();
 
+        Point size = new Point();
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        display.getSize(size);
+        int i = 0, cols = 5;
         for(String item: items) {
-            LinearLayout linearLayout = new LinearLayout(getContext());
-            linearLayout.setOrientation(LinearLayout.VERTICAL);
-            linearLayout.setGravity(Gravity.CENTER);
-
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT);
-            int px = getResources().getDimensionPixelSize(R.dimen.letter_grid_ll_margin);
-            layoutParams.setMargins(px, px, px, px);
-            linearLayout.setLayoutParams(layoutParams);
-
-            TextView textView = new TextView(getContext());
+            GridLayout.Spec rowSpec = GridLayout.spec(i / cols, GridLayout.CENTER);
+            GridLayout.Spec colSpec = GridLayout.spec(i % cols, GridLayout.CENTER);
+            AutoAdjustingTextView textView = new AutoAdjustingTextView(getContext());
             textView.setGravity(Gravity.CENTER);
-            ViewGroup.MarginLayoutParams tvLayoutParams = new ViewGroup.MarginLayoutParams(
-                    ViewGroup.LayoutParams.WRAP_CONTENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT);
-            px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_padding);
+            textView.setSingleLine();
+            GridLayout.LayoutParams tvLayoutParams = new GridLayout.LayoutParams(rowSpec, colSpec);
+            tvLayoutParams.width = size.x / 6;
+            tvLayoutParams.height = getResources().getDimensionPixelSize(R.dimen.letter_grid_height);
+            int px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_padding);
             tvLayoutParams.setMargins(px, px, px, px);
             textView.setLayoutParams(tvLayoutParams);
             px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
@@ -316,20 +285,43 @@ public class LetterInfoFragment extends Fragment {
             if(type.equalsIgnoreCase("signs")
                     && !lettersTabFragment.getTransliterator().getLangDataReader()
                     .isExcludeCombiExamples(item)) {
-                    textView.setText(item + currentLetter);
+                textView.setText(item + currentLetter);
             }
             else if((type.equalsIgnoreCase("consonants")
                     || type.equalsIgnoreCase("ligatures"))
                     && !lettersTabFragment.getTransliterator().getLangDataReader()
                     .isExcludeCombiExamples(item))
                 textView.setText(currentLetter + item);
-            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);
 
+            textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
             // Add the textView and its parent linear layout only if the textview has some content
             if(textView.getText() != null && !textView.getText().equals("")) {
-                linearLayout.addView(textView);
-                diacriticExamplesGridLayout.addView(linearLayout);
+                diacriticExamplesGridLayout.addView(textView, tvLayoutParams);
             }
+            i++;
+        }
+    }
+
+    // A wrapper for setText to add a space at the end, to work around clipping of long characters
+    private void setText(TextView tv, String text) {
+        String lastChar = text.substring(text.length() - 1);
+        switch(lastChar) {
+            // Hindi
+            case "्":
+            case "ँ":
+            case "ॅ":
+            case "ॉ":
+
+            // Malayalam
+            case "്":
+
+            // Kannada
+            case "ೃ":
+                tv.setText(text + " ");
+                break;
+
+            default:
+                tv.setText(text);
         }
     }
 
@@ -342,5 +334,11 @@ public class LetterInfoFragment extends Fragment {
         setUp(v, inflater);
 
         return v;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
     }
 }

@@ -24,11 +24,10 @@
 
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <in.digistorm.aksharam.util.AutoAdjustingTextView
         android:id="@+id/letterInfoHeadingTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -113,108 +112,103 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/letterInfoWordsTV" />
 
+            <!-- alignment in this tv is defined by HTML & CSS !-->
             <TextView
                 android:id="@+id/letterInfoInfoTV"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
                 android:layout_marginTop="24dp"
-                android:layout_marginEnd="16dp"
-                android:padding="16dp"
+                android:layout_marginEnd="8dp"
+                android:padding="2dp"
                 android:text="@string/lorem_ipsum"
                 android:textSize="@dimen/text_normal_size"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/letterInfoWordAndMeaningLL" />
 
-            <LinearLayout
-                android:id="@+id/diacriticExamplesLL"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/diacriticSelectorHintTV"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="4dp"
+                android:gravity="start|center_vertical"
+                android:minHeight="50dp"
+                android:minWidth="200dp"
+                android:textSize="@dimen/text_normal_size"
+                android:text="@string/test_text"
+                app:layout_constraintBottom_toTopOf="@id/diacriticExamplesGL"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/letterInfoInfoTV">
+                app:layout_constraintTop_toBottomOf="@id/letterInfoInfoTV" />
 
-                <TextView
-                    android:id="@+id/diacriticSelectorHintTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="fill_horizontal|left"
-                    android:layout_weight="1"
-                    android:foregroundGravity="fill_horizontal"
-                    android:gravity="fill_horizontal|left"
-                    android:text="@string/test_text"
-                    android:textSize="@dimen/text_normal_size" />
-
-                <androidx.gridlayout.widget.GridLayout
-                    android:id="@+id/diacriticExamplesGL"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:padding="8dp"
-                    app:columnCount="5" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/letterInfoLigaturesLL"
-                android:layout_width="match_parent"
+            <androidx.gridlayout.widget.GridLayout
+                android:id="@+id/diacriticExamplesGL"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:gravity="center"
-                android:orientation="vertical"
-                android:visibility="invisible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:layout_weight="1"
+                android:padding="4dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/diacriticExamplesLL">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/diacriticSelectorHintTV"
+                app:layout_constraintBottom_toTopOf="@id/letterInfoLigaturesBeforeTV" />
 
-                <TextView
-                    android:id="@+id/letterInfoLigaturesBeforeTV"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="fill_horizontal|left"
-                    android:layout_weight="1"
-                    android:foregroundGravity="fill_horizontal"
-                    android:gravity="fill_horizontal|left"
-                    android:text="@string/test_text"
-                    android:textSize="@dimen/text_normal_size" />
+            <TextView
+                android:id="@+id/letterInfoLigaturesBeforeTV"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:text="@string/test_text"
+                android:textSize="@dimen/text_normal_size"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/diacriticExamplesGL"
+                app:layout_constraintBottom_toTopOf="@id/letterInfoLigaturesBeforeGL" />
 
-                <androidx.gridlayout.widget.GridLayout
-                    android:id="@+id/letterInfoLigaturesBeforeGL"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:padding="2dp"
-                    app:columnCount="5">
+            <androidx.gridlayout.widget.GridLayout
+                android:id="@+id/letterInfoLigaturesBeforeGL"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/letterInfoLigaturesBeforeTV"
+                app:layout_constraintBottom_toTopOf="@id/letterInfoLigaturesAfterTV" />
 
-                </androidx.gridlayout.widget.GridLayout>
+            <TextView
+                android:id="@+id/letterInfoLigaturesAfterTV"
+                android:visibility="gone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start|center_vertical"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="4dp"
+                android:text="@string/test_text"
+                android:textSize="@dimen/text_normal_size"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/letterInfoLigaturesBeforeGL"
+                app:layout_constraintBottom_toTopOf="@id/letterInfoLigaturesAfterGL" />
 
-                <TextView
-                    android:id="@+id/letterInfoLigaturesAfterTV"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="fill_horizontal|left"
-                    android:layout_weight="1"
-                    android:foregroundGravity="fill_horizontal"
-                    android:gravity="fill_horizontal|left"
-                    android:text="@string/test_text"
-                    android:textSize="@dimen/text_normal_size" />
-
-                <androidx.gridlayout.widget.GridLayout
-                    android:id="@+id/letterInfoLigaturesAfterGL"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:padding="8dp"
-                    app:columnCount="5">
-
-                </androidx.gridlayout.widget.GridLayout>
-            </LinearLayout>
+            <androidx.gridlayout.widget.GridLayout
+                android:id="@+id/letterInfoLigaturesAfterGL"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="4dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/letterInfoLigaturesAfterTV"
+                app:layout_constraintBottom_toBottomOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>

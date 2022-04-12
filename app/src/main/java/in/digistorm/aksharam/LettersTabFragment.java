@@ -53,11 +53,6 @@ public class LettersTabFragment extends Fragment {
     private LabelledArrayAdapter<String> adapter;
     private Spinner lettersTabLangSpinner;
 
-    public void setLettersTabFragmentLanguage(String lang) {
-        // should add some sanity checks here
-        language = lang;
-    }
-
     public String getLettersTabFragmentLanguage() {
         return language;
     }
@@ -66,6 +61,12 @@ public class LettersTabFragment extends Fragment {
         // should add some sanity checks here
         targetLanguage = lang;
     }
+
+    public void setLettersTabFragmentLanguage(String lang) {
+        // should add some sanity checks here
+        language = lang;
+    }
+
     public String getLettersTabFragmentTargetLanguage() {
         return targetLanguage;
     }
@@ -111,7 +112,7 @@ public class LettersTabFragment extends Fragment {
         categoriesList.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        categoriesList.setAdapter(new LetterCategoryAdapter(getActivity(), this));
+        categoriesList.setAdapter(new LetterCategoryAdapter( this));
         ScrollView sv = view.findViewById(R.id.LettersView);
         sv.addView(categoriesList);
         for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
@@ -162,7 +163,7 @@ public class LettersTabFragment extends Fragment {
                         transliterator = new Transliterator(language, getContext());
 
                 // what is the right way to pass the object reference?
-                categoriesList.setAdapter(new LetterCategoryAdapter(getActivity(), ltf));
+                categoriesList.setAdapter(new LetterCategoryAdapter(ltf));
                 for (int i = 0; i < categoriesList.getExpandableListAdapter()
                         .getGroupCount(); i++) {
                     categoriesList.expandGroup(i);
