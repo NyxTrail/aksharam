@@ -136,6 +136,9 @@ public class LettersTabFragment extends Fragment {
         LettersTabFragment ltf = this;
         GlobalSettings.getInstance().addDataFileListChangedListener("LettersTabFragmentListener", () -> {
             Log.d("LTFListener", "Refreshing LettersTabFragment adapter");
+            if(getContext() == null)
+                return;
+
             transliterator = new Transliterator(getContext());
             adapter.clear();
             // Invoke getAvailableSourceLanguages without Context object so that it does not

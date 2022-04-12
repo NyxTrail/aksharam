@@ -57,6 +57,7 @@ public class LetterInfoFragment extends Fragment {
         lettersTabFragment = ltf;
     }
 
+
     public static LetterInfoFragment newInstance(String letter, LettersTabFragment ltf) {
         LetterInfoFragment letterInfoFragment = new LetterInfoFragment(ltf);
 
