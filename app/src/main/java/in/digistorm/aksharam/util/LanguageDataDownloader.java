@@ -49,13 +49,13 @@ import retrofit2.Retrofit;
 import retrofit2.http.GET;
 
 public class LanguageDataDownloader {
-    private final String baseUrl = "https://git.digistorm.in/api/v1/repos/alan/aksharam-data/";
+    private final String baseUrl = "https://api.github.com/repos/NyxTrail/aksharam-data/";
     private final String logTag = "LanguageDataDownloader";
 
     private final OkHttpClient okHttpClient;
 
-    private interface GiteaAPI {
-        @GET("contents")
+    private interface GitHubAPI {
+        @GET("contents?ref=1.0")
         Call<ResponseBody> getContents();
     }
 
@@ -192,7 +192,7 @@ public class LanguageDataDownloader {
                 .baseUrl(baseUrl)
                 .client(okHttpClient)
                 .build();
-        GiteaAPI giteaAPI = retrofit.create(GiteaAPI.class);
+        GitHubAPI gitHubAPI = retrofit.create(GitHubAPI.class);
 
         Log.d(logTag, " Fetching language data files from git repo.");
         String responseString;
@@ -200,7 +200,7 @@ public class LanguageDataDownloader {
         try {
             // response body from okhttp can be consumed only once:
             // https://square.github.io/okhttp/4.x/okhttp/okhttp3/-response-body/#the-response-body-can-be-consumed-only-once
-            response = giteaAPI.getContents().execute();
+            response = gitHubAPI.getContents().execute();
             if(response.body() == null)
                 throw new IOException("Obtained empty body.");
             responseString = response.body().string();

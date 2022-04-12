@@ -20,6 +20,7 @@ package in.digistorm.aksharam;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -33,6 +34,7 @@ import android.widget.Spinner;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONObject;
 
@@ -53,7 +55,27 @@ public class LettersTabFragment extends Fragment {
     private LabelledArrayAdapter<String> adapter;
     private Spinner lettersTabLangSpinner;
 
+    private LettersTabViewModel viewModel;
+
+    // Default constructor, used by PageCollectionAdapter to initialise the
+    // fragment. The Fragment's children views are created via its onCreate
+    // methods.
+    public LettersTabFragment() {
+        super();
+    }
+
+    // A constructor for LetterInfoFragment for cases when it does not
+    // have access to its parent LettersTabFragment
+    public LettersTabFragment(Context context) {
+        super();
+        // transliterator = new Transliterator(context);
+    }
+
     public String getLettersTabFragmentLanguage() {
+        if(language == null) {
+            if(viewModel != null)
+                return viewModel.getLanguage();
+        }
         return language;
     }
 
@@ -68,10 +90,18 @@ public class LettersTabFragment extends Fragment {
     }
 
     public String getLettersTabFragmentTargetLanguage() {
+        if(targetLanguage == null) {
+            if (viewModel != null)
+                return viewModel.getTargetLanguage();
+        }
         return targetLanguage;
     }
 
     public Transliterator getTransliterator() {
+        if(transliterator == null) {
+            if(viewModel != null)
+                return viewModel.getTransliterator();
+        }
         return transliterator;
     }
 
@@ -79,15 +109,24 @@ public class LettersTabFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        if (transliterator == null)
-            transliterator = Transliterator.getDefaultTransliterator(getContext());
-
         return inflater.inflate(R.layout.letters_layout, container, false);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        Log.d(logTag, "onViewCreated");
+        if(viewModel == null) {
+            Log.d(logTag, "Creating View Model for LettersTabFragment");
+            viewModel = new ViewModelProvider(requireActivity()).get(LettersTabViewModel.class);
+        }
+        // attempt to initialise stuff with view model
+        language = viewModel.getLanguage();
+        targetLanguage = viewModel.getTargetLanguage();
+        adapter = viewModel.getAdapter();
+        if(transliterator == null)
+            transliterator = viewModel.getTransliterator(getContext());
 
         initialiseLettersTabLangSpinner(view);
 
@@ -124,22 +163,33 @@ public class LettersTabFragment extends Fragment {
         Log.d(logTag, "Initialising lettersTabLangSpinner spinner");
         lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
 
-        adapter = new LabelledArrayAdapter<>(getContext(),
-                R.layout.spinner_item,
-                R.id.spinnerItemTV,
-                transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
-                R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
+        // adapter = viewModel.getAdapter();
+        // if(adapter == null) {
+            adapter = new LabelledArrayAdapter<>(getContext(),
+                    R.layout.spinner_item,
+                    R.id.spinnerItemTV,
+                    transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
+                    R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
+            viewModel.setAdapter(adapter);
+        // }
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         adapter.setNotifyOnChange(true);
         lettersTabLangSpinner.setAdapter(adapter);
-        lettersTabLangSpinner.setSelection(0);
+        if(viewModel.getTargetLanguage() != null) {
+            if(adapter.getPosition(viewModel.getTargetLanguage()) != -1)
+                lettersTabLangSpinner.setSelection(adapter.getPosition(viewModel.getTargetLanguage()));
+            else
+                lettersTabLangSpinner.setSelection(0);
+        }
+        else
+            lettersTabLangSpinner.setSelection(0);
         LettersTabFragment ltf = this;
         GlobalSettings.getInstance().addDataFileListChangedListener("LettersTabFragmentListener", () -> {
             Log.d("LTFListener", "Refreshing LettersTabFragment adapter");
             if(getContext() == null)
                 return;
 
-            transliterator = new Transliterator(getContext());
+            transliterator = viewModel.getTransliterator(getContext());
             adapter.clear();
             // Invoke getAvailableSourceLanguages without Context object so that it does not
             // read the files again. The changed files have already been read into
@@ -154,16 +204,17 @@ public class LettersTabFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 language = parent.getItemAtPosition(position).toString();
+                viewModel.setLanguage(language);
                 Log.d("LangSpinner", "Item selected " + language);
                 // re-initialising Transliterator is not necessary if it already has been
                 // re-initialised. We can know this is the case by checking the currently loaded
                 // language
                 if(transliterator == null)
-                    transliterator = new Transliterator(language, getContext());
+                    transliterator = viewModel.getTransliterator(language, getContext());
 
                 else if (!transliterator.getCurrentLang().toLowerCase(Locale.ROOT)
                             .equals(language.toLowerCase(Locale.ROOT)))
-                        transliterator = new Transliterator(language, getContext());
+                        transliterator = viewModel.getTransliterator(language, getContext());
 
                 // what is the right way to pass the object reference?
                 categoriesList.setAdapter(new LetterCategoryAdapter(ltf));
@@ -194,12 +245,20 @@ public class LettersTabFragment extends Fragment {
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabTransSpinner.setAdapter(adapter);
 
-        lettersTabTransSpinner.setSelection(0);
+        if(viewModel.getTargetLanguage() == null)
+            lettersTabTransSpinner.setSelection(0);
+        else {
+            if(adapter.getPosition(viewModel.getTargetLanguage()) == -1)
+                lettersTabTransSpinner.setSelection(0);
+            else
+                lettersTabTransSpinner.setSelection(adapter.getPosition(viewModel.getTargetLanguage()));
+        }
         lettersTabTransSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 Log.d("TransSpinner", "item selected: " + parent.getItemAtPosition(position).toString());
                 targetLanguage = parent.getItemAtPosition(position).toString();
+                viewModel.setTargetLanguage(targetLanguage);
             }
 
             @Override

@@ -37,6 +37,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.gridlayout.widget.GridLayout;
+import androidx.lifecycle.ViewModelProvider;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -51,6 +52,12 @@ public class LetterInfoFragment extends Fragment {
 
     private String currentLetter = "";
     private LettersTabFragment lettersTabFragment;
+
+    private LettersTabViewModel viewModel;
+
+    public LetterInfoFragment() {
+        super();
+    }
 
     public LetterInfoFragment(LettersTabFragment ltf) {
         super();
@@ -78,13 +85,12 @@ public class LetterInfoFragment extends Fragment {
             return ;
         }
         Log.d(logTag, "Showing info dialog for: " + currentLetter);
-        Transliterator tr = lettersTabFragment.getTransliterator();
+        Transliterator tr = viewModel.getTransliterator();
         setText(v.findViewById(R.id.letterInfoHeadingTV), currentLetter);
         setText(v.findViewById(R.id.letterInfoTransliteratedHeadingTV),
-                tr.transliterate(currentLetter,
-                        lettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                tr.transliterate(currentLetter, viewModel.getTargetLanguage()));
 
-        JSONObject letterExamples = lettersTabFragment.getTransliterator().getLangDataReader()
+        JSONObject letterExamples = viewModel.getTransliterator().getLangDataReader()
                 .getLetterExamples(currentLetter);
 
         // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
@@ -107,20 +113,20 @@ public class LetterInfoFragment extends Fragment {
                             getResources().getDisplayMetrics());
                     wordsAndMeaningView.setPadding(px, px, px, px);
                     String meaning = letterExamples.getJSONObject(word)
-                            .getString(lettersTabFragment.getTransliterator().getLangDataReader()
-                                    .getTargetLangCode(lettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                            .getString(viewModel.getTransliterator().getLangDataReader()
+                                    .getTargetLangCode(viewModel.getTargetLanguage()));
 
                     setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningWordTV), word);
                     setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningMeaningTV), meaning);
                     setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningTransliterationTV),
-                            lettersTabFragment.getTransliterator().transliterate(word,
-                                    lettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                            viewModel.getTransliterator().transliterate(word,
+                                    viewModel.getTargetLanguage()));
                     letterInfoWordAndMeaningLL.addView(wordsAndMeaningView);
                 }
             }
 
             // Check if extra info exists for this letter
-            String letterInfo = lettersTabFragment.getTransliterator().getLangDataReader()
+            String letterInfo = viewModel.getTransliterator().getLangDataReader()
                     .getLetterInfo(currentLetter);
             TextView letterInfoInfoTV = v.findViewById(R.id.letterInfoInfoTV);
             if(letterInfo == null || letterInfo.isEmpty()) {
@@ -135,17 +141,16 @@ public class LetterInfoFragment extends Fragment {
             // For consonants and ligatures, show examples of how they can combine with
             // vowel diacritics. For consonants, display possible ligatures with other
             // consonants if ligatures_auto_generatable
-            String category = lettersTabFragment.getTransliterator().getLangDataReader()
+            String category = viewModel.getTransliterator().getLangDataReader()
                     .getCategory(currentLetter);
             boolean showDiacriticExamples = true;
-            if(category != null && !lettersTabFragment.getTransliterator().getLangDataReader()
+            if(category != null && !viewModel.getTransliterator().getLangDataReader()
                     .isExcludeCombiExamples(currentLetter)
                     && (category.equalsIgnoreCase("consonants")
                         || category.equalsIgnoreCase("ligatures"))) {
                 displaySignConsonantCombinations(v, category);
                 if(category.equalsIgnoreCase("consonants"))
-                    if(lettersTabFragment.getTransliterator().getLangDataReader()
-                            .areLigaturesAutoGeneratable())
+                    if(viewModel.getTransliterator().getLangDataReader().areLigaturesAutoGeneratable())
                         displayLigatures(v);
             }
             else
@@ -162,7 +167,7 @@ public class LetterInfoFragment extends Fragment {
         catch (JSONException je) {
             Log.d(logTag, "Exception caught while reading fetching info for "
                     + currentLetter + ", language: "
-                    + lettersTabFragment.getLettersTabFragmentTargetLanguage());
+                    + viewModel.getTargetLanguage());
             je.printStackTrace();
         }
     }
@@ -181,8 +186,8 @@ public class LetterInfoFragment extends Fragment {
         ligatureBeforeHintTV.setVisibility(View.VISIBLE);
 
         ArrayList<String> items;
-        items = lettersTabFragment.getTransliterator().getLangDataReader().getConsonants();
-        String virama = lettersTabFragment.getTransliterator().getLangDataReader().getVirama();
+        items = viewModel.getTransliterator().getLangDataReader().getConsonants();
+        String virama = viewModel.getTransliterator().getLangDataReader().getVirama();
 
         // v.findViewById(R.id.letterInfoLigaturesLL).setVisibility(View.VISIBLE);
         GridLayout ligaturesGLBefore = v.findViewById(R.id.letterInfoLigaturesBeforeGL);
@@ -246,15 +251,15 @@ public class LetterInfoFragment extends Fragment {
         if(type.equalsIgnoreCase("signs")) {
             diacriticSelectorHintTV.setText(getString(R.string.consonants_with_diacritic,
                     currentLetter));
-            items = lettersTabFragment.getTransliterator().getLangDataReader().getConsonants();
-            items.addAll(lettersTabFragment.getTransliterator().getLangDataReader().getLigatures());
+            items = viewModel.getTransliterator().getLangDataReader().getConsonants();
+            items.addAll(viewModel.getTransliterator().getLangDataReader().getLigatures());
         }
         // we need to display examples for a consonant/ligature
         else if(type.equalsIgnoreCase("consonants")
                 || type.equalsIgnoreCase("ligatures")) {
             diacriticSelectorHintTV.setText(getString(R.string.diacritics_with_consonant,
                     currentLetter));
-            items = lettersTabFragment.getTransliterator().getLangDataReader().getDiacritics();
+            items = viewModel.getTransliterator().getLangDataReader().getDiacritics();
         }
 
         if(items == null)
@@ -284,13 +289,13 @@ public class LetterInfoFragment extends Fragment {
             px = getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
             textView.setPadding(px, px, px, px);
             if(type.equalsIgnoreCase("signs")
-                    && !lettersTabFragment.getTransliterator().getLangDataReader()
+                    && !viewModel.getTransliterator().getLangDataReader()
                     .isExcludeCombiExamples(item)) {
                 textView.setText(item + currentLetter);
             }
             else if((type.equalsIgnoreCase("consonants")
                     || type.equalsIgnoreCase("ligatures"))
-                    && !lettersTabFragment.getTransliterator().getLangDataReader()
+                    && !viewModel.getTransliterator().getLangDataReader()
                     .isExcludeCombiExamples(item))
                 textView.setText(currentLetter + item);
 
@@ -327,19 +332,17 @@ public class LetterInfoFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        View v = inflater.inflate(R.layout.letter_info, container, true);
-
-        setUp(v, inflater);
-
-        return v;
+        super.onCreateView(inflater, container, savedInstanceState);
+        return inflater.inflate(R.layout.letter_info, container, true);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
+        viewModel = new ViewModelProvider(requireActivity()).get(LettersTabViewModel.class);
+        setUp(view, getLayoutInflater());
     }
 }
