@@ -26,8 +26,6 @@ import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -94,7 +92,7 @@ public class SettingsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Log.d(logTag, "Setting up the settings activity...");
-        setContentView(R.layout.settings_activity);
+        setContentView(R.layout.activity_settings);
 
         // Toolbar toolbar = findViewById(R.id.SettingsActivityToolbar);
         // setSupportActionBar(toolbar);

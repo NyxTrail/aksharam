@@ -81,11 +81,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Log.d(logTag, "menuItem clicked: " + item + " , id: " + item.getItemId());
-        if(item.getItemId() == R.id.action_bar_settings) {
+        int id = item.getItemId();
+        Log.d(logTag, "menuItem clicked: " + item + " , id: " + id);
+        if(id == R.id.action_bar_settings) {
             Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
-        } else if(item.getItemId() == R.id.dark_light_mode) {
+        }
+        else if(id == R.id.dark_light_mode) {
             GlobalSettings.getInstance().setDarkMode(!GlobalSettings.getInstance().getDarkMode(), this);
             int mode = GlobalSettings.getInstance().getDarkMode() ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
             for(Fragment t: getSupportFragmentManager().getFragments()) {
@@ -100,6 +102,10 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             }
 
             AppCompatDelegate.setDefaultNightMode(mode);
+        }
+        else if(id == R.id.help) {
+            Intent intent = new Intent(this, HelpActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
