@@ -3,24 +3,20 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_width="match_parent"
+    android:padding="2dp"
     android:layout_height="match_parent">
 
     <TextView
         android:id="@+id/spinnerLabelTV"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/test_text"
         android:textSize="@dimen/spinner_hint"/>
 
     <TextView
         android:id="@+id/spinnerItemTV"
-        style="?android:spinnerDropDownItemStyle"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:text="@string/test_text"
-        android:textSize="@dimen/spinner_text"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:textSize="@dimen/spinner_text"/>
 </LinearLayout>
