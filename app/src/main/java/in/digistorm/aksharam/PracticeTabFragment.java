@@ -176,6 +176,7 @@ public class PracticeTabFragment extends Fragment {
                 // re-initialise the "practice in" spinner
                 initialisePracticeTabPracticeInSpinner();
                 initialisePracticeTabPracticeTypeSpinner();
+                getActivity().findViewById(R.id.PracticeTabInputTIET).setEnabled(true);
             }
 
             @Override
