@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             GlobalSettings.getInstance().setDarkMode(!GlobalSettings.getInstance().getDarkMode(), this);
             int mode = GlobalSettings.getInstance().getDarkMode() ? AppCompatDelegate.MODE_NIGHT_YES : AppCompatDelegate.MODE_NIGHT_NO;
             for(Fragment t: getSupportFragmentManager().getFragments()) {
-                /* LetterInfoFragment is be re-initialised correctly when the uiMode     *
+                /* LetterInfoFragment has to be re-initialised correctly when the uiMode *
                  * configuration change happens due to switching light/dark modes.       *
                  * We will simply close LetterInfoFragment if it is open. This should    *
                  * land us in Letters tab, if we were in LetterInfo when dark/light mode *
@@ -104,7 +104,13 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             AppCompatDelegate.setDefaultNightMode(mode);
         }
         else if(id == R.id.help) {
-            Intent intent = new Intent(this, HelpActivity.class);
+            Intent intent = new Intent(this, HTMLInfoActivity.class);
+            intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.EXTRA_VALUES.HELP);
+            startActivity(intent);
+        }
+        else if(id == R.id.privacy) {
+            Intent intent = new Intent(this, HTMLInfoActivity.class);
+            intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.EXTRA_VALUES.PRIVACY);
             startActivity(intent);
         }
 
@@ -138,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onResume();
 
         // if there are no downloaded files, switch to Initialisation activity
-        if(getFilesDir().list().length == 0) {
+        if(LangDataReader.areDataFilesAvailable(this) == null) {
             Log.d(logTag, "No files found in data directory. Switching to initialisation activity.");
             Intent intent = new Intent(this, InitialiseAppActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);

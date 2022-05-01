@@ -46,7 +46,7 @@
             android:windowSoftInputMode="adjustPan"/>
         <activity android:name="in.digistorm.aksharam.SettingsActivity"
             android:windowSoftInputMode="adjustPan"/>
-        <activity android:name="in.digistorm.aksharam.HelpActivity"
+        <activity android:name="in.digistorm.aksharam.HTMLInfoActivity"
             android:windowSoftInputMode="adjustPan"/>
     </application>
 </manifest>

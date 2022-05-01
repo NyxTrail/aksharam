@@ -22,22 +22,45 @@ package in.digistorm.aksharam;
 
 import android.os.Bundle;
 import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import in.digistorm.aksharam.util.Log;
 
-public class HelpActivity extends AppCompatActivity {
+/* A full screen TextView activity to display information in html for
+   help, privacy policy etc
+ */
+public class HTMLInfoActivity extends AppCompatActivity {
     String logTag = "HelpActivity";
 
+    public static String EXTRA_NAME = "HTMLINFO_EXTRA";
+    public enum EXTRA_VALUES {
+        HELP,
+        PRIVACY
+    };
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Log.d(logTag, "Starting help activity...");
+        Log.d(logTag, "Starting HTMLInfoActivity...");
         setContentView(R.layout.activity_help);
 
-        ((TextView) findViewById(R.id.help_activity_tv))
-                .setText(Html.fromHtml(getString(R.string.help_text)));
+        Object extra = getIntent().getExtras().get(EXTRA_NAME);
+
+        TextView htmlInfoActivityTV = findViewById(R.id.htmlinfo_activity_tv);
+        htmlInfoActivityTV.setMovementMethod(LinkMovementMethod.getInstance());
+        if(extra == EXTRA_VALUES.HELP) {
+            Log.d(logTag, "Displaying help");
+            String text = "<a href='http://www.google.com'>Google</a> this is a link";
+
+            htmlInfoActivityTV.setText(Html.fromHtml(getString(R.string.help_text)));
+        }
+        else if(extra == EXTRA_VALUES.PRIVACY) {
+            Log.d(logTag, "Displaying privacy");
+            htmlInfoActivityTV.setText(Html.fromHtml(getString(R.string.privacy_text)));
+        }
     }
 }

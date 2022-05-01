@@ -192,13 +192,12 @@ public class LettersTabFragment extends Fragment {
 
             transliterator = viewModel.getTransliterator(getContext());
             adapter.clear();
-            // Invoke getAvailableSourceLanguages without Context object so that it does not
-            // read the files again. The changed files have already been read into
-            // LangDataReader when it was changed by the SettingsLanguageListAdapter
-            adapter.addAll(transliterator.getLangDataReader().getAvailableSourceLanguages());
+            adapter.addAll(transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()));
+            // adapter.notifyDataSetChanged();
             // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
             // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
             // think of to fix this
+            Log.d("LTFListener", "Resetting spinner adapter");
             lettersTabLangSpinner.setAdapter(adapter);
         });
         lettersTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

@@ -32,9 +32,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -67,7 +69,7 @@ public class LangDataReader {
 
     public LangDataReader(String file, Context context) {
         Log.d(logTag, "Initialising lang data file: " + file);
-        if(file == null)
+        if(file == null || !file.toLowerCase(Locale.ROOT).contains(".json"))
             return;
         langData = read(file, true, context);
         categories = new LinkedHashMap<>();
@@ -95,7 +97,6 @@ public class LangDataReader {
         Log.d(logTag, "Reading language file " + file);
         try {
             InputStream is = context.openFileInput(file);
-            // InputStream is = context.getAssets().open("languages/" + file);
             InputStreamReader isr = new InputStreamReader(is);
             BufferedReader br = new BufferedReader(isr);
             StringBuilder sb = new StringBuilder();
@@ -260,6 +261,9 @@ public class LangDataReader {
         sourceLangs.clear();
         for(String file: files) {
             Log.d(logTag, "found file " + file);
+            // if file is not json, ignore it
+            if(!file.toLowerCase(Locale.ROOT).contains(".json"))
+                continue;
             file = file.replace(".json", "");
             sourceLangs.add(file.substring(0,1).toUpperCase(Locale.ROOT) + file.substring(1));
         }
@@ -335,9 +339,39 @@ public class LangDataReader {
 
     // This needs to be changed when interface for data file addition is added
     public static String getLangFile(String langName) {
-        if(langName == null)
+        if(langName == null || langName.equals(""))
             return null;
         return  langName.toLowerCase(Locale.ROOT) + ".json";
+    }
+
+    /* return null if there are no suitable files available
+       if a file is available, return first such file
+     */
+    public static String areDataFilesAvailable(Context context) {
+        String[] fileList = context.getFilesDir().list();
+        if(fileList == null || fileList.length <= 0)
+            return null;
+
+        Log.d("LangDataReader", "Found files: " + Arrays.toString(fileList));
+        for(String s: fileList) {
+            if(s.toLowerCase(Locale.ROOT).contains(".json"))
+                return s;
+        }
+        return null;
+    }
+
+    public String[] getDataFiles(Context context) {
+        String[] fileList = context.getFilesDir().list();
+        if(fileList == null || fileList.length <= 0)
+            return null;
+
+        Log.d(logTag, "Found files: " + Arrays.toString(fileList));
+        List<String> files = new ArrayList<>(); int i = 0;
+        for(String s: fileList) {
+            if(s.toLowerCase(Locale.ROOT).contains(".json"))
+                files.add(s);
+        }
+        return files.toArray(new String[0]);
     }
 
     // get virama for the current language

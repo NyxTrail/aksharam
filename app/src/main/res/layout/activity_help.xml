@@ -33,9 +33,13 @@
         android:fillViewport="true">
 
         <TextView
-            android:id="@+id/help_activity_tv"
+            android:id="@+id/htmlinfo_activity_tv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textIsSelectable="true"
+            android:linksClickable="true"
+            android:clickable="true"
+            android:focusable="true"
             android:layout_margin="4dp" />
     </androidx.core.widget.NestedScrollView>
 

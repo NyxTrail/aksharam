@@ -40,7 +40,10 @@ import in.digistorm.aksharam.util.OnRequestCompleted;
 
 import org.json.JSONArray;
 
+import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Locale;
 
 public class InitialiseAppActivity extends AppCompatActivity {
     private final String logTag = "InitialiseAppActivity";
@@ -77,18 +80,14 @@ public class InitialiseAppActivity extends AppCompatActivity {
     private boolean startMainActivity() {
         Log.d(logTag, "Attempting to start main activity...");
         // First check if we have data files available
-        // This cannot be null because, according to the doc list() returns null only if it is invoked
-        // on a non-directory file
-        if(getFilesDir().list().length <= 0) {
+        if(LangDataReader.areDataFilesAvailable(this) == null) {
             Log.d(logTag, "No data files found!! Continuing initialisation activity");
             // we cannot start the main activity
             return false;
         }
 
-        // Get a reference to current activity, to be passed to the intent
-        InitialiseAppActivity activity = this;
-        Log.d(logTag, "Creating intent...");
-        Intent intent = new Intent(activity, MainActivity.class);
+        Log.d(logTag, "Starting MainActivity...");
+        Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         // Main activity is started
         return true;

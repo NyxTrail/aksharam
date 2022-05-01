@@ -22,12 +22,20 @@ package in.digistorm.aksharam;
 
 import android.content.Context;
 import android.content.Intent;
+import android.renderscript.ScriptGroup;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
 import java.util.Map;
 
 import in.digistorm.aksharam.util.Log;
@@ -39,8 +47,6 @@ public class Transliterator {
 
     // The backing langDataReader for all tabs
     private LangDataReader langDataReader;
-    // listeners for users of Transliterator so that they can adapt
-    // when backing LangDataReader changes
     private static Transliterator  currentTransliterator;
     public LangDataReader getLangDataReader() {
         return langDataReader;
@@ -72,20 +78,18 @@ public class Transliterator {
         // called the constructor without any input lang, find one
         // files are downloaded, this constructor is called in MainActivity. Since no "default"
         // language is chosen yet, we choose one from the files list
-        String[] fileList = context.getFilesDir().list();
-        if(fileList.length > 0) {
-            Log.d(logTag, "Found language file: " + fileList[0] + "... Initialising it.");
-            // fileList.length - ".json".length
-            initialise(fileList[0].substring(0, fileList[0].length() - 5), context);
-        }
-        else {
-            // should this happen? don't know if i can test this
+        String file = LangDataReader.areDataFilesAvailable(context);
+        if(file == null) {
             // if no files are available, we restart the Initialisation activity
-            // TODO: is this the right place to do this? in Transliterator class?
-            Log.d(logTag, "Starting InitialiseAppActivity...");
+            Log.d(logTag, "Could not find any language files. Starting Initialisation activity");
             Intent intent = new Intent(context, InitialiseAppActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
+        }
+        else {
+            Log.d(logTag, "Found language file: " + file + "... Initialising it.");
+            // fileList.length - ".json".length
+            initialise(file.substring(0, file.length() - 5), context);
         }
     }
 
@@ -110,7 +114,7 @@ public class Transliterator {
         Log.d(logTag, languages.toString());
 
         // for each lang file that is not currentFile, add its characters to the hashmap
-        for(String file: context.getFilesDir().list()) {
+        for(String file: langDataReader.getAvailableSourceLanguages(context)) {
             Log.d(logTag, "Reading file " + file);
 
             // ignore the currently loaded file
@@ -195,5 +199,9 @@ public class Transliterator {
         }
         Log.d(logTag, "Constructed string: " + out);
         return out.toString();
+    }
+
+    public static Transliterator getCurrentTransliterator() {
+        return currentTransliterator;
     }
 }

@@ -111,10 +111,7 @@ public class SettingsLanguageListAdapter extends RecyclerView.Adapter<SettingsLa
                 activity.deleteFile(fileName);
                 fileList.remove(fileName);
                 adapter.notifyItemRemoved(pos);
-                if(activity.getFilesDir().list().length  > 0)
-                    GlobalSettings.getInstance().invokeDataFileListChangedListeners();
-                else
-                    GlobalSettings.getInstance().clearDataFileListChangedListeners();
+                GlobalSettings.getInstance().invokeDataFileListChangedListeners();
                 return;
             }
 
@@ -127,11 +124,7 @@ public class SettingsLanguageListAdapter extends RecyclerView.Adapter<SettingsLa
                 downloadIV.setVisibility(View.VISIBLE);
                 DownloadClickListener downloadClickListener = new DownloadClickListener(holder, adapter);
                 downloadIV.setOnClickListener(downloadClickListener);
-                // Transliterator.getLangDataReader().getAvailableSourceLanguages(activity);
-                if(activity.getFilesDir().list().length  > 0)
-                    GlobalSettings.getInstance().invokeDataFileListChangedListeners();
-                else
-                    GlobalSettings.getInstance().clearDataFileListChangedListeners();
+                GlobalSettings.getInstance().invokeDataFileListChangedListeners();
             } catch(JSONException je) {
                 Log.d("DeleteClickListener", "JSONException when fetching file from online files list");
                 je.printStackTrace();

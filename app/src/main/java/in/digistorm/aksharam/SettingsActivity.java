@@ -45,9 +45,9 @@ public class SettingsActivity extends AppCompatActivity {
         RecyclerView manageLanguagesRV = findViewById(R.id.SettingsActivityManageLanguagesRV);
 
         // get downloaded files
-        String[] files = getFilesDir().list();
-        ArrayList<String> filesList = new ArrayList<String>();
-        filesList.addAll(Arrays.asList(files));
+        String[] files = Transliterator.getCurrentTransliterator()
+                .getLangDataReader().getDataFiles(this);
+        ArrayList<String> filesList = new ArrayList<>(Arrays.asList(files));
         Log.d(logTag, "List of files available: " + filesList);
 
         SettingsActivity self = this;
@@ -94,9 +94,14 @@ public class SettingsActivity extends AppCompatActivity {
         Log.d(logTag, "Setting up the settings activity...");
         setContentView(R.layout.activity_settings);
 
-        // Toolbar toolbar = findViewById(R.id.SettingsActivityToolbar);
-        // setSupportActionBar(toolbar);
-
         populateLanguageList();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(logTag, "Clearing listeners before being destroyed.");
+        if(LangDataReader.areDataFilesAvailable(this) == null)
+            GlobalSettings.getInstance().clearDataFileListChangedListeners();
     }
 }

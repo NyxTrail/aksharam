@@ -83,7 +83,7 @@
     <string name="delete_button">Delete button</string>
     <string name="download_button">Download button</string>
 
-    <!-- Help Activity !-->
+    <!-- HTMLInfoActivity !-->
     <string name="help_text">
         &lt;h1>Help&lt;/h1>
         &lt;h3>Downloading Data Files&lt;/h3>
@@ -107,14 +107,25 @@
         &lt;h3>Practice Tab&lt;/h3>
         &lt;p>To use the practice tab effectively, it is recommended to install a keyboard that supports
         at least two languages - one that you wish to learn and another that you know. I recommend the
-        \"Indic Keyboard\" by \"Indic Project\" available in the Play Store and F-Droid.&lt;/p>
+        \"Indic Keyboard\" by \"Indic Project\" available in the
+        &lt;a href="https://play.google.com/store/apps/details?id=org.smc.inputmethod.indic">Play Store&lt;/a>
+        and &lt;a href="https://f-droid.org/en/packages/org.smc.inputmethod.indic/">F-Droid&lt;a>.&lt;/p>
         &lt;p>In the practice tab, choose a script you wish to learn and a script that you know. Next you
         can choose a suitable practice type and test your knowledge by entering characters in the script
         that you already know.&lt;/p>
     </string>
+    <string name="privacy_text">
+        &lt;h1>Privacy Policy&lt;/h1>
+        &lt;p>This app needs to connect to the internet to download data files for the languages you wish to learn.
+        &lt;br/>The data files are downloaded from the Github repo here: https://github.com/NyxTrail/aksharam-data
+        &lt;br/>&lt;br/>
+        Beyond the above requirement, the app does not share any data with anyone. All your data stays on your device.
+        &lt;/p>
+    </string>
 
     <!-- Action bar Menu Items !-->
     <string name="help">Help</string>
+    <string name="privacy">Privacy</string>
     <string name="dark_light_mode">Dark/Light Mode</string>
     <string name="settings">Settings</string>
 </resources>
