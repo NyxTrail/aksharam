@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.htmlinfo;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -27,6 +27,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.util.Log;
 
 /* A full screen TextView activity to display information in html for

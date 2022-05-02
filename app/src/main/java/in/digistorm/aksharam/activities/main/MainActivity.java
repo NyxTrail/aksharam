@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.main;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +35,14 @@ import android.view.MenuItem;
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.tabs.TabLayoutMediator;
 
+import in.digistorm.aksharam.activities.htmlinfo.HTMLInfoActivity;
+import in.digistorm.aksharam.activities.initialise.InitialiseAppActivity;
+import in.digistorm.aksharam.activities.main.letters.LetterInfoFragment;
+import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.activities.settings.SettingsActivity;
+import in.digistorm.aksharam.util.Transliterator;
+import in.digistorm.aksharam.util.GlobalSettings;
+import in.digistorm.aksharam.util.LangDataReader;
 import in.digistorm.aksharam.util.Log;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {

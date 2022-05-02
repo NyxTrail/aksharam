@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.main.transliterate;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -35,6 +35,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.util.Transliterator;
+import in.digistorm.aksharam.util.GlobalSettings;
+import in.digistorm.aksharam.util.LabelledArrayAdapter;
 import in.digistorm.aksharam.util.Log;
 
 public class TransliterateTabFragment extends Fragment {

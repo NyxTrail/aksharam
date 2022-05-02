@@ -1,5 +1,4 @@
-package in.digistorm.aksharam;
-
+package in.digistorm.aksharam.activities.main.letters;
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
  *
@@ -39,10 +38,15 @@ import org.json.JSONObject;
 
 import java.util.Locale;
 
+import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.activities.main.MainActivity;
+import in.digistorm.aksharam.util.GlobalSettings;
+import in.digistorm.aksharam.util.LabelledArrayAdapter;
 import in.digistorm.aksharam.util.Log;
+import in.digistorm.aksharam.util.Transliterator;
 
 public class LettersTabFragment extends Fragment {
-    private final String logTag = "LettersTabFragment";
+    private final String logTag = "in.digistorm.aksharam.activities.main.letters.LettersTabFragment";
 
     private ExpandableListView categoriesList;
 
@@ -50,8 +54,6 @@ public class LettersTabFragment extends Fragment {
     private String language;
     // The target language to transliterate to
     private String targetLanguage;
-
-    private Transliterator transliterator;
 
     private LabelledArrayAdapter<String> adapter;
     private Spinner lettersTabLangSpinner;
@@ -66,7 +68,7 @@ public class LettersTabFragment extends Fragment {
     }
 
     // A constructor for LetterInfoFragment for cases when it does not
-    // have access to its parent LettersTabFragment
+    // have access to its parent in.digistorm.aksharam.activities.main.letters.LettersTabFragment
     public LettersTabFragment(Context context) {
         super();
         // transliterator = new Transliterator(context);
@@ -99,11 +101,7 @@ public class LettersTabFragment extends Fragment {
     }
 
     public Transliterator getTransliterator() {
-        if(transliterator == null) {
-            if(viewModel != null)
-                return viewModel.getTransliterator();
-        }
-        return transliterator;
+        return viewModel.getTransliterator();
     }
 
     @Nullable
@@ -119,15 +117,14 @@ public class LettersTabFragment extends Fragment {
 
         Log.d(logTag, "onViewCreated");
         if(viewModel == null) {
-            Log.d(logTag, "Creating View Model for LettersTabFragment");
+            Log.d(logTag, "Creating View Model for in.digistorm.aksharam.activities.main.letters.LettersTabFragment");
             viewModel = new ViewModelProvider(requireActivity()).get(LettersTabViewModel.class);
         }
         // attempt to initialise stuff with view model
         language = viewModel.getLanguage();
         targetLanguage = viewModel.getTargetLanguage();
         adapter = viewModel.getAdapter();
-        if(transliterator == null)
-            transliterator = viewModel.getTransliterator(getContext());
+        viewModel.getTransliterator(getContext());
 
         initialiseLettersTabLangSpinner(view);
 
@@ -137,7 +134,7 @@ public class LettersTabFragment extends Fragment {
             Spinner transSpinner = view.findViewById(R.id.lettersTabTransSpinner);
             String transLanguage = (String) transSpinner.getItemAtPosition(transSpinner.getSelectedItemPosition());
             Log.d(logTag, "Fetching info for " + transLanguage);
-            JSONObject infoJSON = transliterator.getLangDataReader().getInfo(transLanguage, getContext());
+            JSONObject infoJSON = viewModel.getTransliterator().getLangDataReader().getInfo(transLanguage, getContext());
             Log.d(logTag, infoJSON.toString());
 
             String info = infoJSON.optJSONObject("general").optString("en")
@@ -147,7 +144,7 @@ public class LettersTabFragment extends Fragment {
             MainActivity.replaceTabFragment(0, lif);
         });
 
-        Log.d(logTag, transliterator.getLangDataReader().getCategories().toString());
+        Log.d(logTag, viewModel.getTransliterator().getLangDataReader().getCategories().toString());
         categoriesList = new ExpandableListView(getContext());
         categoriesList.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -169,7 +166,7 @@ public class LettersTabFragment extends Fragment {
             adapter = new LabelledArrayAdapter<>(getContext(),
                     R.layout.spinner_item,
                     R.id.spinnerItemTV,
-                    transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
+                    viewModel.getTransliterator().getLangDataReader().getAvailableSourceLanguages(getContext()),
                     R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
             viewModel.setAdapter(adapter);
         // }
@@ -186,13 +183,13 @@ public class LettersTabFragment extends Fragment {
             lettersTabLangSpinner.setSelection(0);
         LettersTabFragment ltf = this;
         GlobalSettings.getInstance().addDataFileListChangedListener("LettersTabFragmentListener", () -> {
-            Log.d("LTFListener", "Refreshing LettersTabFragment adapter");
+            Log.d("LTFListener", "Refreshing in.digistorm.aksharam.activities.main.letters.LettersTabFragment adapter");
             if(getContext() == null)
                 return;
 
-            transliterator = viewModel.getTransliterator(getContext());
+            viewModel.getTransliterator(getContext());
             adapter.clear();
-            adapter.addAll(transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()));
+            adapter.addAll(viewModel.getTransliterator().getLangDataReader().getAvailableSourceLanguages(getContext()));
             // adapter.notifyDataSetChanged();
             // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
             // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
@@ -209,12 +206,12 @@ public class LettersTabFragment extends Fragment {
                 // re-initialising Transliterator is not necessary if it already has been
                 // re-initialised. We can know this is the case by checking the currently loaded
                 // language
-                if(transliterator == null)
-                    transliterator = viewModel.getTransliterator(language, getContext());
+                if(viewModel.getTransliterator() == null)
+                    viewModel.getTransliterator(language, getContext());
 
-                else if (!transliterator.getCurrentLang().toLowerCase(Locale.ROOT)
+                else if (!viewModel.getTransliterator().getCurrentLang().toLowerCase(Locale.ROOT)
                             .equals(language.toLowerCase(Locale.ROOT)))
-                        transliterator = viewModel.getTransliterator(language, getContext());
+                    viewModel.getTransliterator(language, getContext());
 
                 // what is the right way to pass the object reference?
                 categoriesList.setAdapter(new LetterCategoryAdapter(ltf));
@@ -237,10 +234,10 @@ public class LettersTabFragment extends Fragment {
         Log.d(logTag, "Initialising lettersTabTransSpinner");
         Spinner lettersTabTransSpinner = getActivity().findViewById(R.id.lettersTabTransSpinner);
 
-        Log.d(logTag, transliterator.getLangDataReader().getTransLangs().toString());
+        Log.d(logTag, viewModel.getTransliterator().getLangDataReader().getTransLangs().toString());
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item, R.id.spinnerItemTV,
-                transliterator.getLangDataReader().getTransLangs(),
+                viewModel.getTransliterator().getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.letters_tab_trans_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabTransSpinner.setAdapter(adapter);

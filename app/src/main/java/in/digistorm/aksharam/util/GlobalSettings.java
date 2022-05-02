@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.util;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -30,8 +30,6 @@ import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
-
-import in.digistorm.aksharam.util.Log;
 
 public class GlobalSettings {
     private static GlobalSettings globalSettings;

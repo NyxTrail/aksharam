@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.main.letters;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -44,8 +44,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.util.AutoAdjustingTextView;
 import in.digistorm.aksharam.util.Log;
+import in.digistorm.aksharam.util.Transliterator;
 
 public class LetterInfoFragment extends Fragment {
     private final String logTag = "LetterInfoFragment";

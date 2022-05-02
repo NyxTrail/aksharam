@@ -18,27 +18,20 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.util;
 
 import android.content.Context;
 import android.content.Intent;
-import android.renderscript.ScriptGroup;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.Locale;
 import java.util.Map;
 
-import in.digistorm.aksharam.util.Log;
+import in.digistorm.aksharam.activities.initialise.InitialiseAppActivity;
 
 // This class is responsible for the actual transliteration
 public class Transliterator {

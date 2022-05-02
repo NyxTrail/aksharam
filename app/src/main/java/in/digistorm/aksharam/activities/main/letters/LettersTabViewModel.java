@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.main.letters;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -25,6 +25,9 @@ import android.content.Context;
 import androidx.lifecycle.ViewModel;
 
 import java.util.Locale;
+
+import in.digistorm.aksharam.util.LabelledArrayAdapter;
+import in.digistorm.aksharam.util.Transliterator;
 
 public class LettersTabViewModel extends ViewModel {
     private String targetLanguage;

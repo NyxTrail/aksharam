@@ -18,7 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.util;
 
 import android.content.Context;
 import org.json.JSONArray;
@@ -39,8 +39,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
-import in.digistorm.aksharam.util.Log;
 
 public class LangDataReader {
     private final String logTag = "LangDataReader";

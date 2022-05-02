@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.settings;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -29,14 +29,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import in.digistorm.aksharam.util.LanguageDataDownloader;
-import in.digistorm.aksharam.util.Log;
-
 import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+
+import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.util.Transliterator;
+import in.digistorm.aksharam.util.GlobalSettings;
+import in.digistorm.aksharam.util.LangDataReader;
+import in.digistorm.aksharam.util.LanguageDataDownloader;
+import in.digistorm.aksharam.util.Log;
 
 public class SettingsActivity extends AppCompatActivity {
     private final String logTag = "SettingsActivity";

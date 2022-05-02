@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.initialise;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -36,6 +36,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
+import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.util.Log;
 
 public class LanguageDataFileListAdapter extends RecyclerView.Adapter<LanguageDataFileListAdapter.ViewHolder> {

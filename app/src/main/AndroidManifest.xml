@@ -35,18 +35,18 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AksharamTheme">
-        <activity android:name="in.digistorm.aksharam.InitialiseAppActivity"
+        <activity android:name=".activities.initialise.InitialiseAppActivity"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="in.digistorm.aksharam.MainActivity"
+        <activity android:name=".activities.main.MainActivity"
             android:windowSoftInputMode="adjustPan"/>
-        <activity android:name="in.digistorm.aksharam.SettingsActivity"
+        <activity android:name=".activities.settings.SettingsActivity"
             android:windowSoftInputMode="adjustPan"/>
-        <activity android:name="in.digistorm.aksharam.HTMLInfoActivity"
+        <activity android:name=".activities.htmlinfo.HTMLInfoActivity"
             android:windowSoftInputMode="adjustPan"/>
     </application>
 </manifest>

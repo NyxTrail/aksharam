@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.util;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -40,8 +40,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import in.digistorm.aksharam.util.Log;
 
 public class LabelledArrayAdapter<T> extends BaseAdapter implements Filterable {
     /**

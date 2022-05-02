@@ -25,8 +25,6 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import in.digistorm.aksharam.GlobalSettings;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

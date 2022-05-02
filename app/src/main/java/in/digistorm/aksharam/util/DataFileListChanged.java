@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.util;
 
 /*
  * copyright (c) 2022 alan m varghese <alan@digistorm.in>

@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.initialise;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -34,16 +34,17 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import org.json.JSONArray;
+
+import java.io.IOException;
+
+import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.activities.main.MainActivity;
+import in.digistorm.aksharam.util.GlobalSettings;
+import in.digistorm.aksharam.util.LangDataReader;
 import in.digistorm.aksharam.util.LanguageDataDownloader;
 import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.OnRequestCompleted;
-
-import org.json.JSONArray;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Locale;
 
 public class InitialiseAppActivity extends AppCompatActivity {
     private final String logTag = "InitialiseAppActivity";

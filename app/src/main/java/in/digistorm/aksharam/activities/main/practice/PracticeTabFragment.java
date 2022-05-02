@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.main.practice;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -45,7 +45,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
+import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.util.GlobalSettings;
+import in.digistorm.aksharam.util.LabelledArrayAdapter;
 import in.digistorm.aksharam.util.Log;
+import in.digistorm.aksharam.util.Transliterator;
 
 public class PracticeTabFragment extends Fragment {
     private final String logTag = "PracticeTabFragment";
@@ -163,6 +167,7 @@ public class PracticeTabFragment extends Fragment {
             // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
             // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
             // think of to fix this
+            Log.d("PTFListener", "Resetting spinner adapter");
             practiceTabLangSpinner.setAdapter(adapter);
         });
         practiceTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {

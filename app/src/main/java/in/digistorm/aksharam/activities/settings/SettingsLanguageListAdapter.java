@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.settings;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -32,15 +32,17 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
-import in.digistorm.aksharam.util.LanguageDataDownloader;
-import in.digistorm.aksharam.util.Log;
-import in.digistorm.aksharam.util.OnRequestCompleted;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 
 import java.util.ArrayList;
 import java.util.Locale;
+
+import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.util.GlobalSettings;
+import in.digistorm.aksharam.util.LanguageDataDownloader;
+import in.digistorm.aksharam.util.Log;
+import in.digistorm.aksharam.util.OnRequestCompleted;
 
 public class SettingsLanguageListAdapter extends RecyclerView.Adapter<SettingsLanguageListAdapter.ViewHolder> {
     private final String logTag = "SettingsLangListAdapter";

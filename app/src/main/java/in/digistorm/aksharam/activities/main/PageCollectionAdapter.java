@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.main;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -28,6 +28,9 @@ import androidx.viewpager2.adapter.FragmentStateAdapter;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import in.digistorm.aksharam.activities.main.letters.LettersTabFragment;
+import in.digistorm.aksharam.activities.main.practice.PracticeTabFragment;
+import in.digistorm.aksharam.activities.main.transliterate.TransliterateTabFragment;
 import in.digistorm.aksharam.util.Log;
 
 public class PageCollectionAdapter extends FragmentStateAdapter {

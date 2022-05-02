@@ -1,4 +1,4 @@
-package in.digistorm.aksharam;
+package in.digistorm.aksharam.activities.main.letters;
 
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -36,6 +36,8 @@ import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
 
+import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.activities.main.MainActivity;
 import in.digistorm.aksharam.util.AutoAdjustingTextView;
 import in.digistorm.aksharam.util.Log;
 
