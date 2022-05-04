@@ -39,6 +39,7 @@ import androidx.fragment.app.Fragment;
 import java.util.Locale;
 
 import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.util.LanguageDetector;
 import in.digistorm.aksharam.util.Transliterator;
 import in.digistorm.aksharam.util.GlobalSettings;
 import in.digistorm.aksharam.util.LabelledArrayAdapter;
@@ -109,17 +110,18 @@ public class TransliterateTabFragment extends Fragment {
     public void transliterateButtonOnClick(View view) {
         String inputString = ((EditText) ((View)view.getParent())
                 .findViewById(R.id.TransliterateTabInputTextField)).getText().toString();
-        Log.d(logTag, "Transliterating " + inputString);
+        Log.d(logTag, "Transliterating " + inputString + " to " + targetLanguage);
 
         if(sourceChanged) {
             sourceChanged = false;
-            String prevLang = tr.getCurrentLang();
-            String lang = tr.detectLanguage(inputString, getContext());
+            String lang = new LanguageDetector(getContext())
+                    .detectLanguage(inputString, getContext());
+            Log.d(logTag, "Detected language: " + lang);
             if(lang == null) {
                 Toast.makeText(getContext(), R.string.lang_could_not_detect,
                         Toast.LENGTH_LONG).show();
             }
-            else if(!lang.equalsIgnoreCase(prevLang)) {
+            else if(!lang.equalsIgnoreCase(tr.getCurrentLang())) {
                 tr = new Transliterator(lang, getContext());
                 initialiseSpinner(null);
             }

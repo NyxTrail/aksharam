@@ -52,7 +52,6 @@ public class LangDataReader {
     private String langCode;
     private String virama;
     private boolean ligaturesAutoGeneratable;
-    private final ArrayList<String> sourceLangs = new ArrayList<>();
     // transliteration languages suppported by the current data file
     private final ArrayList<String> transLangs = new ArrayList<>();
     // codes for the languages above
@@ -250,14 +249,15 @@ public class LangDataReader {
         return currentLang;
     }
 
-    public ArrayList<String> getAvailableSourceLanguages(Context context) {
+    public static ArrayList<String> getAvailableSourceLanguages(Context context) {
+        String logTag = "LangDataReader";
         Log.d(logTag, "finding all available lang data files");
         String[] files = context.getFilesDir().list();
 
         if(files == null)
             return null;
 
-        sourceLangs.clear();
+        ArrayList<String> sourceLangs = new ArrayList<>();
         for(String file: files) {
             Log.d(logTag, "found file " + file);
             // if file is not json, ignore it
@@ -268,11 +268,7 @@ public class LangDataReader {
         }
         Log.d(logTag, "source languages found: " + sourceLangs);
         // return a copy that clients can do whatever with
-        return new ArrayList<>(sourceLangs);
-    }
-
-    public ArrayList<String> getAvailableSourceLanguages() {
-        return new ArrayList<>(sourceLangs);
+        return sourceLangs;
     }
 
     public ArrayList<String> getDiacritics() {
