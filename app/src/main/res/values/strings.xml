@@ -49,6 +49,9 @@
     <string name="letters_tab_header">Letters</string>
     <string name="transliterate_tab_header">Transliterate</string>
     <string name="practice_tab_header">Practice</string>
+    <string name="lang_could_not_detect">
+        Could not detect language. Have you downloaded its data?
+    </string>
 
     <string name="letters_tab_lang_input_hint">Language</string>
     <string name="letters_tab_trans_hint">Convert To</string>

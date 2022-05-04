@@ -27,23 +27,33 @@ import androidx.lifecycle.ViewModel;
 import java.util.Locale;
 
 import in.digistorm.aksharam.util.LabelledArrayAdapter;
+import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.Transliterator;
 
 public class LettersTabViewModel extends ViewModel {
+    private String logTag = "LettersTabViewModel";
+
     private String targetLanguage;
-    private String language;
     private Transliterator transliterator;
     private LabelledArrayAdapter<String> adapter;
 
     public Transliterator getTransliterator(Context context) {
         if(transliterator == null)
             transliterator = Transliterator.getDefaultTransliterator(context);
-
         return transliterator;
+    }
+
+    public void resetTransliterator(Context context) {
+        if(transliterator == null) {
+            Log.d(logTag, "Transliterator is null. Initialising...");
+            transliterator = Transliterator.getDefaultTransliterator(context);
+        }
     }
 
     public Transliterator getTransliterator(String language, Context context) {
         if(transliterator != null) {
+            // re-initialise transliterator if its language does not match the
+            // language parameter we received
             if (transliterator.getCurrentLang().toLowerCase(Locale.ROOT)
                     .equals(language.toLowerCase(Locale.ROOT)))
                 return transliterator;
@@ -64,12 +74,8 @@ public class LettersTabViewModel extends ViewModel {
         return targetLanguage;
     }
 
-    public void setLanguage(String lang) {
-        language = lang;
-    }
-
     public String getLanguage() {
-        return language;
+        return transliterator.getCurrentLang();
     }
 
     public LabelledArrayAdapter<String> getAdapter() {

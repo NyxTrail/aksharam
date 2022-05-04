@@ -30,10 +30,13 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+
+import java.util.Locale;
 
 import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.util.Transliterator;
@@ -84,7 +87,6 @@ public class TransliterateTabFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                Log.d(logTag, "Input string has changed.");
                 sourceChanged = true;
             }
         });
@@ -99,6 +101,7 @@ public class TransliterateTabFragment extends Fragment {
         languageSelectionSpinner.setAlpha(0.3f);
 
         GlobalSettings.getInstance().addDataFileListChangedListener("TransliterateTabFragmentListener", () -> {
+            Log.d(logTag, "Re-initialising spinners");
             initialiseSpinner(view);
         });
     }
@@ -110,11 +113,17 @@ public class TransliterateTabFragment extends Fragment {
 
         if(sourceChanged) {
             sourceChanged = false;
+            String prevLang = tr.getCurrentLang();
             String lang = tr.detectLanguage(inputString, getContext());
-            if(lang != null) {
+            if(lang == null) {
+                Toast.makeText(getContext(), R.string.lang_could_not_detect,
+                        Toast.LENGTH_LONG).show();
+            }
+            else if(!lang.equalsIgnoreCase(prevLang)) {
                 tr = new Transliterator(lang, getContext());
                 initialiseSpinner(null);
             }
+            Log.d(logTag, lang + "; " + tr.getCurrentLang());
         }
 
         // Now we are ready to transliterate

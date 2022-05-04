@@ -46,8 +46,10 @@ public class Transliterator {
     }
 
     public static Transliterator getDefaultTransliterator(Context context) {
-        if(currentTransliterator == null)
-            new Transliterator(context);
+        if(currentTransliterator == null) {
+            currentTransliterator = new Transliterator(context);
+            return currentTransliterator;
+        }
         return currentTransliterator;
     }
 
@@ -67,6 +69,9 @@ public class Transliterator {
         currentTransliterator = this;
     }
 
+    // Constructor for when we don't know which language to load
+    // load the first one we can find
+    // if we can't, start initialisation activity
     public Transliterator(Context context) {
         // called the constructor without any input lang, find one
         // files are downloaded, this constructor is called in MainActivity. Since no "default"
@@ -114,7 +119,7 @@ public class Transliterator {
             if (file.equals(langDataReader.getCurrentFile()))
                 continue;
 
-            langDataReader = new LangDataReader(file, context);
+            langDataReader = new LangDataReader(LangDataReader.getLangFile(file), context);
 
             langData = langDataReader.getLangData();
             characters.clear();

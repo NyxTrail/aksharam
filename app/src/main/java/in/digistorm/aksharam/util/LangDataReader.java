@@ -109,6 +109,7 @@ public class LangDataReader {
         } catch(FileNotFoundException fnfe) {
             Log.d(logTag, "FileNotFoundException caught while opening file: " + file);
             fnfe.printStackTrace();
+            return new JSONObject();
         } catch (IOException ie) {
             Log.d(logTag, "IOException caught while reading from file: " + file);
             ie.printStackTrace();
@@ -339,6 +340,8 @@ public class LangDataReader {
     public static String getLangFile(String langName) {
         if(langName == null || langName.equals(""))
             return null;
+        if(langName.toLowerCase(Locale.ROOT).endsWith(".json"))
+            return langName;
         return  langName.toLowerCase(Locale.ROOT) + ".json";
     }
 

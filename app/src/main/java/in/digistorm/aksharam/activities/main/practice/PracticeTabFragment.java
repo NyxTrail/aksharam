@@ -35,6 +35,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -56,11 +58,9 @@ public class PracticeTabFragment extends Fragment {
 
     private Spinner practiceTabLangSpinner;
 
-    private String language;
-    private Transliterator transliterator;
-    private String transLang;
-    private String practiceType;
     private String practiceString;
+
+    private PracticeTabViewModel viewModel;
 
     private class TextChangedListener implements TextWatcher {
         @Override
@@ -74,7 +74,7 @@ public class PracticeTabFragment extends Fragment {
 
             boolean correctInProgress = true;
             StringBuilder markup = new StringBuilder();
-            String transliteratedString = transliterator.transliterate(practiceString, transLang);
+            String transliteratedString = viewModel.getTransliterator().transliterate(practiceString, viewModel.getTransLang());
             Log.d(logTag, "Practice text " + practiceString + " was transliterated to "
                     + transliteratedString);
             Log.d(logTag, "Text entered was: " + s.toString());
@@ -132,7 +132,13 @@ public class PracticeTabFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        transliterator = new Transliterator(getContext());
+        Log.d(logTag, "onViewCreated");
+        if(viewModel == null) {
+            Log.d(logTag, "Creating View Model for PracticeTabFragment");
+            viewModel = new ViewModelProvider(requireActivity()).get(PracticeTabViewModel.class);
+        }
+        // Initialise viewModel with a Transliterator
+        viewModel.resetTransliterator(getContext());
 
         view.findViewById(R.id.PracticeTabRefreshButton).setOnClickListener(v -> {
             clearInput();
@@ -144,12 +150,13 @@ public class PracticeTabFragment extends Fragment {
     }
 
     public void initialisePracticeTabLangSpinner(View v) {
+        Log.d(logTag, "Initialising PracticeTabLangSpinner");
         practiceTabLangSpinner = v.findViewById(R.id.PracticeTabLangSpinner);
 
         LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                transliterator.getLangDataReader().getAvailableSourceLanguages(getContext()),
+                viewModel.getTransliterator().getLangDataReader().getAvailableSourceLanguages(getContext()),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_lang_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         adapter.setNotifyOnChange(true);
@@ -158,12 +165,12 @@ public class PracticeTabFragment extends Fragment {
 
         GlobalSettings.getInstance().addDataFileListChangedListener("PracticeTabFragmentListener", () -> {
             Log.d("PTFListener", "Change in data files detected. Updating adapter.");
-            transliterator = new Transliterator(getContext());
+            if(getContext() == null)
+                return;
+
+            viewModel.resetTransliterator(getContext());
             adapter.clear();
-            // Invoke getAvailableSourceLanguages without Context object so that it does not
-            // read the files again. The changed files have already been read into
-            // LangDataReader when it was changed by the SettingsLanguageListAdapter
-            adapter.addAll(transliterator.getLangDataReader().getAvailableSourceLanguages());
+            adapter.addAll(viewModel.getTransliterator().getLangDataReader().getAvailableSourceLanguages(getContext()));
             // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
             // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
             // think of to fix this
@@ -173,10 +180,11 @@ public class PracticeTabFragment extends Fragment {
         practiceTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d(logTag, "onItemSelected invoked by " + parent.toString());
                 clearInput();
 
-                language = parent.getItemAtPosition(position).toString();
-                transliterator = new Transliterator(language, getContext());
+                String language = parent.getItemAtPosition(position).toString();
+                viewModel.getTransliterator(language, getContext());
 
                 // re-initialise the "practice in" spinner
                 initialisePracticeTabPracticeInSpinner();
@@ -213,7 +221,7 @@ public class PracticeTabFragment extends Fragment {
         LabelledArrayAdapter<String> practiceInAdapter = new LabelledArrayAdapter<>(getContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                transliterator.getLangDataReader().getTransLangs(),
+                viewModel.getTransliterator().getLangDataReader().getTransLangs(),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_practice_in_hint));
         practiceInAdapter.setDropDownViewResource(R.layout.spinner_drop_down);
         practiceTabPracticeInSpinner.setAdapter(practiceInAdapter);
@@ -225,9 +233,9 @@ public class PracticeTabFragment extends Fragment {
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 clearInput();
 
-                transLang = parent.getItemAtPosition(position).toString();
+                viewModel.setTransLang(parent.getItemAtPosition(position).toString());
                 ((TextInputLayout) getActivity().findViewById(R.id.PracticeTabInputTIL))
-                        .setHint(getString(R.string.practice_tab_practice_input_hint, transLang));
+                        .setHint(getString(R.string.practice_tab_practice_input_hint, viewModel.getTransLang()));
             }
 
             @Override
@@ -242,7 +250,7 @@ public class PracticeTabFragment extends Fragment {
                 R.id.PracticeTabPracticeTypeSpinner);
 
         ArrayList<String> practiceTypes = new ArrayList<>();
-        Set<String> categories = transliterator.getLangDataReader().getCategories().keySet();
+        Set<String> categories = viewModel.getTransliterator().getLangDataReader().getCategories().keySet();
         for(String category: categories) {
             practiceTypes.add(category.substring(0, 1).toUpperCase(Locale.ROOT)
                     + category.substring(1));
@@ -255,7 +263,7 @@ public class PracticeTabFragment extends Fragment {
         // Most of the combinations in these languages do not result in a meaningful ligature and
         // are usually represented using a half-consonant (with a virama). So, we will add random
         // ligatures only if the language's data file says we should.
-        if(transliterator.getLangDataReader().areLigaturesAutoGeneratable())
+        if(viewModel.getTransliterator().getLangDataReader().areLigaturesAutoGeneratable())
             practiceTypes.add("Random Ligatures");
         practiceTypes.add("Random Words");
 
@@ -273,7 +281,7 @@ public class PracticeTabFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 clearInput();
-                practiceType = parent.getItemAtPosition(position).toString();
+                viewModel.setPracticeType(parent.getItemAtPosition(position).toString());
                 startPractice();
             }
 
@@ -285,25 +293,25 @@ public class PracticeTabFragment extends Fragment {
     }
 
     public void startPractice() {
-        if(practiceType == null || practiceType.equals(""))
+        if(viewModel.getPracticeType() == null || viewModel.getPracticeType().equals(""))
             return;
 
         // get all letters of current language, category-wise
-        Map<String, ArrayList<String>> letters = transliterator.getLangDataReader().getCategories();
+        Map<String, ArrayList<String>> letters = viewModel.getTransliterator().getLangDataReader().getCategories();
 
         Random random = new Random();
         StringBuilder practiceString = new StringBuilder();
 
         Log.d(logTag, "letters: " + letters.toString());
-        Log.d(logTag, "letters[\"" + practiceType.toLowerCase(Locale.ROOT) + "\"]: "
-                + letters.get(practiceType.toLowerCase(Locale.ROOT)));
+        Log.d(logTag, "letters[\"" + viewModel.getPracticeType().toLowerCase(Locale.ROOT) + "\"]: "
+                + letters.get(viewModel.getPracticeType().toLowerCase(Locale.ROOT)));
 
         int numConsonants, numLigatures, numVowels, numSigns;
         // Special variable to hold the Virama.
         // Useful to detect chillu letters in Malayalam
-        String virama = transliterator.getLangDataReader().getVirama();
+        String virama = viewModel.getTransliterator().getLangDataReader().getVirama();
 
-        switch(practiceType.toLowerCase(Locale.ROOT)) {
+        switch(viewModel.getPracticeType().toLowerCase(Locale.ROOT)) {
             case "random words":
                 // Let's construct a made-up word in current language
                 // First letter can be a vowel or consonant (not a sign)
@@ -341,7 +349,7 @@ public class PracticeTabFragment extends Fragment {
                         // 20% chance that the next character is a joint letter
                         if(random.nextInt(100) < 21 && !prevChar.equals(virama)) {
                             // for malayalam, there is also a chance the next character is a chillu
-                            if(language.equalsIgnoreCase("malayalam")) {
+                            if(viewModel.getLanguage().equalsIgnoreCase("malayalam")) {
                                 if(random.nextInt(100) < 31)
                                     nextChar = letters.get("chillu").get(random.nextInt(letters.get("chillu").size()));
                                 else
@@ -403,12 +411,14 @@ public class PracticeTabFragment extends Fragment {
                                         letters.get("ligatures").size()));
 
                                 // Following for predecessor ligatures that have combining rules
-                                boolean isCombineAfter = transliterator.getLangDataReader().isCombineAfter(predecessor);
-                                boolean isCombineBefore = transliterator.getLangDataReader().isCombineBefore(predecessor);
+                                boolean isCombineAfter = viewModel.getTransliterator().getLangDataReader()
+                                        .isCombineAfter(predecessor);
+                                boolean isCombineBefore = viewModel.getTransliterator().getLangDataReader()
+                                        .isCombineBefore(predecessor);
 
                                 Log.d(logTag, "predecessor: " + predecessor);
 
-                                predecessor = transliterator.getLangDataReader().getBase(predecessor);
+                                predecessor = viewModel.getTransliterator().getLangDataReader().getBase(predecessor);
                                 Log.d(logTag, "base: " + predecessor);
 
                                 if(isCombineAfter && isCombineBefore) {
@@ -431,7 +441,7 @@ public class PracticeTabFragment extends Fragment {
                                     predecessor = predecessor + virama + letters.get("consonants")
                                             .get(random.nextInt(numConsonants));
                                 }
-                            } while (transliterator.getLangDataReader().isExcludeCombiExamples(predecessor));
+                            } while(viewModel.getTransliterator().getLangDataReader().isExcludeCombiExamples(predecessor));
                             break;
                     }
                     String sign;
@@ -439,7 +449,7 @@ public class PracticeTabFragment extends Fragment {
                     // TODO: support it!
                     do {
                         sign = letters.get("signs").get(random.nextInt(numSigns));
-                    } while(sign.equals(transliterator.getLangDataReader().getVirama()));
+                    } while(sign.equals(viewModel.getTransliterator().getLangDataReader().getVirama()));
 
                     practiceString.append(predecessor).append(sign).append(" ");
                 }
@@ -451,11 +461,11 @@ public class PracticeTabFragment extends Fragment {
                     String ligature = letters.get("ligatures").get(random.nextInt(numLigatures));
                     // nextChar is base char if a base exists in the data file.
                     // if there is no base in the data file, nextChar equals ligature (variable above)
-                    String nextChar = transliterator.getLangDataReader().getBase(ligature);
+                    String nextChar = viewModel.getTransliterator().getLangDataReader().getBase(ligature);
 
                     // get the rules for combining this letter if such rule exists
-                    boolean isCombineAfter = transliterator.getLangDataReader().isCombineAfter(ligature);
-                    boolean isCombineBefore = transliterator.getLangDataReader().isCombineBefore(ligature);
+                    boolean isCombineAfter = viewModel.getTransliterator().getLangDataReader().isCombineAfter(ligature);
+                    boolean isCombineBefore = viewModel.getTransliterator().getLangDataReader().isCombineBefore(ligature);
                     if (isCombineAfter && isCombineBefore) {
                         // randomly select either combineBefore or combineAfter
                         switch (random.nextInt(2)) {
@@ -484,9 +494,9 @@ public class PracticeTabFragment extends Fragment {
                 }
                 break;
             default:
-                int numLetters = letters.get(practiceType.toLowerCase(Locale.ROOT)).size();
+                int numLetters = letters.get(viewModel.getPracticeType().toLowerCase(Locale.ROOT)).size();
                 for(int i = 0; i < 10; i++)
-                    practiceString.append(letters.get(practiceType.toLowerCase(Locale.ROOT))
+                    practiceString.append(letters.get(viewModel.getPracticeType().toLowerCase(Locale.ROOT))
                             .get(random.nextInt(numLetters))).append(" ");
         }
 
