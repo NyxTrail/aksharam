@@ -36,6 +36,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.AksharamTheme">
         <activity android:name=".activities.initialise.InitialiseAppActivity"
+            android:exported="true"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,10 +44,13 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.main.MainActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".activities.settings.SettingsActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustPan"/>
         <activity android:name=".activities.htmlinfo.HTMLInfoActivity"
+            android:exported="false"
             android:windowSoftInputMode="adjustPan"/>
     </application>
 </manifest>
