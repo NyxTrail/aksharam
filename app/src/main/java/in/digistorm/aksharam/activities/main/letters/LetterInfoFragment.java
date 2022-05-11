@@ -50,10 +50,9 @@ import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.Transliterator;
 
 public class LetterInfoFragment extends Fragment {
-    private final String logTag = "LetterInfoFragment";
+    private final String logTag = getClass().getSimpleName();
 
     private String currentLetter = "";
-    private LettersTabFragment lettersTabFragment;
 
     private LettersTabViewModel viewModel;
 
@@ -61,14 +60,8 @@ public class LetterInfoFragment extends Fragment {
         super();
     }
 
-    public LetterInfoFragment(LettersTabFragment ltf) {
-        super();
-        lettersTabFragment = ltf;
-    }
-
-
-    public static LetterInfoFragment newInstance(String letter, LettersTabFragment ltf) {
-        LetterInfoFragment letterInfoFragment = new LetterInfoFragment(ltf);
+    public static LetterInfoFragment newInstance(String letter) {
+        LetterInfoFragment letterInfoFragment = new LetterInfoFragment();
 
         Bundle args = new Bundle();
         args.putString("letter", letter);

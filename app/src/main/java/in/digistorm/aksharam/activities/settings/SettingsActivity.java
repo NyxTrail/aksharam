@@ -43,7 +43,7 @@ import in.digistorm.aksharam.util.LanguageDataDownloader;
 import in.digistorm.aksharam.util.Log;
 
 public class SettingsActivity extends AppCompatActivity {
-    private final String logTag = "SettingsActivity";
+    private final String logTag = getClass().getSimpleName();
 
     private void populateLanguageList() {
         RecyclerView manageLanguagesRV = findViewById(R.id.SettingsActivityManageLanguagesRV);

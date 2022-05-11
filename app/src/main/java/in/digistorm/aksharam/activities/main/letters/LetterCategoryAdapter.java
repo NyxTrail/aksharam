@@ -42,12 +42,12 @@ import in.digistorm.aksharam.util.AutoAdjustingTextView;
 import in.digistorm.aksharam.util.Log;
 
 public class LetterCategoryAdapter extends BaseExpandableListAdapter {
-    private final String logTag = "LetterCategoryAdapter";
+    private final String logTag = getClass().getSimpleName();
 
     private final String[] headers;
 
     // The adapters copy of the parent fragment
-    private LettersTabFragment lettersTabFragment;
+    private final LettersTabFragment lettersTabFragment;
 
     public LetterCategoryAdapter(LettersTabFragment ltf) {
         lettersTabFragment = ltf;
@@ -157,7 +157,7 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             tv.setOnLongClickListener(v -> {
                 Log.d(logTag, letter + " long clicked!");
 
-                LetterInfoFragment letterInfoFragment = LetterInfoFragment.newInstance(letter, lettersTabFragment);
+                LetterInfoFragment letterInfoFragment = LetterInfoFragment.newInstance(letter);
                 MainActivity.replaceTabFragment(0, letterInfoFragment);
                 return true;
             });

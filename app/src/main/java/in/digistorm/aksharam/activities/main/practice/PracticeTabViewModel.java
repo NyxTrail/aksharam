@@ -30,7 +30,7 @@ import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.Transliterator;
 
 public class PracticeTabViewModel extends ViewModel {
-    private String logTag = "PracticeTabViewModel";
+    private final String logTag = getClass().getSimpleName();
 
     private Transliterator transliterator;
     private String transLang;

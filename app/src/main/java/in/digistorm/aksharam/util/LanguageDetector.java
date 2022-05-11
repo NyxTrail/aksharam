@@ -30,7 +30,7 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class LanguageDetector {
-    private String logTag = "LanguageDetector";
+    private final String logTag = getClass().getSimpleName();
     private LangDataReader langDataReader;
 
     public LanguageDetector(Context context) {

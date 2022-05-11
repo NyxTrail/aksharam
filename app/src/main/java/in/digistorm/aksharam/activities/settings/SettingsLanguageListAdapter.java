@@ -45,7 +45,7 @@ import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.OnRequestCompleted;
 
 public class SettingsLanguageListAdapter extends RecyclerView.Adapter<SettingsLanguageListAdapter.ViewHolder> {
-    private final String logTag = "SettingsLangListAdapter";
+    private final String logTag = getClass().getSimpleName();
     private final ArrayList<String> fileList;
     private final JSONArray onlineFiles;
     private final Activity activity;
@@ -203,7 +203,7 @@ public class SettingsLanguageListAdapter extends RecyclerView.Adapter<SettingsLa
         this.activity = activity;
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final ConstraintLayout parentConstraintLayout;
 
         public ViewHolder(@NonNull View view) {

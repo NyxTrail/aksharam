@@ -46,10 +46,9 @@ import in.digistorm.aksharam.util.LangDataReader;
 import in.digistorm.aksharam.util.Log;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
-    private ViewPager2 viewPager;
     private static PageCollectionAdapter pageCollectionAdapter;
     private int tabPosition;
-    private String logTag = "MainActivity";
+    private final String logTag = getClass().getSimpleName();
 
     public static void replaceTabFragment(int index, Fragment fragment) {
         pageCollectionAdapter.replaceFragment(index, fragment);
@@ -69,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         new Transliterator(getApplicationContext());
 
         pageCollectionAdapter = new PageCollectionAdapter(this);
-        viewPager = findViewById(R.id.pager);
+        ViewPager2 viewPager = findViewById(R.id.pager);
         viewPager.setAdapter(pageCollectionAdapter);
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.addOnTabSelectedListener(this);

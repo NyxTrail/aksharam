@@ -41,7 +41,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class LangDataReader {
-    private final String logTag = "LangDataReader";
+    private final String logTag = getClass().getSimpleName();
     // Data object from the lang data file
     private JSONObject langData;
 

@@ -35,7 +35,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.google.android.material.textfield.TextInputEditText;
@@ -51,10 +50,9 @@ import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.util.GlobalSettings;
 import in.digistorm.aksharam.util.LabelledArrayAdapter;
 import in.digistorm.aksharam.util.Log;
-import in.digistorm.aksharam.util.Transliterator;
 
 public class PracticeTabFragment extends Fragment {
-    private final String logTag = "PracticeTabFragment";
+    private final String logTag = getClass().getSimpleName();
 
     private Spinner practiceTabLangSpinner;
 

@@ -46,7 +46,7 @@ import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.Transliterator;
 
 public class LettersTabFragment extends Fragment {
-    private final String logTag = "in.digistorm.aksharam.activities.main.letters.LettersTabFragment";
+    private final String logTag = getClass().getSimpleName();
 
     private ExpandableListView categoriesList;
 

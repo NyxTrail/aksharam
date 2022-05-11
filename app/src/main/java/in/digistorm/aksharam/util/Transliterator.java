@@ -24,19 +24,13 @@ import android.content.Context;
 import android.content.Intent;
 
 import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import in.digistorm.aksharam.activities.initialise.InitialiseAppActivity;
 
 // This class is responsible for the actual transliteration
 public class Transliterator {
     // The JSON mapping used to transliterate
-    private static final String logTag = "Transliterator";
+    private final String logTag = getClass().getSimpleName();
 
     // The backing langDataReader for all tabs
     private LangDataReader langDataReader;

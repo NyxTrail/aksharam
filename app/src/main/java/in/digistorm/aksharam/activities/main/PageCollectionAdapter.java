@@ -34,8 +34,7 @@ import in.digistorm.aksharam.activities.main.transliterate.TransliterateTabFragm
 import in.digistorm.aksharam.util.Log;
 
 public class PageCollectionAdapter extends FragmentStateAdapter {
-    private final String logTag = "PageCollectionAdatper";
-    private MainActivity mainActivity;
+    private final String logTag = getClass().getSimpleName();
 
     private ArrayList<Fragment> fragments = new ArrayList<>();
     private ArrayList<Stack<Fragment>> backStack = new ArrayList<>();
@@ -46,7 +45,6 @@ public class PageCollectionAdapter extends FragmentStateAdapter {
 
     public PageCollectionAdapter(FragmentActivity fragmentActivity) {
         super(fragmentActivity);
-        this.mainActivity = (MainActivity) fragmentActivity;
 
         Log.d(logTag, "Setting up fragments");
 
@@ -83,18 +81,7 @@ public class PageCollectionAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         Log.d(logTag, "position: " + position);
         Log.d(logTag, fragments.get(position).getClass().getName());
-        switch(position) {
-            case 0:
-                return fragments.get(0);
-            case 1:
-                return fragments.get(1);
-            case 2:
-                return fragments.get(2);
-            default:
-                // something bad happened
-                Log.d(logTag, "Invalid tab at position " + position);
-                return fragments.get(0);
-        }
+        return fragments.get(position);
     }
 
     public void replaceFragment(int index, Fragment fragment) {
@@ -113,8 +100,6 @@ public class PageCollectionAdapter extends FragmentStateAdapter {
         if(!backStack.get(index).isEmpty()) {
             fragments.set(index, backStack.get(index).pop());
             notifyItemChanged(index);
-//            if (backStack.get(index).isEmpty())
-//                mainActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
             return true;
         }
         else

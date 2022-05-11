@@ -34,13 +34,13 @@ import in.digistorm.aksharam.util.Log;
    help, privacy policy etc
  */
 public class HTMLInfoActivity extends AppCompatActivity {
-    String logTag = "HelpActivity";
+    final String logTag = getClass().getSimpleName();
 
     public static String EXTRA_NAME = "HTMLINFO_EXTRA";
     public enum EXTRA_VALUES {
         HELP,
         PRIVACY
-    };
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +55,6 @@ public class HTMLInfoActivity extends AppCompatActivity {
         htmlInfoActivityTV.setMovementMethod(LinkMovementMethod.getInstance());
         if(extra == EXTRA_VALUES.HELP) {
             Log.d(logTag, "Displaying help");
-            String text = "<a href='http://www.google.com'>Google</a> this is a link";
 
             htmlInfoActivityTV.setText(Html.fromHtml(getString(R.string.help_text)));
         }

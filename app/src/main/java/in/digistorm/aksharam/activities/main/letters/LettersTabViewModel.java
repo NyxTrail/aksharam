@@ -31,7 +31,7 @@ import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.Transliterator;
 
 public class LettersTabViewModel extends ViewModel {
-    private String logTag = "LettersTabViewModel";
+    private final String logTag = getClass().getSimpleName();
 
     private String targetLanguage;
     private Transliterator transliterator;

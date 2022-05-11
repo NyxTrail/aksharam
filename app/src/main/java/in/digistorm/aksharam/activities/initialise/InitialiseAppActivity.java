@@ -47,7 +47,7 @@ import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.OnRequestCompleted;
 
 public class InitialiseAppActivity extends AppCompatActivity {
-    private final String logTag = "InitialiseAppActivity";
+    private final String logTag = getClass().getSimpleName();
 
     private LanguageDataDownloader languageDataDownloader;
     private LanguageDataFileListAdapter adapter;

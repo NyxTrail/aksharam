@@ -35,7 +35,7 @@ import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.util.Log;
 
 public class LanguageInfoFragment extends Fragment {
-    private final String logTag = "LanguageInfoFragment";
+    private final String logTag = getClass().getSimpleName();
 
     public static LanguageInfoFragment newInstance(String info) {
         LanguageInfoFragment lif = new LanguageInfoFragment();

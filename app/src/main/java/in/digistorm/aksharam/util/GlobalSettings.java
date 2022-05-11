@@ -32,9 +32,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class GlobalSettings {
-    private static GlobalSettings globalSettings;
+    private final String logTag = getClass().getSimpleName();
 
-    private final String logTag = "GlobalSettings";
+    private static GlobalSettings globalSettings;
 
     // Dark/Light mode
     private boolean darkMode;

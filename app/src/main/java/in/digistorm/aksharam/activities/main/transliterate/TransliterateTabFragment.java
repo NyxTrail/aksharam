@@ -46,11 +46,11 @@ import in.digistorm.aksharam.util.LabelledArrayAdapter;
 import in.digistorm.aksharam.util.Log;
 
 public class TransliterateTabFragment extends Fragment {
+    private final String logTag = getClass().getSimpleName();
+
     private String targetLanguage;
     private Transliterator tr;
     private boolean sourceChanged = true;
-
-    private final String logTag = "TransTabFragment";
 
     @Nullable
     @Override

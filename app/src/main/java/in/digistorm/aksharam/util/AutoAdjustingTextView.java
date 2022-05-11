@@ -29,7 +29,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatTextView;
 
 public class AutoAdjustingTextView extends AppCompatTextView {
-    String logTag = "AutoAdjustingTextView";
+    String logTag = getClass().getSimpleName();
 
     public AutoAdjustingTextView(@NonNull Context context) {
         super(context);

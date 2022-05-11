@@ -41,8 +41,8 @@ import in.digistorm.aksharam.util.Log;
 
 public class LanguageDataFileListAdapter extends RecyclerView.Adapter<LanguageDataFileListAdapter.ViewHolder> {
     // apparently log tag can at most be 23 characters
-    private final String logTag = "LangDataFileListAdapter";
-    private JSONArray dataFileList;
+    private final String logTag = getClass().getSimpleName();
+    private final JSONArray dataFileList;
     // map is filename, true/false depending on whether file is selected
     private final Map<Integer, Boolean> selectedFiles = new HashMap<>();
 
@@ -101,7 +101,7 @@ public class LanguageDataFileListAdapter extends RecyclerView.Adapter<LanguageDa
         return dataFileList.length();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         private final CheckedTextView checkedTextView;
 
         public ViewHolder(View view) {

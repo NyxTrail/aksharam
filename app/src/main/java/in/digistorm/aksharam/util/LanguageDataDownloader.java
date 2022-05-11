@@ -46,8 +46,9 @@ import retrofit2.Retrofit;
 import retrofit2.http.GET;
 
 public class LanguageDataDownloader {
+    private final String logTag = getClass().getSimpleName();
+
     private final String baseUrl = "https://api.github.com/repos/NyxTrail/aksharam-data/";
-    private final String logTag = "LanguageDataDownloader";
 
     private final OkHttpClient okHttpClient;
 
@@ -193,7 +194,7 @@ public class LanguageDataDownloader {
 
         Log.d(logTag, " Fetching language data files from git repo.");
         String responseString;
-        retrofit2.Response<ResponseBody> response = null;
+        retrofit2.Response<ResponseBody> response;
         try {
             // response body from okhttp can be consumed only once:
             // https://square.github.io/okhttp/4.x/okhttp/okhttp3/-response-body/#the-response-body-can-be-consumed-only-once
