@@ -1,0 +1,2 @@
+- Initial release to f-droid
+- changelog added
