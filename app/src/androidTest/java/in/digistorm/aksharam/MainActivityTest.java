@@ -224,7 +224,7 @@ public class MainActivityTest {
                     for(String targetLanguage: testCase.keySet()) {
                         if(targetLanguage.toLowerCase(Locale.ROOT).equals("src"))
                             continue;
-                        android.util.Log.d(logTag, "Testing " + language + " to " + targetLanguage + " transliteration.");
+                        Log.d(logTag, "Testing " + language + " to " + targetLanguage + " transliteration.");
                         String target = testCase.get(targetLanguage);
                         onView(withId(R.id.TransliterateTabInputTextField)).perform(replaceText(src));
                         onView(withId(R.id.LanguageSelectionSpinner)).perform(click());

@@ -1,0 +1,14 @@
+Aksharam is an easy to use reference app to learn Indian language scripts by comparing the alphabets. Know the script for an Indian language? See what those letters look like in a different Indian language.
+
+Features:
+- Tap a letter to see what it corresponds to in a different language
+- Long tap a letter to see more detailed information about a particular letter
+- Includes easy to visualise comparison of vowels, consonants and joint letters
+- See how letters combine with each other (consonants + vowels, consonants + consonants)
+- Transliteration of text into a script you can understand
+- Practice your ability to recognize the script for a language by typing in corresponding letters in a language you are familiar with
+
+Note:
+* This app is designed for those who already know the script for an Indian language.
+* Currently Kannada, Hindi and Malayalam languages are supported.
+* UI language is in English.
