@@ -39,7 +39,7 @@ public class LanguageDetector {
             Log.d(logTag, "Could not find any data files.");
             return;
         }
-        langDataReader = new LangDataReader(LangDataReader.areDataFilesAvailable(context), context);
+        langDataReader = new LangDataReader(file, context);
     }
 
     public String detectLanguage(String input, Context context) {

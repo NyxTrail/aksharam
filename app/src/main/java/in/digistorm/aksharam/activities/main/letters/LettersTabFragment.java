@@ -42,6 +42,7 @@ import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.activities.main.MainActivity;
 import in.digistorm.aksharam.util.GlobalSettings;
 import in.digistorm.aksharam.util.LabelledArrayAdapter;
+import in.digistorm.aksharam.util.LangDataReader;
 import in.digistorm.aksharam.util.Log;
 import in.digistorm.aksharam.util.Transliterator;
 
@@ -135,15 +136,13 @@ public class LettersTabFragment extends Fragment {
         Log.d(logTag, "Initialising LettersTabLangSpinner");
         lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
 
-        // adapter = viewModel.getAdapter();
-        // if(adapter == null) {
-            adapter = new LabelledArrayAdapter<>(getContext(),
-                    R.layout.spinner_item,
-                    R.id.spinnerItemTV,
-                    viewModel.getTransliterator().getLangDataReader().getAvailableSourceLanguages(getContext()),
-                    R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
-            viewModel.setAdapter(adapter);
-        // }
+        adapter = new LabelledArrayAdapter<>(getContext(),
+                R.layout.spinner_item,
+                R.id.spinnerItemTV,
+                LangDataReader.getAvailableSourceLanguages(getContext()),
+                R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
+        viewModel.setAdapter(adapter);
+
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         adapter.setNotifyOnChange(true);
         lettersTabLangSpinner.setAdapter(adapter);

@@ -203,6 +203,12 @@ public class LanguageDataDownloader {
                 throw new IOException("Obtained empty body.");
             responseString = response.body().string();
             Log.d(logTag, responseString);
+            JSONArray jsonArray = new JSONArray(responseString);
+            for(int i = 0; i < jsonArray.length(); i++) {
+                String fileName = jsonArray.getJSONObject(i).optString("name");
+                if(!fileName.endsWith(".json"))
+                    jsonArray.remove(i);
+            }
             return new JSONArray(responseString);
         } catch (IOException | JSONException e) {
             if(e instanceof IOException)

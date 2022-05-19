@@ -49,7 +49,7 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     private static PageCollectionAdapter pageCollectionAdapter;
     private int tabPosition;
     private final String logTag = getClass().getSimpleName();
-
+    private String[] tabHeads;
     public static void replaceTabFragment(int index, Fragment fragment) {
         pageCollectionAdapter.replaceFragment(index, fragment);
     }
@@ -58,6 +58,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        if(tabHeads == null) {
+            tabHeads = new String[]{
+                    getText(R.string.letters_tab_header).toString(),
+                    getText(R.string.transliterate_tab_header).toString(),
+                    getText(R.string.practice_tab_header).toString()
+            };
+        }
 
         if(GlobalSettings.getInstance() == null)
             GlobalSettings.createInstance(this);
@@ -73,8 +81,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         TabLayout tabLayout = findViewById(R.id.tab_layout);
         tabLayout.addOnTabSelectedListener(this);
 
+
         TabLayoutMediator tabLayoutMediator = new TabLayoutMediator(tabLayout, viewPager,
-                tabConfigurationStrategy()
+                ((tab, position) -> tab.setText(tabHeads[position]))
         );
         tabLayoutMediator.attach();
     }
@@ -122,22 +131,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public static TabLayoutMediator.TabConfigurationStrategy tabConfigurationStrategy() {
-        return (tab, position) -> {
-            switch(position) {
-                case 0:
-                    tab.setText(R.string.letters_tab_header);
-                    break;
-                case 1:
-                    tab.setText(R.string.transliterate_tab_header);
-                    break;
-                case 2:
-                    tab.setText(R.string.practice_tab_header);
-                    break;
-            }
-        };
     }
 
     @Override
