@@ -36,8 +36,8 @@ import in.digistorm.aksharam.util.Log;
 public class PageCollectionAdapter extends FragmentStateAdapter {
     private final String logTag = getClass().getSimpleName();
 
-    private ArrayList<Fragment> fragments = new ArrayList<>();
-    private ArrayList<Stack<Fragment>> backStack = new ArrayList<>();
+    private final ArrayList<Fragment> fragments = new ArrayList<>();
+    private final ArrayList<Stack<Fragment>> backStack = new ArrayList<>();
 
     public ArrayList<Fragment> getFragments() {
         return fragments;

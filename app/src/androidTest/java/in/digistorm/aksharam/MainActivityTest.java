@@ -141,15 +141,16 @@ public class MainActivityTest {
         Transliterator transliterator = new Transliterator(language,
                 ApplicationProvider.getApplicationContext());
         HashMap<String, ArrayList<String>> categories =
-                transliterator.getLangDataReader().getCategories();
+                transliterator.getLanguage().getLettersCategoryWise();
+        Log.d(logTag, "Letters category wise: " + categories);
         if(categories == null) {
             Log.d(logTag, "Obtained null categories list. Exiting test.");
             return;
         }
 
-        ArrayList<String> transLangs = transliterator.getLangDataReader().getTransLangs();
+        ArrayList<String> transLangs = transliterator.getLanguage().getSupportedLanguagesForTransliteration();
         // track what we have clicked so far
-        HashMap<String, String> clickedLetters = new HashMap<>();
+        ArrayList<String> clickedLetters = new ArrayList<>();
         for(String transLang: transLangs) {
             // Click the target language selection spinner
             Log.d(logTag, "Clicking " + transLang + " in the transliteration target spinner");
@@ -160,33 +161,29 @@ public class MainActivityTest {
             clickLanguageInfo();
 
             for(String category: categories.keySet()) {
-
+                int pos = random.nextInt(Objects.requireNonNull(categories.get(category)).size());
                 // for each category, touch a couple of random letters
-                for(int i = 0; i < 4; i++) {
-                    int pos = random.nextInt(Objects.requireNonNull(categories.get(category)).size());
+                for(int i = 0; i < 7; i++) {
+                    // 20% of the time, we choose the previous letter
+                    pos = random.nextInt(100) < 20 ? pos : random.nextInt(Objects.requireNonNull(categories.get(category)).size());
                     String letter = Objects.requireNonNull(categories.get(category)).get(pos);
                     String transliteratedLetter = transliterator.transliterate(letter, transLang);
-                    if(!clickedLetters.containsKey(letter))
-                        clickedLetters.put(letter, letter);
-
-                    Log.d(logTag, "Clicking " + clickedLetters.get(letter));
+                    if(!clickedLetters.contains(letter))
+                        clickedLetters.add(letter);
 
                     boolean longClick = random.nextBoolean();
+                    Log.d(logTag, "Clicking: " + letter + " long click: " + longClick);
                     onData(allOf(
                             is(instanceOf(ArrayList.class)),
                             is(categories.get(category)))
                     ).inAdapterView(is(instanceOf(ExpandableListView.class)))
                             .onChildView(withId(R.id.LetterGrid))
-                            .onChildView(anyOf(withText(clickedLetters.get(letter)), withText(letter)))
+                            .onChildView(anyOf(withText(letter), withText(transliteratedLetter)))
                             .perform(longClick?longClick() : click());
 
+                    // long click opens a new fragment, return to previous fragment
                     if(longClick)
                         onView(withId(R.id.letterInfoCL)).perform(pressBack());
-
-                    if(Objects.equals(clickedLetters.get(letter), transliteratedLetter))
-                        clickedLetters.put(letter, letter);
-                    else
-                        clickedLetters.put(letter, transliteratedLetter);
                 }
             }
         }
@@ -194,7 +191,7 @@ public class MainActivityTest {
 
     private void lettersTabTest() {
         Log.d(logTag, "Test started for Letters tab");
-        ArrayList<String> languages = LangDataReader.getAvailableSourceLanguages(
+        ArrayList<String> languages = LangDataReader.getDownloadedLanguages(
                 ApplicationProvider.getApplicationContext());
         // Verify each available source language
         assertNotNull(languages);

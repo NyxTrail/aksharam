@@ -40,9 +40,8 @@ import in.digistorm.aksharam.activities.initialise.InitialiseAppActivity;
 import in.digistorm.aksharam.activities.main.letters.LetterInfoFragment;
 import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.activities.settings.SettingsActivity;
-import in.digistorm.aksharam.util.Transliterator;
-import in.digistorm.aksharam.util.GlobalSettings;
 import in.digistorm.aksharam.util.LangDataReader;
+import in.digistorm.aksharam.util.GlobalSettings;
 import in.digistorm.aksharam.util.Log;
 
 public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSelectedListener {
@@ -71,9 +70,6 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
             GlobalSettings.createInstance(this);
 
         Log.d(logTag, "Initialising transliterator...");
-        // Simple initialisation, Transliterator(context) picks a language from the downloaded
-        // selection
-        new Transliterator(getApplicationContext());
 
         pageCollectionAdapter = new PageCollectionAdapter(this);
         ViewPager2 viewPager = findViewById(R.id.pager);
@@ -133,6 +129,14 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         return super.onOptionsItemSelected(item);
     }
 
+    public void startInitialisationAcitivity() {
+        Log.d(logTag, "MainActivity ending. Starting Initialisation Activity.");
+        Intent intent = new Intent(this, InitialiseAppActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        startActivity(intent);
+        finish();
+    }
+
     @Override
     public void onBackPressed() {
         if (!pageCollectionAdapter.restoreFragment(tabPosition))
@@ -144,12 +148,9 @@ public class MainActivity extends AppCompatActivity implements TabLayout.OnTabSe
         super.onResume();
 
         // if there are no downloaded files, switch to Initialisation activity
-        if(LangDataReader.areDataFilesAvailable(this) == null) {
+        if(LangDataReader.getDownloadedLanguages(this).isEmpty()) {
             Log.d(logTag, "No files found in data directory. Switching to initialisation activity.");
-            Intent intent = new Intent(this, InitialiseAppActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
+            startInitialisationAcitivity();
         }
     }
 

@@ -20,7 +20,7 @@ package in.digistorm.aksharam.activities.main.letters;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import android.content.Context;
+import android.annotation.SuppressLint;
 import android.graphics.Point;
 import android.graphics.Typeface;
 import android.os.Build;
@@ -32,9 +32,12 @@ import android.view.ViewGroup;
 import android.widget.BaseExpandableListAdapter;
 
 import androidx.gridlayout.widget.GridLayout;
+
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
+
+import java.util.Arrays;
 
 import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.activities.main.MainActivity;
@@ -47,18 +50,19 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     private final String[] headers;
 
     // The adapters copy of the parent fragment
-    private final LettersTabFragment lettersTabFragment;
+    private final LettersTabViewModel viewModel;
+    private final Point size;
 
-    public LetterCategoryAdapter(LettersTabFragment ltf) {
-        lettersTabFragment = ltf;
-        headers = lettersTabFragment.getTransliterator().getLangDataReader()
-                .getCategories().keySet().toArray(new String[0]);
+    public LetterCategoryAdapter(LettersTabViewModel model, Point s) {
+        viewModel = model;
+        size = s;
+        headers = viewModel.getTransliterator().getLanguage().getLettersCategoryWise()
+                .keySet().toArray(new String[0]);
     }
 
     @Override
     public int getGroupCount() {
-        return lettersTabFragment.getTransliterator().getLangDataReader()
-                .getCategories().size();
+        return viewModel.getTransliterator().getLanguage().getLettersCategoryWise().size();
     }
 
     @Override
@@ -74,8 +78,8 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
 
     @Override
     public Object getChild(int groupPosition, int childPosition) {
-        return lettersTabFragment.getTransliterator().getLangDataReader()
-                .getCategories().get(headers[groupPosition]);
+        return viewModel.getTransliterator().getLanguage()
+                .getLettersCategoryWise().get(headers[groupPosition]);
     }
 
     @Override
@@ -93,14 +97,14 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
         return false;
     }
 
+    @SuppressLint("InflateParams")
     @Override
     public View getGroupView(int groupPosition, boolean isExpanded, View convertView,
                              ViewGroup parent) {
         Log.d(logTag, "getting groupview for position " + groupPosition);
         if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) lettersTabFragment.getActivity()
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.letter_category_header, null);
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            convertView = layoutInflater.inflate(R.layout.letter_category_header, parent, false);
         }
 
         TextView letterCategoryHeaderTV = convertView.findViewById(R.id.LetterCategoryHeaderText);
@@ -121,36 +125,32 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
     public View getChildView(int groupPosition, int childPosition, boolean isLastChild,
                              View convertView, ViewGroup parent) {
         if (convertView == null) {
-            LayoutInflater layoutInflater = (LayoutInflater) lettersTabFragment.getActivity()
-                    .getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            convertView = layoutInflater.inflate(R.layout.letter_category_content, null);
+            LayoutInflater layoutInflater = LayoutInflater.from(parent.getContext());
+            convertView = layoutInflater.inflate(R.layout.letter_category_content, parent, false);
         }
         Log.d(logTag, "creating grid for group: " + groupPosition);
-        Log.d(logTag, "group is: " + lettersTabFragment.getTransliterator()
-                .getLangDataReader().getCategories().get(headers[groupPosition]));
         GridLayout gridLayout = convertView.findViewById(R.id.LetterGrid);
         gridLayout.removeAllViews();
         gridLayout.setClickable(true);
 
-        String[] letters = lettersTabFragment.getTransliterator().getLangDataReader()
-                .getCategories().get(headers[groupPosition]).toArray(new String[0]);
+        String[] letters = viewModel.getTransliterator().getLanguage()
+                .getLettersCategoryWise().get(headers[groupPosition]).toArray(new String[0]);
+        Log.d(logTag, "group is: " + Arrays.toString(letters));
 
-        Point size = new Point();
-        lettersTabFragment.getActivity().getWindowManager().getDefaultDisplay().getSize(size);
         int i = 0, cols = 5;
         for(String letter: letters) {
             GridLayout.Spec rowSpec = GridLayout.spec(i / cols, GridLayout.CENTER);
             GridLayout.Spec colSpec = GridLayout.spec(i % cols, GridLayout.CENTER);
 
-            AutoAdjustingTextView tv = new AutoAdjustingTextView(lettersTabFragment.getContext());
+            AutoAdjustingTextView tv = new AutoAdjustingTextView(parent.getContext());
             tv.setGravity(Gravity.CENTER);
             tv.setText(letter);
             GridLayout.LayoutParams tvLayoutParams = new GridLayout.LayoutParams(rowSpec, colSpec);
             tvLayoutParams.width = size.x / 6;
-            int pixels = lettersTabFragment.getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
+            int pixels = parent.getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_margin);
             tvLayoutParams.setMargins(pixels, pixels, pixels, pixels);
             tv.setLayoutParams(tvLayoutParams);
-            pixels = lettersTabFragment.getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_padding);
+            pixels = parent.getResources().getDimensionPixelSize(R.dimen.letter_grid_tv_padding);
             tv.setPadding(pixels, pixels, pixels, pixels);
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22);
 
@@ -165,13 +165,12 @@ public class LetterCategoryAdapter extends BaseExpandableListAdapter {
             tv.setOnClickListener(v -> {
                 Log.d(logTag, letter + " clicked!");
                 if (tv.getText().toString().equals(letter)) {
-                    if (!lettersTabFragment.getLettersTabFragmentLanguage().equalsIgnoreCase(
-                            lettersTabFragment.getLettersTabFragmentTargetLanguage()))
-                        tv.setText(lettersTabFragment.getTransliterator().transliterate(
+                    if (!viewModel.getLanguage().equalsIgnoreCase(viewModel.getTargetLanguage()))
+                        tv.setText(viewModel.getTransliterator().transliterate(
                                 letter,
-                                lettersTabFragment.getLettersTabFragmentTargetLanguage()));
+                                viewModel.getTargetLanguage()));
                     else
-                        Log.d(logTag, "source lang = target lang");
+                        Log.d(logTag, "source lang = target lang... Error is data file?");
                 }
                 else
                     tv.setText(letter);

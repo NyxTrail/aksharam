@@ -20,7 +20,6 @@ package in.digistorm.aksharam.activities.initialise;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -52,36 +51,31 @@ public class InitialiseAppActivity extends AppCompatActivity {
     private LanguageDataDownloader languageDataDownloader;
     private LanguageDataFileListAdapter adapter;
 
-    private AlertDialog dialog;
-
     private void showLanguageDataSelectionList(JSONArray languageDataFiles) {
         InitialiseAppActivity self = this;
 
         // This is called from the background thread; views can be updated only in the threads that
         // created them
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                Log.d(logTag, "Updating RecyclerView in UI thread");
-                // First, hide the progress bar
-                findViewById(R.id.InitialiseAppProgressBar).setVisibility(View.INVISIBLE);
-                // Set the appropriate hint
-                ((TextView) findViewById(R.id.InitialiseAppHintTV)).setText(R.string.initialisation_choice_hint);
+        runOnUiThread(() -> {
+            Log.d(logTag, "Updating RecyclerView in UI thread");
+            // First, hide the progress bar
+            findViewById(R.id.InitialiseAppProgressBar).setVisibility(View.INVISIBLE);
+            // Set the appropriate hint
+            ((TextView) findViewById(R.id.InitialiseAppHintTV)).setText(R.string.initialisation_choice_hint);
 
-                RecyclerView languageListRV = findViewById(R.id.InitialiseAppLangListRV);
-                adapter = new LanguageDataFileListAdapter(languageDataFiles);
-                languageListRV.setLayoutManager(new LinearLayoutManager(self));
-                languageListRV.setAdapter(adapter);
+            RecyclerView languageListRV = findViewById(R.id.InitialiseAppLangListRV);
+            adapter = new LanguageDataFileListAdapter(languageDataFiles);
+            languageListRV.setLayoutManager(new LinearLayoutManager(self));
+            languageListRV.setAdapter(adapter);
 
-                ((Button) findViewById(R.id.InitialiseAppProceedButton)).setEnabled(true);
-            }
+            ((Button) findViewById(R.id.InitialiseAppProceedButton)).setEnabled(true);
         });
     }
 
     private boolean startMainActivity() {
         Log.d(logTag, "Attempting to start main activity...");
         // First check if we have data files available
-        if(LangDataReader.areDataFilesAvailable(this) == null) {
+        if(LangDataReader.getDownloadedLanguages(this).isEmpty()) {
             Log.d(logTag, "No data files found!! Continuing initialisation activity");
             // we cannot start the main activity
             return false;
@@ -157,23 +151,15 @@ public class InitialiseAppActivity extends AppCompatActivity {
                     dialog.dismiss();
                     finish();
                 })
-                .setPositiveButton(R.string.retry_download, (dialog, which) -> {
-                    setUpActivity();
-                })
-                .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                    @Override
-                    public void onDismiss(DialogInterface dialog) {
-                        Log.d("NoInternetDialog", "Dialog dismissed!");
-                    }
-                });
-        dialog = dialogBuilder.create();
-        dialog.show();
+                .setPositiveButton(R.string.retry_download, (dialog, which) -> setUpActivity())
+                .setOnDismissListener(dialog -> Log.d("NoInternetDialog", "Dialog dismissed!"));
+        AlertDialog dialog1 = dialogBuilder.create();
+        dialog1.show();
     }
 
     protected void setUpActivity() {
         // Attempt to start main activity
         boolean mainActivityStarted = startMainActivity();
-        InitialiseAppActivity activity = this;
         if(!mainActivityStarted) {
             // if we are not able to start the main activity...
             // continue setting up the initialisation activity (current activity)
@@ -190,7 +176,7 @@ public class InitialiseAppActivity extends AppCompatActivity {
                     runOnUiThread(this::showNoInternetDialog);
                 }
             });
-            findViewById(R.id.InitialiseAppProceedButton).setOnClickListener(v -> proceed(v));
+            findViewById(R.id.InitialiseAppProceedButton).setOnClickListener(this::proceed);
         }
         else
             finish();

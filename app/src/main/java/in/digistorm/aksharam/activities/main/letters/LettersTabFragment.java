@@ -20,6 +20,7 @@ package in.digistorm.aksharam.activities.main.letters;
  */
 
 import android.content.Context;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,9 +35,9 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import org.json.JSONObject;
-
+import java.util.ArrayList;
 import java.util.Locale;
+import java.util.Map;
 
 import in.digistorm.aksharam.R;
 import in.digistorm.aksharam.activities.main.MainActivity;
@@ -67,7 +68,6 @@ public class LettersTabFragment extends Fragment {
     // have access to its parent in.digistorm.aksharam.activities.main.letters.LettersTabFragment
     public LettersTabFragment(Context context) {
         super();
-        // transliterator = new Transliterator(context);
     }
 
     public String getLettersTabFragmentLanguage() {
@@ -106,25 +106,27 @@ public class LettersTabFragment extends Fragment {
         // set up the info button
         view.findViewById(R.id.lettersTabInfoButton).setOnClickListener(v -> {
             Log.d(logTag, "Info button clicked!");
-            Spinner transSpinner = view.findViewById(R.id.lettersTabTransSpinner);
-            String transLanguage = (String) transSpinner.getItemAtPosition(transSpinner.getSelectedItemPosition());
-            Log.d(logTag, "Fetching info for " + transLanguage);
-            JSONObject infoJSON = viewModel.getTransliterator().getLangDataReader().getInfo(transLanguage, getContext());
-            Log.d(logTag, infoJSON.toString());
+            Log.d(logTag, "Fetching info for transliterating " + viewModel.getLanguage() +
+                    " to " + viewModel.getTargetLanguage());
 
-            String info = infoJSON.optJSONObject("general").optString("en")
-                    + infoJSON.optJSONObject(transLanguage.toLowerCase(Locale.ROOT))
-                    .optString("en");
-            LanguageInfoFragment lif = LanguageInfoFragment.newInstance(info);
+            Map<String, Map<String, String>> info = viewModel.getTransliterator(getContext())
+                    .getLanguage().getInfo();
+            Log.d(logTag, info.toString());
+            LanguageInfoFragment lif = LanguageInfoFragment.newInstance(
+                    info.get("general").get("en") +
+                            info.get(viewModel.getTargetLanguage().toLowerCase(Locale.ROOT)).get("en"));
             MainActivity.replaceTabFragment(0, lif);
         });
 
-        Log.d(logTag, viewModel.getTransliterator().getLangDataReader().getCategories().toString());
+        Log.d(logTag, viewModel.getTransliterator().getLanguage().getLettersCategoryWise().toString());
         categoriesList = new ExpandableListView(getContext());
+        categoriesList.setId(View.generateViewId());
         categoriesList.setLayoutParams(new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT));
-        categoriesList.setAdapter(new LetterCategoryAdapter( this));
+        Point size = new Point();
+        requireActivity().getWindowManager().getDefaultDisplay().getSize(size);
+        categoriesList.setAdapter(new LetterCategoryAdapter(viewModel, size));
         ScrollView sv = view.findViewById(R.id.LettersView);
         sv.addView(categoriesList);
         for (int i = 0; i < categoriesList.getExpandableListAdapter().getGroupCount(); i++) {
@@ -136,16 +138,22 @@ public class LettersTabFragment extends Fragment {
         Log.d(logTag, "Initialising LettersTabLangSpinner");
         lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner);
 
-        adapter = new LabelledArrayAdapter<>(getContext(),
+        ArrayList<String> languages = LangDataReader.getDownloadedLanguages(requireContext());
+        if(languages.size() == 0) {
+            ((MainActivity) requireActivity()).startInitialisationAcitivity();
+            return;
+        }
+
+        adapter = new LabelledArrayAdapter<>(requireContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                LangDataReader.getAvailableSourceLanguages(getContext()),
+                languages,
                 R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint));
         viewModel.setAdapter(adapter);
-
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         adapter.setNotifyOnChange(true);
         lettersTabLangSpinner.setAdapter(adapter);
+
         if(viewModel.getTargetLanguage() != null) {
             if(adapter.getPosition(viewModel.getTargetLanguage()) != -1)
                 lettersTabLangSpinner.setSelection(adapter.getPosition(viewModel.getTargetLanguage()));
@@ -154,7 +162,6 @@ public class LettersTabFragment extends Fragment {
         }
         else
             lettersTabLangSpinner.setSelection(0);
-        LettersTabFragment ltf = this;
         GlobalSettings.getInstance().addDataFileListChangedListener("LettersTabFragmentListener", () -> {
             Log.d("LTFListener", "Refreshing LettersTabFragment adapter");
             if(getContext() == null)
@@ -162,7 +169,13 @@ public class LettersTabFragment extends Fragment {
 
             viewModel.resetTransliterator(getContext());
             adapter.clear();
-            adapter.addAll(viewModel.getTransliterator().getLangDataReader().getAvailableSourceLanguages(getContext()));
+            ArrayList<String> lang = LangDataReader.getDownloadedLanguages(getContext());
+            if(lang.size() == 0) {
+                ((MainActivity) requireActivity()).startInitialisationAcitivity();
+                return;
+            }
+
+            adapter.addAll(lang);
             // adapter.notifyDataSetChanged();
             // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
             // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
@@ -176,9 +189,11 @@ public class LettersTabFragment extends Fragment {
                 String language = parent.getItemAtPosition(position).toString();
                 Log.d("LangSpinner", "Item selected " + language);
 
-                viewModel.getTransliterator(language, getContext());
+                viewModel.setTransliterator(language, getContext());
 
-                categoriesList.setAdapter(new LetterCategoryAdapter(ltf));
+                Point size = new Point();
+                requireActivity().getWindowManager().getDefaultDisplay().getSize(size);
+                categoriesList.setAdapter(new LetterCategoryAdapter(viewModel, size));
                 for (int i = 0; i < categoriesList.getExpandableListAdapter()
                         .getGroupCount(); i++) {
                     categoriesList.expandGroup(i);
@@ -196,12 +211,11 @@ public class LettersTabFragment extends Fragment {
 
     public void initialiseLettersTabTransSpinner() {
         Log.d(logTag, "Initialising lettersTabTransSpinner");
-        Spinner lettersTabTransSpinner = getActivity().findViewById(R.id.lettersTabTransSpinner);
+        Spinner lettersTabTransSpinner = requireActivity().findViewById(R.id.lettersTabTransSpinner);
 
-        Log.d(logTag, viewModel.getTransliterator().getLangDataReader().getTransLangs().toString());
-        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
+        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(requireContext(),
                 R.layout.spinner_item, R.id.spinnerItemTV,
-                viewModel.getTransliterator().getLangDataReader().getTransLangs(),
+                viewModel.getTransliterator().getLanguage().getSupportedLanguagesForTransliteration(),
                 R.id.spinnerLabelTV, getString(R.string.letters_tab_trans_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         lettersTabTransSpinner.setAdapter(adapter);
@@ -217,8 +231,8 @@ public class LettersTabFragment extends Fragment {
         lettersTabTransSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Log.d("TransSpinner", "item selected: " + parent.getItemAtPosition(position).toString());
                 String targetLanguage = parent.getItemAtPosition(position).toString();
+                Log.d("TransSpinner", "item selected: " + targetLanguage);
                 viewModel.setTargetLanguage(targetLanguage);
             }
 

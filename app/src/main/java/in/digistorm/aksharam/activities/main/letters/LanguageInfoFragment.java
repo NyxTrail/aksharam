@@ -52,9 +52,7 @@ public class LanguageInfoFragment extends Fragment {
                              Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        View v = inflater.inflate(R.layout.language_info, container, false);
-
-        return v;
+        return inflater.inflate(R.layout.language_info, container, false);
     }
 
     @Override

@@ -62,7 +62,7 @@ public class TransliterateTabFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         if(tr == null) {
-            tr = Transliterator.getDefaultTransliterator(getContext());
+            tr =  new Transliterator(getContext());
         }
 
         ((EditText) view.findViewById(R.id.TransliterateTabInputTextField))
@@ -95,11 +95,11 @@ public class TransliterateTabFragment extends Fragment {
         if(s.length() == 0 || view == null)
             return;
         String lang = detectLanguage(s);
-        if(lang != null && !lang.equalsIgnoreCase(tr.getCurrentLang())) {
+        if(lang != null && !lang.equalsIgnoreCase(tr.getLanguage().getLanguage())) {
             tr = new Transliterator(lang, getContext());
             initialiseSpinner(null);
         }
-        Log.d(logTag, lang + "; " + tr.getCurrentLang());
+        Log.d(logTag, lang + "; " + tr.getLanguage().getLanguage());
 
         // Now we are ready to transliterate
         String outputString = tr.transliterate(s, targetLanguage);
@@ -159,11 +159,10 @@ public class TransliterateTabFragment extends Fragment {
             return ;
         }
 
-        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
+        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(requireContext(),
                 R.layout.spinner_item,
-                // Transliterator class' LangDataReader should be initialised now,
-                // no need to check what languages are available now; just fetch them
-                R.id.spinnerItemTV, tr.getLangDataReader().getTransLangs(),
+                R.id.spinnerItemTV,
+                tr.getLanguage().getSupportedLanguagesForTransliteration(),
                 R.id.spinnerLabelTV, getString(R.string.transliterate_tab_trans_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         languageSelectionSpinner.setAdapter(adapter);
@@ -172,10 +171,11 @@ public class TransliterateTabFragment extends Fragment {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 targetLanguage = parent.getItemAtPosition(position).toString();
-                EditText editText = getActivity().findViewById(R.id.TransliterateTabInputTextField);
+                EditText editText = requireActivity().findViewById(R.id.TransliterateTabInputTextField);
                 if(editText == null)
                     return ;
-                transliterate(editText.getText().toString(), getActivity().findViewById(R.id.TransliterateTabOutputTextView));
+                transliterate(editText.getText().toString(), requireActivity()
+                        .findViewById(R.id.TransliterateTabOutputTextView));
             }
 
             @Override

@@ -33,12 +33,10 @@ import org.json.JSONArray;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import in.digistorm.aksharam.R;
-import in.digistorm.aksharam.util.Transliterator;
-import in.digistorm.aksharam.util.GlobalSettings;
 import in.digistorm.aksharam.util.LangDataReader;
+import in.digistorm.aksharam.util.GlobalSettings;
 import in.digistorm.aksharam.util.LanguageDataDownloader;
 import in.digistorm.aksharam.util.Log;
 
@@ -49,9 +47,7 @@ public class SettingsActivity extends AppCompatActivity {
         RecyclerView manageLanguagesRV = findViewById(R.id.SettingsActivityManageLanguagesRV);
 
         // get downloaded files
-        String[] files = Transliterator.getCurrentTransliterator()
-                .getLangDataReader().getDataFiles(this);
-        ArrayList<String> filesList = new ArrayList<>(Arrays.asList(files));
+        ArrayList<String> filesList = LangDataReader.getDownloadedFiles(getApplicationContext());
         Log.d(logTag, "List of files available: " + filesList);
 
         SettingsActivity self = this;
@@ -105,7 +101,7 @@ public class SettingsActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Log.d(logTag, "Clearing listeners before being destroyed.");
-        if(LangDataReader.areDataFilesAvailable(this) == null)
+        if(LangDataReader.getDownloadedLanguages(this).isEmpty())
             GlobalSettings.getInstance().clearDataFileListChangedListeners();
     }
 }

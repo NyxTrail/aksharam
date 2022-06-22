@@ -20,6 +20,7 @@ package in.digistorm.aksharam.activities.main.practice;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -42,13 +43,14 @@ import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Random;
 import java.util.Set;
 
 import in.digistorm.aksharam.R;
+import in.digistorm.aksharam.activities.main.MainActivity;
 import in.digistorm.aksharam.util.GlobalSettings;
 import in.digistorm.aksharam.util.LabelledArrayAdapter;
+import in.digistorm.aksharam.util.LangDataReader;
 import in.digistorm.aksharam.util.Log;
 
 public class PracticeTabFragment extends Fragment {
@@ -147,14 +149,26 @@ public class PracticeTabFragment extends Fragment {
         initialisePracticeTabLangSpinner(view);
     }
 
+    public ArrayList<String> getDownloadedLanguages() {
+        ArrayList<String> languages = LangDataReader.getDownloadedLanguages(requireContext());
+        if(languages.size() == 0) {
+            ((MainActivity) requireActivity()).startInitialisationAcitivity();
+            return new ArrayList<>(); // Return an empty array list if we could not find any
+                                      // downloaded files. Should not be a problem since we
+                                      // are anyways exiting this activity.
+        }
+        return languages;
+    }
+
     public void initialisePracticeTabLangSpinner(View v) {
         Log.d(logTag, "Initialising PracticeTabLangSpinner");
         practiceTabLangSpinner = v.findViewById(R.id.PracticeTabLangSpinner);
 
-        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(getContext(),
+
+        LabelledArrayAdapter<String> adapter = new LabelledArrayAdapter<>(requireContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                viewModel.getTransliterator().getLangDataReader().getAvailableSourceLanguages(getContext()),
+                getDownloadedLanguages(),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_lang_hint));
         adapter.setDropDownViewResource(R.layout.spinner_drop_down);
         adapter.setNotifyOnChange(true);
@@ -168,13 +182,14 @@ public class PracticeTabFragment extends Fragment {
 
             viewModel.resetTransliterator(getContext());
             adapter.clear();
-            adapter.addAll(viewModel.getTransliterator().getLangDataReader().getAvailableSourceLanguages(getContext()));
+            adapter.addAll(getDownloadedLanguages());
             // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
             // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
             // think of to fix this
             Log.d("PTFListener", "Resetting spinner adapter");
             practiceTabLangSpinner.setAdapter(adapter);
         });
+
         practiceTabLangSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -182,12 +197,12 @@ public class PracticeTabFragment extends Fragment {
                 clearInput();
 
                 String language = parent.getItemAtPosition(position).toString();
-                viewModel.getTransliterator(language, getContext());
+                viewModel.setTransliterator(language, getContext());
 
                 // re-initialise the "practice in" spinner
                 initialisePracticeTabPracticeInSpinner();
                 initialisePracticeTabPracticeTypeSpinner();
-                getActivity().findViewById(R.id.PracticeTabInputTIET).setEnabled(true);
+                requireActivity().findViewById(R.id.PracticeTabInputTIET).setEnabled(true);
             }
 
             @Override
@@ -198,28 +213,28 @@ public class PracticeTabFragment extends Fragment {
     }
 
     private void clearInput() {
-        TextInputEditText textInputEditText = getActivity().findViewById(R.id.PracticeTabInputTIET);
+        TextInputEditText textInputEditText = requireActivity().findViewById(R.id.PracticeTabInputTIET);
         if(textInputEditText == null)
             return;
 
         Log.d(logTag, "Clearing input edit text");
-        ((TextInputEditText) getActivity().findViewById(R.id.PracticeTabInputTIET))
+        ((TextInputEditText) requireActivity().findViewById(R.id.PracticeTabInputTIET))
                 .removeTextChangedListener(textChangedListener);
-        ((TextInputEditText) getActivity().findViewById(R.id.PracticeTabInputTIET)).setText("");
-        ((TextInputEditText) getActivity().findViewById(R.id.PracticeTabInputTIET))
+        ((TextInputEditText) requireActivity().findViewById(R.id.PracticeTabInputTIET)).setText("");
+        ((TextInputEditText) requireActivity().findViewById(R.id.PracticeTabInputTIET))
                 .addTextChangedListener(textChangedListener);
     }
 
     public void initialisePracticeTabPracticeInSpinner() {
         clearInput();
 
-        Spinner practiceTabPracticeInSpinner = getActivity().findViewById(
+        Spinner practiceTabPracticeInSpinner = requireActivity().findViewById(
                 R.id.PracticeTabPracticeInSpinner);
 
-        LabelledArrayAdapter<String> practiceInAdapter = new LabelledArrayAdapter<>(getContext(),
+        LabelledArrayAdapter<String> practiceInAdapter = new LabelledArrayAdapter<>(requireContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
-                viewModel.getTransliterator().getLangDataReader().getTransLangs(),
+                viewModel.getTransliterator().getLanguage().getSupportedLanguagesForTransliteration(),
                 R.id.spinnerLabelTV, getString(R.string.practice_tab_practice_in_hint));
         practiceInAdapter.setDropDownViewResource(R.layout.spinner_drop_down);
         practiceTabPracticeInSpinner.setAdapter(practiceInAdapter);
@@ -232,7 +247,7 @@ public class PracticeTabFragment extends Fragment {
                 clearInput();
 
                 viewModel.setTransLang(parent.getItemAtPosition(position).toString());
-                ((TextInputLayout) getActivity().findViewById(R.id.PracticeTabInputTIL))
+                ((TextInputLayout) requireActivity().findViewById(R.id.PracticeTabInputTIL))
                         .setHint(getString(R.string.practice_tab_practice_input_hint, viewModel.getTransLang()));
             }
 
@@ -244,11 +259,11 @@ public class PracticeTabFragment extends Fragment {
     }
 
     public void initialisePracticeTabPracticeTypeSpinner() {
-        Spinner practiceTabPracticeTypeSpinner = getActivity().findViewById(
+        Spinner practiceTabPracticeTypeSpinner = requireActivity().findViewById(
                 R.id.PracticeTabPracticeTypeSpinner);
 
         ArrayList<String> practiceTypes = new ArrayList<>();
-        Set<String> categories = viewModel.getTransliterator().getLangDataReader().getCategories().keySet();
+        Set<String> categories = viewModel.getTransliterator().getLanguage().getLettersCategoryWise().keySet();
         for(String category: categories) {
             practiceTypes.add(category.substring(0, 1).toUpperCase(Locale.ROOT)
                     + category.substring(1));
@@ -261,11 +276,11 @@ public class PracticeTabFragment extends Fragment {
         // Most of the combinations in these languages do not result in a meaningful ligature and
         // are usually represented using a half-consonant (with a virama). So, we will add random
         // ligatures only if the language's data file says we should.
-        if(viewModel.getTransliterator().getLangDataReader().areLigaturesAutoGeneratable())
+        if(viewModel.getTransliterator().getLanguage().areLigaturesAutoGeneratable())
             practiceTypes.add("Random Ligatures");
         practiceTypes.add("Random Words");
 
-        LabelledArrayAdapter<String> practiceTypeAdapter = new LabelledArrayAdapter<>(getContext(),
+        LabelledArrayAdapter<String> practiceTypeAdapter = new LabelledArrayAdapter<>(requireContext(),
                 R.layout.spinner_item,
                 R.id.spinnerItemTV,
                 practiceTypes,
@@ -295,19 +310,18 @@ public class PracticeTabFragment extends Fragment {
             return;
 
         // get all letters of current language, category-wise
-        Map<String, ArrayList<String>> letters = viewModel.getTransliterator().getLangDataReader().getCategories();
+        ArrayList<String> vowels = viewModel.getTransliterator().getLanguage().getVowels();
+        ArrayList<String> consonants = viewModel.getTransliterator().getLanguage().getConsonants();
+        ArrayList<String> ligatures = viewModel.getTransliterator().getLanguage().getLigatures();
+        ArrayList<String> signs = viewModel.getTransliterator().getLanguage().getDiacritics();
+        ArrayList<String> chillu = viewModel.getTransliterator().getLanguage().getChillu();
 
         Random random = new Random();
         StringBuilder practiceString = new StringBuilder();
 
-        Log.d(logTag, "letters: " + letters.toString());
-        Log.d(logTag, "letters[\"" + viewModel.getPracticeType().toLowerCase(Locale.ROOT) + "\"]: "
-                + letters.get(viewModel.getPracticeType().toLowerCase(Locale.ROOT)));
-
-        int numConsonants, numLigatures, numVowels, numSigns;
         // Special variable to hold the Virama.
         // Useful to detect chillu letters in Malayalam
-        String virama = viewModel.getTransliterator().getLangDataReader().getVirama();
+        String virama = viewModel.getTransliterator().getLanguage().getVirama();
 
         switch(viewModel.getPracticeType().toLowerCase(Locale.ROOT)) {
             case "random words":
@@ -319,27 +333,15 @@ public class PracticeTabFragment extends Fragment {
                     int wordLength = random.nextInt(6) + 3;   // length is 3 to 6 + 3
                     Log.d(logTag, "Constructing word of length " + wordLength);
 
-                    numVowels = letters.get("vowels").size();
-                    numConsonants = letters.get("consonants").size();
-                    numLigatures = letters.get("ligatures").size();
-                    numSigns = letters.get("signs").size();
-
-                    // Choose the first character
-                    if(random.nextInt(2) == 0)
-                        practiceString.append(letters.get("vowels").get(random.nextInt(numVowels)));
+                    // Choose the first character. Vowel or consonant
+                    if(random.nextBoolean())
+                        practiceString.append(vowels.get(random.nextInt(vowels.size())));
                     else {
-                        practiceString.append(letters.get("consonants")
-                                .get(random.nextInt(numConsonants)));
+                        practiceString.append(consonants.get(random.nextInt(consonants.size())));
                     }
 
-                    ArrayList<String> categories = new ArrayList<>();
-                    categories.add("vowels");
-                    categories.add("consonants");
-                    categories.add("signs");
-
                     for(int j = 1; j < wordLength; j++) {
-                        String category;
-                        String nextChar = "";
+                        String nextChar;
 
                         String prevChar = practiceString.substring(practiceString.length() - 1,
                                 practiceString.length());
@@ -349,29 +351,28 @@ public class PracticeTabFragment extends Fragment {
                             // for malayalam, there is also a chance the next character is a chillu
                             if(viewModel.getLanguage().equalsIgnoreCase("malayalam")) {
                                 if(random.nextInt(100) < 31)
-                                    nextChar = letters.get("chillu").get(random.nextInt(letters.get("chillu").size()));
+                                    nextChar = chillu.get(random.nextInt(chillu.size()));
                                 else
                                     // Since it's malayalam, we can just get one of the ligatures at random
-                                    nextChar = letters.get("ligatures").get(random.nextInt(numLigatures));
+                                    nextChar = ligatures.get(random.nextInt(ligatures.size()));
                             }
                             else
                                 // construct ligature
-                                nextChar = letters.get("consonants").get(random.nextInt(numConsonants))
-                                        + virama + letters.get("consonants").get(random.nextInt(numConsonants));
+                                nextChar = consonants.get(random.nextInt(consonants.size()))
+                                        + virama
+                                        + consonants.get(random.nextInt(consonants.size()));
                         }
                         // if previous letter was a vowel or a sign...
-                        else if(letters.get("vowels").contains(prevChar) ||
-                                letters.get("signs").contains(prevChar)) {
+                        else if(vowels.contains(prevChar) || signs.contains(prevChar)) {
                             // ...next char must be a consonant
-                            nextChar = letters.get("consonants").get(random.nextInt(numConsonants));
+                            nextChar = consonants.get(random.nextInt(consonants.size()));
                         }
                         else {
                             // if previous character was a consonant, next character can be a
                             // consonant or a sign
-                            category = categories.get(random.nextInt(2) + 1);
+                            ArrayList<String> randomChoice = random.nextBoolean() ? consonants : signs;
                             do {
-                                nextChar = letters.get(category).get(random.nextInt(letters
-                                        .get(category).size()));
+                                nextChar = randomChoice.get(random.nextInt(randomChoice.size()));
                             } while (prevChar.equals(virama) && nextChar.equals(virama));
                         }
 
@@ -381,121 +382,122 @@ public class PracticeTabFragment extends Fragment {
                 }
                 break;
             case "random ligatures":
-                numConsonants = letters.get("consonants").size();
                 for(int i = 0; i < 10; i++) {
                     // choose a random consonant
-                    practiceString.append(letters.get("consonants")
-                            .get(random.nextInt(numConsonants))
-                            + virama
-                            + letters.get("consonants").get(random.nextInt(numConsonants)));
+                    practiceString.append(consonants.get(random.nextInt(consonants.size())))
+                            .append(virama)
+                            .append(consonants.get(random.nextInt(consonants.size())));
                     practiceString.append(" ");
                 }
                 break;
             case "signs":
-                numSigns = letters.get("signs").size();
-                numConsonants = letters.get("consonants").size();
+                // predecessor is the consonant or ligature to combine the sign with
                 String predecessor = "";
                 for(int i = 0; i < 10; i++) {
                     // choose a consonant or a ligature to combine the sign with
                     switch (random.nextInt(2)) {
-                        // choose a consonant
                         case 0:
-                            predecessor = letters.get("consonants").get(random.nextInt(numConsonants));
+                            predecessor = consonants.get(random.nextInt(consonants.size()));
                             break;
+
                         // choose a ligature
                         case 1:
-                            do {
-                                predecessor = letters.get("ligatures").get(random.nextInt(
-                                        letters.get("ligatures").size()));
+                            String letter = ligatures.get(random.nextInt(ligatures.size()));
+                            Log.d(logTag, "letter chosen: " + letter);
 
-                                // Following for predecessor ligatures that have combining rules
-                                boolean isCombineAfter = viewModel.getTransliterator().getLangDataReader()
-                                        .isCombineAfter(predecessor);
-                                boolean isCombineBefore = viewModel.getTransliterator().getLangDataReader()
-                                        .isCombineBefore(predecessor);
+                            // Following for ligatures that have combining rules.
+                            // Certain consonants (right now, only ರ್ in Kannada), form different types of
+                            // ligatures before and after a consonant.
+                            boolean isCombineAfter = viewModel.getTransliterator().getLanguage()
+                                    .getLetterDefinition(letter).shouldCombineAfter();
+                            boolean isCombineBefore = viewModel.getTransliterator().getLanguage()
+                                    .getLetterDefinition(letter).shouldCombineBefore();
 
-                                Log.d(logTag, "predecessor: " + predecessor);
+                            String base = viewModel.getTransliterator().getLanguage()
+                                    .getLetterDefinition(letter).getBase();
+                            // Find the base of this ligature, if any.
+                            // "base" of a ligature is the actual consonant used for combining with
+                            // the vowel sign
+                            predecessor = base == null || base.isEmpty() ? letter : base;
+                            Log.d(logTag, "base: " + predecessor);
 
-                                predecessor = viewModel.getTransliterator().getLangDataReader().getBase(predecessor);
-                                Log.d(logTag, "base: " + predecessor);
-
-                                if(isCombineAfter && isCombineBefore) {
-                                    switch(random.nextInt(2)) {
-                                        // combine before
-                                        case 0:
-                                            predecessor = letters.get("consonants").get(random.nextInt(numConsonants))
-                                                    + virama + predecessor;
-                                            break;
-                                        // combine after
-                                        case 1:
-                                            predecessor = predecessor + virama + letters.get("consonants").get(
-                                                    random.nextInt(numConsonants));
-                                            break;
-                                    }
-                                } else if(isCombineAfter) {
-                                    predecessor = letters.get("consonants").get(random.nextInt(numConsonants))
-                                            + virama + predecessor;
-                                } else if(isCombineBefore) {
-                                    predecessor = predecessor + virama + letters.get("consonants")
-                                            .get(random.nextInt(numConsonants));
-                                }
-                            } while(viewModel.getTransliterator().getLangDataReader().isExcludeCombiExamples(predecessor));
+                            if (isCombineAfter && isCombineBefore) {
+                                // If letter can be combined before and after another letter,
+                                // do one at random.
+                                predecessor = random.nextBoolean() ?
+                                        (consonants.get(random.nextInt(consonants.size())) +
+                                                virama + predecessor) :
+                                        (predecessor + virama + consonants.get(
+                                                random.nextInt(consonants.size())));
+                            } else if (isCombineAfter) {
+                                predecessor = consonants.get(random.nextInt(consonants.size()))
+                                        + virama + predecessor;
+                            } else if (isCombineBefore) {
+                                predecessor = predecessor + virama + consonants.get(random.nextInt(
+                                        consonants.size()));
+                            }
                             break;
                     }
-                    String sign;
-                    // Virama not supported in practice type for signs
-                    // TODO: support it!
-                    do {
-                        sign = letters.get("signs").get(random.nextInt(numSigns));
-                    } while(sign.equals(viewModel.getTransliterator().getLangDataReader().getVirama()));
 
+                    String sign;
+                    // what happens if sign selected is a virama?
+                    sign = signs.get(random.nextInt(signs.size()));
                     practiceString.append(predecessor).append(sign).append(" ");
                 }
                 break;
             case "ligatures":
-                numLigatures = letters.get("ligatures").size();
-                numConsonants = letters.get("consonants").size();
                 for (int i = 0; i < 10; i++) {
-                    String ligature = letters.get("ligatures").get(random.nextInt(numLigatures));
+                    String ligature = ligatures.get(random.nextInt(ligatures.size()));
+                    Log.d(logTag, "Ligature obtained: " + ligature);
                     // nextChar is base char if a base exists in the data file.
                     // if there is no base in the data file, nextChar equals ligature (variable above)
-                    String nextChar = viewModel.getTransliterator().getLangDataReader().getBase(ligature);
+                    String nextChar = viewModel.getTransliterator().getLanguage()
+                            .getLetterDefinition(ligature).getBase();
+                    nextChar = (nextChar == null) ? ligature : nextChar;
 
                     // get the rules for combining this letter if such rule exists
-                    boolean isCombineAfter = viewModel.getTransliterator().getLangDataReader().isCombineAfter(ligature);
-                    boolean isCombineBefore = viewModel.getTransliterator().getLangDataReader().isCombineBefore(ligature);
+                    boolean isCombineAfter = viewModel.getTransliterator().getLanguage()
+                            .getLetterDefinition(ligature).shouldCombineAfter();
+                    boolean isCombineBefore = viewModel.getTransliterator().getLanguage()
+                            .getLetterDefinition(ligature).shouldCombineBefore();
+
                     if (isCombineAfter && isCombineBefore) {
                         // randomly select either combineBefore or combineAfter
                         switch (random.nextInt(2)) {
                             //combineBefore
                             case 0:
-                                // assumption: virama is required for the joining
-                                practiceString.append(letters.get("consonants").get(random.nextInt(numConsonants))
-                                        + virama + nextChar + " ");
+                                practiceString.append(consonants.get(random.nextInt(consonants.size())))
+                                        .append(virama).append(nextChar).append(" ");
                                 break;
                             // combineAfter
                             case 1:
-                                // assumption: virama is required for the joining
-                                practiceString.append(nextChar + virama
-                                        + letters.get("consonants").get(random.nextInt(numConsonants)) + " ");
+                                practiceString.append(nextChar).append(virama).append(
+                                        consonants.get(random.nextInt(consonants.size()))).append(" ");
                                 break;
                         }
                     } else if (isCombineAfter) {
-                        practiceString.append(nextChar + virama
-                                + letters.get("consonants").get(random.nextInt(numConsonants)) + " ");
+                        practiceString.append(consonants.get(random.nextInt(consonants.size()))).append(virama)
+                                .append(nextChar).append(" ");
                     } else if (isCombineBefore) {
-                        practiceString.append(letters.get("consonants").get(random.nextInt(numConsonants))
-                                + virama + nextChar + " ");
+                        practiceString.append(nextChar).append(virama).append(nextChar)
+                                .append(consonants.get(random.nextInt(consonants.size())));
                     } else {
-                        practiceString.append(nextChar + " ");
+                        practiceString.append(nextChar).append(" ");
                     }
                 }
                 break;
-            default:
-                int numLetters = letters.get(viewModel.getPracticeType().toLowerCase(Locale.ROOT)).size();
+            case "vowels":
                 for(int i = 0; i < 10; i++)
-                    practiceString.append(letters.get(viewModel.getPracticeType().toLowerCase(Locale.ROOT))
-                            .get(random.nextInt(numLetters))).append(" ");
+                    practiceString.append(vowels.get(random.nextInt(vowels.size()))).append(" ");
+                break;
+            case "consonants":
+                for(int i = 0; i < 10; i++)
+                    practiceString.append(consonants.get(random.nextInt(consonants.size()))).append(" ");
+                break;
+            case "chillu":
+                for(int i = 0; i < 10; i++)
+                    practiceString.append(chillu.get(random.nextInt(chillu.size()))).append(" ");
+                break;
         }
 
         // strip the last " " from practiceString
@@ -503,7 +505,7 @@ public class PracticeTabFragment extends Fragment {
                 practiceString.length() - 1));
 
         this.practiceString = practiceString.toString();
-        ((TextView) getActivity().findViewById(R.id.PracticeTabPracticeTextTV))
+        ((TextView) requireActivity().findViewById(R.id.PracticeTabPracticeTextTV))
                 .setText(practiceString.toString());
     }
 }

@@ -39,27 +39,26 @@ public class LettersTabViewModel extends ViewModel {
 
     public Transliterator getTransliterator(Context context) {
         if(transliterator == null)
-            transliterator = Transliterator.getDefaultTransliterator(context);
+            transliterator = new Transliterator(context);
         return transliterator;
     }
 
     public void resetTransliterator(Context context) {
         if(transliterator == null) {
             Log.d(logTag, "Transliterator is null. Initialising...");
-            transliterator = Transliterator.getDefaultTransliterator(context);
+            transliterator = new Transliterator(context);
         }
     }
 
-    public Transliterator getTransliterator(String language, Context context) {
+    public void setTransliterator(String language, Context context) {
         if(transliterator != null) {
             // re-initialise transliterator if its language does not match the
             // language parameter we received
-            if (transliterator.getCurrentLang().toLowerCase(Locale.ROOT)
+            if (!transliterator.getLanguage().getLanguage().toLowerCase(Locale.ROOT)
                     .equals(language.toLowerCase(Locale.ROOT)))
-                return transliterator;
+                transliterator = new Transliterator(language, context);
         }
         transliterator = new Transliterator(language, context);
-        return transliterator;
     }
 
     public Transliterator getTransliterator() {
@@ -75,7 +74,7 @@ public class LettersTabViewModel extends ViewModel {
     }
 
     public String getLanguage() {
-        return transliterator.getCurrentLang();
+        return transliterator.getLanguage().getLanguage();
     }
 
     public LabelledArrayAdapter<String> getAdapter() {

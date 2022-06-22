@@ -23,7 +23,8 @@ package in.digistorm.aksharam.util;
 import android.content.Context;
 import android.content.Intent;
 
-import org.json.JSONException;
+import java.util.ArrayList;
+import java.util.Locale;
 
 import in.digistorm.aksharam.activities.initialise.InitialiseAppActivity;
 
@@ -33,55 +34,33 @@ public class Transliterator {
     private final String logTag = getClass().getSimpleName();
 
     // The backing langDataReader for all tabs
-    private LangDataReader langDataReader;
-    private static Transliterator  currentTransliterator;
-    public LangDataReader getLangDataReader() {
-        return langDataReader;
-    }
-
-    public static Transliterator getDefaultTransliterator(Context context) {
-        if(currentTransliterator == null) {
-            currentTransliterator = new Transliterator(context);
-            return currentTransliterator;
-        }
-        return currentTransliterator;
-    }
-
-    public String getCurrentLang() {
-        return langDataReader.getCurrentLang();
-    }
-
-    // langDataReader should be set up using correct constructors for Transliterator
-    // This method should be removed
-    public void setLangDataReader(LangDataReader langDataReader) {
-        this.langDataReader = langDataReader;
-    }
+    private Language language;
 
     private void initialise(String inputLang, Context context) {
         Log.d(logTag, "Initialising transliterator for: " + inputLang);
-        langDataReader = new LangDataReader(LangDataReader.getLangFile(inputLang), context);
-        currentTransliterator = this;
+        language = LangDataReader.getLanguageData(inputLang, context);
     }
 
     // Constructor for when we don't know which language to load
     // load the first one we can find
     // if we can't, start initialisation activity
     public Transliterator(Context context) {
-        // called the constructor without any input lang, find one
-        // files are downloaded, this constructor is called in MainActivity. Since no "default"
-        // language is chosen yet, we choose one from the files list
-        String file = LangDataReader.areDataFilesAvailable(context);
-        if(file == null) {
+        // Called the constructor without any input lang, find one.
+        // Files are already downloaded, this constructor is called in MainActivity
+        // to display a default language.
+        ArrayList<String> fileList = LangDataReader.getDownloadedLanguages(context);
+        if(fileList.size() == 0) {
             // if no files are available, we restart the Initialisation activity
+            // TODO: This is not the right place to do this
+            // TODO: This is VERY VERY BAD. A Transliterator constructor that starts an activity?!
             Log.d(logTag, "Could not find any language files. Starting Initialisation activity");
             Intent intent = new Intent(context, InitialiseAppActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             context.startActivity(intent);
         }
         else {
-            Log.d(logTag, "Found language file: " + file + "... Initialising it.");
-            // fileList.length - ".json".length
-            initialise(file.substring(0, file.length() - 5), context);
+            Log.d(logTag, "Found language file: " + fileList.get(0) + "... Initialising it.");
+            initialise(fileList.get(0), context);
         }
     }
 
@@ -93,9 +72,10 @@ public class Transliterator {
     // str is the string that needs to be converted
     // targetLanguage is the language to which the string needs to be converted
     public String transliterate(String str, String targetLanguage) {
-        String targetLangCode = langDataReader.getTargetLangCode(targetLanguage);
+        targetLanguage = targetLanguage.toLowerCase(Locale.ROOT);
+        String targetLangCode = language.getLanguageCode(targetLanguage);
         Log.d(logTag, "Transliterating " + str
-                + " (" + langDataReader.getCurrentLang() + ") to " + targetLanguage
+                + " (" + language.getLanguage() + ") to " + targetLanguage
                 + "(code: " + targetLangCode + ")");
 
         StringBuilder out = new StringBuilder();
@@ -103,27 +83,24 @@ public class Transliterator {
 
         // Process the string character by character
         for (char ch: str.toCharArray()) {
-            character = "" + ch;
-            try {
-                if (langDataReader.getLangData().has(character))
-                    if (langDataReader.getLangData().optJSONObject(character).has(targetLangCode))
-                        out = out.append(langDataReader.getLangData().optJSONObject(character)
-                                .getJSONArray(targetLangCode)
-                                .getString(0));
-                    else
-                        out = out.append(ch);
+            character = "" + ch; // convert to string
+            if (language.getLetterDefinitons().containsKey(character))
+                if (language.getLetterDefinition(character)
+                        .getTransliterationHints().containsKey(targetLangCode))
+                    out = out.append(language.getLetterDefinition(character)
+                            .getTransliterationHints()
+                            .get(targetLangCode)
+                            .get(0));
                 else
-                    out = out.append(ch);
-            } catch (JSONException e) {
-                Log.d(logTag, "Error while looking up transliteration data");
-                e.printStackTrace();
-            }
+                    out = out.append(character);
+            else
+                out = out.append(character);
         }
         Log.d(logTag, "Constructed string: " + out);
         return out.toString();
     }
 
-    public static Transliterator getCurrentTransliterator() {
-        return currentTransliterator;
+    public Language getLanguage() {
+        return language;
     }
 }
