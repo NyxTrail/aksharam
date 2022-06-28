@@ -20,7 +20,6 @@ package in.digistorm.aksharam.activities.main.practice;
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import android.content.Context;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
@@ -70,7 +69,7 @@ public class PracticeTabFragment extends Fragment {
 
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
-            TextView practiceTextTV = getActivity().findViewById(R.id.PracticeTabPracticeTextTV);
+            TextView practiceTextTV = requireActivity().findViewById(R.id.PracticeTabPracticeTextTV);
 
             boolean correctInProgress = true;
             StringBuilder markup = new StringBuilder();
@@ -85,7 +84,7 @@ public class PracticeTabFragment extends Fragment {
                         + practiceString + "</font>"));
                 Toast.makeText(getContext(), R.string.practice_tab_correct_text_entered,
                         Toast.LENGTH_SHORT).show();
-                getActivity().findViewById(R.id.PracticeTabInputTIET).setEnabled(false);
+                requireActivity().findViewById(R.id.PracticeTabInputTIET).setEnabled(false);
                 return;
             }
 

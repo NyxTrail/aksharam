@@ -91,10 +91,17 @@ public class Transliterator {
                             .getTransliterationHints()
                             .get(targetLangCode)
                             .get(0));
-                else
+                else {
+                    Log.d(logTag, "Could not find transliteration hints for character: "
+                            + character + "of language: " + language.getLanguage()
+                            + "for transliteration to language: " + targetLanguage);
                     out = out.append(character);
-            else
+                }
+            else {
+                Log.d(logTag, "Could not find letter definition for letter: "
+                        + character + " in language: " + language.getLanguage());
                 out = out.append(character);
+            }
         }
         Log.d(logTag, "Constructed string: " + out);
         return out.toString();
