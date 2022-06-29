@@ -55,14 +55,14 @@
                 android:inputType="text|textMultiLine"
                 android:textColorHint="#78909C"
                 android:textSize="@dimen/text_normal_size"
-                app:layout_constraintBottom_toTopOf="@id/transliterateTabInfoTV"
+                app:layout_constraintBottom_toTopOf="@id/TransliterateTabInfoTV"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 android:importantForAutofill="no" />
 
             <TextView
-                android:id="@+id/transliterateTabInfoTV"
+                android:id="@+id/TransliterateTabInfoTV"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
@@ -87,7 +87,7 @@
                 android:contentDescription="@string/trans_spinner_desc"
                 app:layout_constraintBottom_toTopOf="@id/TransliterateTabOutputTextView"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/transliterateTabInfoTV"
+                app:layout_constraintStart_toEndOf="@id/TransliterateTabInfoTV"
                 app:layout_constraintTop_toBottomOf="@id/TransliterateTabInputTextField" />
 
 
@@ -102,7 +102,7 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.40"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/transliterateTabInfoTV" />
+                app:layout_constraintTop_toBottomOf="@id/TransliterateTabInfoTV" />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
 

@@ -137,11 +137,11 @@ public class TransliterateTabFragment extends Fragment {
             Log.d(logTag, getString(R.string.lang_could_not_detect));
             if(getActivity() == null)
                 return null;
-            setText(getActivity(), R.id.transliterateTabInfoTV,
+            setText(getActivity(), R.id.TransliterateTabInfoTV,
                     Html.fromHtml(getText(R.string.lang_could_not_detect).toString()));
             return null;
         }
-        setText(getActivity(), R.id.transliterateTabInfoTV, getText(R.string.transliterate_tab_info_default));
+        setText(getActivity(), R.id.TransliterateTabInfoTV, getText(R.string.transliterate_tab_info_default));
         return lang;
     }
 

@@ -30,20 +30,26 @@ import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.fail;
 
+import android.text.Html;
+
+import androidx.test.core.app.ApplicationProvider;
 import androidx.test.platform.app.InstrumentationRegistry;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 
+import in.digistorm.aksharam.util.Language;
 import in.digistorm.aksharam.util.Log;
 
 public class TransliterateTabTest extends AksharamTestBase {
     public void startTest() {
-        Log.d(getLogTag(), "Test started for Practice Tab");
+        Log.d(getLogTag(), "Test started for Transliterate Tab");
 
         try {
             Map<String, List<Map<String, String>>> testData = TransliterateTabTestData.getData(
@@ -54,14 +60,41 @@ public class TransliterateTabTest extends AksharamTestBase {
                     if(src == null)
                         continue;
                     for(String targetLanguage: testCase.keySet()) {
+                        // ignore "src"
                         if(targetLanguage.toLowerCase(Locale.ROOT).equals("src"))
                             continue;
                         Log.d(getLogTag(), "Testing " + language + " to " + targetLanguage + " transliteration.");
-                        String target = testCase.get(targetLanguage);
+                        Log.d(getLogTag(), "Source text: " + src);
+                        String storedTransliteration = testCase.get(targetLanguage);
+                        Log.d(getLogTag(), "Stored transliteration is: " + storedTransliteration);
+
+                        // Enter the test string into transliteration input
                         onView(withId(R.id.TransliterateTabInputTextField)).perform(replaceText(src));
-                        onView(withId(R.id.LanguageSelectionSpinner)).perform(click());
-                        onData(allOf(is(instanceOf(String.class)), is(upperCaseFirstLetter(targetLanguage)))).perform(click());
-                        onView(withId(R.id.TransliterateTabOutputTextView)).check(matches(withText(target)));
+
+                        // Actual transliteration output in the app
+                        String transliteration = getText(withId(R.id.TransliterateTabOutputTextView));
+
+                        /* If transliteration is equal to the source, app was unable to transliterate the source text.
+                           This happens if all data files are not downloaded in the app.
+                         */
+                        if(transliteration.equals(src)) {
+                            Log.d(getLogTag(), "Transliteration result is same as input text. Data file is not available for: "
+                                    + language);
+                            Log.d(getLogTag(), "Checking if the app displayed its failure message.");
+                            String errorText = Html.fromHtml(ApplicationProvider.getApplicationContext()
+                                    .getText(R.string.lang_could_not_detect).toString()).toString();
+                            onView(withId(R.id.TransliterateTabInfoTV)).check(matches(withText(errorText)));
+                        }
+                        else {
+                            String spinnerChoice = getSpinnerChoice(withId(R.id.LanguageSelectionSpinner));
+                            if(spinnerChoice.isEmpty()) {
+                                Log.d(getLogTag(), "Language selection spinner not enabled.");
+                                fail();
+                            }
+                            onView(withId(R.id.LanguageSelectionSpinner)).perform(click());
+                            onData(allOf(is(instanceOf(String.class)), is(upperCaseFirstLetter(targetLanguage)))).perform(click());
+                            onView(withId(R.id.TransliterateTabOutputTextView)).check(matches(withText(storedTransliteration)));
+                        }
                     }
                 }
             }
