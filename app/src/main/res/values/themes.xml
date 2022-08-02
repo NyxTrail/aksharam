@@ -37,11 +37,22 @@
         <!-- Shape for small components like buttons -->
         <item name="materialButtonStyle">@style/AksharamButton</item>
     </style>
+
     <style name="AksharamButton" parent="Widget.MaterialComponents.Button">
         <item name="tint">@color/purple_500</item>
     </style>
+
     <style name="RoundedImageButton" parent="Widget.MaterialComponents.Button.OutlinedButton">
         <item name="tint">@color/purple_500</item>
         <item name="backgroundTint">#FF000000</item>
     </style>
+
+    <style name="Theme.AksharamTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.AksharamTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.AksharamTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>

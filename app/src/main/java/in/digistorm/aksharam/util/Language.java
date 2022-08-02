@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package in.digistorm.aksharam.util;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -100,7 +99,7 @@ public class Language {
 
     public LinkedHashMap<String, ArrayList<String>> getLettersCategoryWise() {
         if(lettersCategoryWise == null) {
-            Log.d(logTag, "Finding letters category wise");
+            LogKt.logDebug(logTag, "Finding letters category wise");
             lettersCategoryWise = new LinkedHashMap<>();
 
             for(Map.Entry<String, LetterDefinition> entry : letterDefinitons.entrySet()) {
@@ -131,7 +130,7 @@ public class Language {
         if(lettersCategoryWise == null)
             lettersCategoryWise = getLettersCategoryWise();
 
-        Log.d(logTag, lettersCategoryWise.toString());
+        in.digistorm.aksharam.util.LogKt.logDebug(logTag, lettersCategoryWise.toString());
 
         ArrayList<String> test = lettersCategoryWise.get(category);
         if(test == null)

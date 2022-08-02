@@ -1,27 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-
-<!--
- ~
- ~ Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
- ~
- ~ This files is part of Aksharam, a script teaching app for Indic
- ~ languages.
- ~
- ~ Aksharam is free software: you can redistribute it and/or modify
- ~ it under the terms of the GNU General Public License as published by
- ~ the Free Software Foundation, either version 3 of the License, or
- ~ (at your option) any later version.
- ~
- ~ Aksharam is distributed in the hope that it will be useful,
- ~ but WITHOUT ANY WARRANTY; without even teh implied warranty of
- ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- ~ GNU General Public License for more details.
- ~
- ~ You should have received a copy of the GNU General Public License
- ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
- ~
- -->
-
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="in.digistorm.aksharam">
 
@@ -35,22 +12,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AksharamTheme">
-        <activity android:name=".activities.initialise.InitialiseAppActivity"
+        <activity
+            android:name=".activities.initialise.InitialiseAppActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustPan">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".activities.main.MainActivity"
+        <activity
+            android:name=".activities.main.MainActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"/>
-        <activity android:name=".activities.settings.SettingsActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".activities.settings.SettingsActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"/>
-        <activity android:name=".activities.htmlinfo.HTMLInfoActivity"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".activities.htmlinfo.HTMLInfoActivity"
             android:exported="false"
-            android:windowSoftInputMode="adjustPan"/>
+            android:windowSoftInputMode="adjustPan" />
     </application>
+
 </manifest>

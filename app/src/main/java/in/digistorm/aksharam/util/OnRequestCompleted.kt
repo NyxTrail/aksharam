@@ -1,5 +1,3 @@
-package in.digistorm.aksharam.util;
-
 /*
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
  *
@@ -19,8 +17,11 @@ package in.digistorm.aksharam.util;
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+package `in`.digistorm.aksharam.util
 
-public interface OnRequestCompleted {
-    public void onDownloadCompleted();
-    public void onDownloadFailed(Exception e);
+import java.lang.Exception
+
+interface OnRequestCompleted {
+    fun onDownloadCompleted()
+    fun onDownloadFailed(e: Exception?)
 }

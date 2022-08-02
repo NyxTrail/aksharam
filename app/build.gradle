@@ -20,6 +20,7 @@
 
 plugins {
     id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
 }
 
 android {
@@ -46,6 +47,12 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+    buildFeatures {
+        viewBinding true
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
 }
 
 dependencies {
@@ -60,6 +67,8 @@ dependencies {
     implementation 'androidx.annotation:annotation:1.4.0'
     implementation 'com.squareup.retrofit2:retrofit:2.9.0'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
 
 
     testImplementation 'junit:junit:4.13.2'

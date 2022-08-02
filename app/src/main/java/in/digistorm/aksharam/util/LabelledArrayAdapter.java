@@ -434,7 +434,7 @@ public class LabelledArrayAdapter<T> extends BaseAdapter implements Filterable {
                 }
             }
         } catch (ClassCastException e) {
-            Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
+            LogKt.logError("ArrayAdapter", "You must supply a resource ID for a TextView");
             throw new IllegalStateException(
                     "ArrayAdapter requires the resource ID to be a TextView", e);
         }
@@ -480,7 +480,7 @@ public class LabelledArrayAdapter<T> extends BaseAdapter implements Filterable {
                 }
             }
         } catch (ClassCastException e) {
-            Log.e("ArrayAdapter", "You must supply a resource ID for a TextView");
+            LogKt.logError("ArrayAdapter", "You must supply a resource ID for a TextView");
             throw new IllegalStateException(
                     "ArrayAdapter requires the resource ID to be a TextView", e);
         }

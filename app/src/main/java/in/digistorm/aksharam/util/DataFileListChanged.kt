@@ -1,5 +1,3 @@
-package in.digistorm.aksharam.util;
-
 /*
  * copyright (c) 2022 alan m varghese <alan@digistorm.in>
  *
@@ -19,7 +17,8 @@ package in.digistorm.aksharam.util;
  * you should have received a copy of the gnu general public license
  * along with this program. if not, see <http://www.gnu.org/licenses/>.
  */
+package `in`.digistorm.aksharam.util
 
-public interface DataFileListChanged {
-     void onDataFileListChanged();
+interface DataFileListChanged {
+    fun onDataFileListChanged()
 }
