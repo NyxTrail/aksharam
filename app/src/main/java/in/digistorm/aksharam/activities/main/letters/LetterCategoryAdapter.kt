@@ -34,8 +34,8 @@ import androidx.annotation.RequiresApi
 import android.os.Build
 import android.util.TypedValue
 import android.view.Gravity
+import android.view.LayoutInflater
 import android.view.View
-import android.view.View.OnLongClickListener
 import androidx.gridlayout.widget.GridLayout
 import java.util.*
 
@@ -45,12 +45,12 @@ class LetterCategoryAdapter(
 
     private val logTag = LetterCategoryAdapter::class.simpleName
 
-    private val headers: Array<String> = viewModel.transliterator!!.language!!.lettersCategoryWise
+    private val headers: Array<String> = viewModel.transliterator.language!!.lettersCategoryWise
         .keys.toTypedArray()
 
 
     override fun getGroupCount(): Int {
-        return viewModel.transliterator!!.language!!.lettersCategoryWise.size
+        return viewModel.transliterator.language!!.lettersCategoryWise.size
     }
 
     override fun getChildrenCount(groupPosition: Int): Int {
@@ -63,7 +63,7 @@ class LetterCategoryAdapter(
     }
 
     override fun getChild(groupPosition: Int, childPosition: Int): Any? {
-        return viewModel.transliterator?.language?.lettersCategoryWise?.get(headers[groupPosition])
+        return viewModel.transliterator.language?.lettersCategoryWise?.get(headers[groupPosition])
     }
 
     override fun getGroupId(groupPosition: Int): Long {
@@ -80,40 +80,46 @@ class LetterCategoryAdapter(
 
     @SuppressLint("InflateParams")
     override fun getGroupView(
-        groupPosition: Int, isExpanded: Boolean, convertView: View,
-        parent: ViewGroup
+        groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup
     ): View {
-        logDebug(logTag, "getting groupview for position $groupPosition")
+        logDebug(logTag, "Getting GroupView for position $groupPosition")
+
+        val previousView: View = convertView
+            ?: LayoutInflater.from(parent.context).inflate(R.layout.letter_category_header, parent, false)
+
         val letterCategoryHeaderTV =
-            convertView.findViewById<TextView>(R.id.LetterCategoryHeaderText)
+            previousView.findViewById<TextView>(R.id.LetterCategoryHeaderText)
         // Set some padding on the left so that the text does not overwrite the expand indicator
-        letterCategoryHeaderTV.setPadding(
+        letterCategoryHeaderTV?.setPadding(
             100,
             letterCategoryHeaderTV.paddingTop,
             letterCategoryHeaderTV.paddingRight,
             letterCategoryHeaderTV.paddingBottom
         )
-        letterCategoryHeaderTV.setTypeface(null, Typeface.BOLD)
-        letterCategoryHeaderTV.text =
+        letterCategoryHeaderTV?.setTypeface(null, Typeface.BOLD)
+        letterCategoryHeaderTV?.text =
             headers[groupPosition].uppercase(Locale.getDefault())
-        letterCategoryHeaderTV.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25f)
-        return convertView
+        letterCategoryHeaderTV?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25f)
+        return previousView
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
     override fun getChildView(
         groupPosition: Int, childPosition: Int, isLastChild: Boolean,
-        convertView: View, parent: ViewGroup
+        convertView: View?, parent: ViewGroup
     ): View {
         logDebug(logTag, "creating grid for group: $groupPosition")
-        val gridLayout = convertView.findViewById<GridLayout>(R.id.LetterGrid)
+
+        val previousView: View = convertView
+            ?: LayoutInflater.from(parent.context).inflate(R.layout.letter_category_content, parent, false)
+        val gridLayout = previousView.findViewById<GridLayout>(R.id.LetterGrid)
         gridLayout.removeAllViews()
         gridLayout.isClickable = true
 
-        val letters = viewModel.transliterator?.language
-            ?.lettersCategoryWise?.get(headers[groupPosition])?.toTypedArray() ?: return convertView
+        val letters = viewModel.transliterator.language
+            ?.lettersCategoryWise?.get(headers[groupPosition])?.toTypedArray() ?: return previousView
 
-        logDebug(logTag, "group is: " + Arrays.toString(letters))
+        logDebug(logTag, "group is: " + letters.contentToString())
         val cols = 5
 
         for ((i, letter) in letters.withIndex()) {
@@ -130,26 +136,26 @@ class LetterCategoryAdapter(
             pixels = parent.resources.getDimensionPixelSize(R.dimen.letter_grid_tv_padding)
             tv.setPadding(pixels, pixels, pixels, pixels)
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
-            tv.setOnLongClickListener(OnLongClickListener { v: View? ->
+            tv.setOnLongClickListener {
                 logDebug(logTag, "$letter long clicked!")
                 val letterInfoFragment = LetterInfoFragment.newInstance(letter)
                 MainActivity.replaceTabFragment(0, letterInfoFragment)
                 true
-            })
-            tv.setOnClickListener(View.OnClickListener { v: View? ->
+            }
+            tv.setOnClickListener {
                 logDebug(logTag, "$letter clicked!")
                 if (tv.text.toString() == letter) {
                     if (!viewModel.getLanguage()
                             .equals(viewModel.targetLanguage, ignoreCase = true)
-                    ) tv.text = viewModel.transliterator!!.transliterate(
+                    ) tv.text = viewModel.transliterator.transliterate(
                         letter,
                         viewModel.targetLanguage!!
                     ) else logDebug(logTag, "source lang = target lang... Error is data file?")
                 } else tv.text = letter
-            })
+            }
             gridLayout.addView(tv, tvLayoutParams)
         }
-        return convertView
+        return previousView
     }
 
     override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {
