@@ -24,7 +24,7 @@ plugins {
 }
 
 android {
-    compileSdkVersion 32
+    compileSdkVersion 33
     buildToolsVersion "30.0.3"
 
     defaultConfig {
@@ -70,6 +70,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.2'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.3.5'
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.5'
+    implementation 'androidx.core:core-ktx:+'
 
 
     testImplementation 'junit:junit:4.13.2'
