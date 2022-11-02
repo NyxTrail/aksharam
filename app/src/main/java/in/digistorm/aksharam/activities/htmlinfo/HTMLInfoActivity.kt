@@ -51,10 +51,10 @@ class HTMLInfoActivity : AppCompatActivity() {
         htmlInfoActivityTV.movementMethod = LinkMovementMethod.getInstance()
         if (extra === ExtraValues.HELP) {
             logDebug(logTag, "Displaying help")
-            htmlInfoActivityTV.text = Html.fromHtml(getString(R.string.help_text))
+            htmlInfoActivityTV.text = Html.fromHtml(getString(R.string.help_text), Html.FROM_HTML_MODE_LEGACY)
         } else if (extra === ExtraValues.PRIVACY) {
             logDebug(logTag, "Displaying privacy")
-            htmlInfoActivityTV.text = Html.fromHtml(getString(R.string.privacy_text))
+            htmlInfoActivityTV.text = Html.fromHtml(getString(R.string.privacy_text), Html.FROM_HTML_MODE_LEGACY)
         }
     }
 }

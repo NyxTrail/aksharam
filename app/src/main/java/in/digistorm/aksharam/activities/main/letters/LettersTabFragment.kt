@@ -41,7 +41,7 @@ class LettersTabFragment : Fragment {
     private val logTag = LettersTabFragment::class.simpleName
 
     private var adapter: LabelledArrayAdapter<String>? = null
-    private var lettersTabLangSpinner: Spinner? = null
+    // private var lettersTabLangSpinner: Spinner? = null
 
     // This will hold the id for the ExpandableListView for easily finding it later
     private var expandableListViewId = -1
@@ -109,7 +109,7 @@ class LettersTabFragment : Fragment {
 
     private fun initialiseLettersTabLangSpinner(view: View) {
         logDebug(logTag, "Initialising LettersTabLangSpinner")
-        lettersTabLangSpinner = view.findViewById(R.id.lettersTabLangSpinner)
+        val lettersTabLangSpinner: Spinner = requireView().findViewById(R.id.lettersTabLangSpinner)
         val languages: ArrayList<String> = getDownloadedLanguages(requireContext())
         if (languages.size == 0) {
             (requireActivity() as MainActivity).startInitialisationAcitivity()
@@ -128,16 +128,16 @@ class LettersTabFragment : Fragment {
         viewModel.adapter = adapter
         adapter?.setDropDownViewResource(R.layout.spinner_drop_down)
         adapter?.setNotifyOnChange(true)
-        lettersTabLangSpinner?.adapter = adapter
+        lettersTabLangSpinner.adapter = adapter
 
         if (viewModel.targetLanguage != null) {
             if (adapter?.getPosition(viewModel.targetLanguage) != -1)
-                lettersTabLangSpinner?.setSelection(adapter?.getPosition(viewModel.targetLanguage) ?: 0)
+                lettersTabLangSpinner.setSelection(adapter?.getPosition(viewModel.targetLanguage) ?: 0)
             else
-                lettersTabLangSpinner?.setSelection(0)
+                lettersTabLangSpinner.setSelection(0)
         }
         else
-            lettersTabLangSpinner?.setSelection(0)
+            lettersTabLangSpinner.setSelection(0)
         GlobalSettings.instance?.addDataFileListChangedListener("LettersTabFragmentListener",
             object: DataFileListChanged {
                 override fun onDataFileListChanged() {
@@ -156,19 +156,20 @@ class LettersTabFragment : Fragment {
                     // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
                     // think of to fix this
                     logDebug("LTFListener", "Resetting spinner adapter")
-                    lettersTabLangSpinner?.adapter = adapter
+                    lettersTabLangSpinner.adapter = adapter
                 }
             })
         logDebug(logTag, "Setting up item listener for the language selection spinner")
-        lettersTabLangSpinner?.onItemSelectedListener = object :
+
+        lettersTabLangSpinner.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View,
+                parent: AdapterView<*>?,
+                view: View?,
                 position: Int,
                 id: Long
             ) {
-                val language = parent.getItemAtPosition(position).toString()
+                val language = parent?.getItemAtPosition(position).toString()
                 logDebug("LangSpinner", "Item selected $language")
                 viewModel.setTransliterator(language, requireContext())
                 val size = Point()
@@ -211,12 +212,12 @@ class LettersTabFragment : Fragment {
         lettersTabTransSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View,
+                    parent: AdapterView<*>?,
+                    view: View?,
                     position: Int,
                     id: Long
                 ) {
-                    val targetLanguage = parent.getItemAtPosition(position).toString()
+                    val targetLanguage = parent?.getItemAtPosition(position).toString()
                     logDebug("TransSpinner", "item selected: $targetLanguage")
                     viewModel.targetLanguage = targetLanguage
                 }

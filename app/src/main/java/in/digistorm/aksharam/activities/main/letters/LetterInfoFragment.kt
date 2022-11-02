@@ -56,9 +56,9 @@ class LetterInfoFragment : Fragment() {
         setText(v.findViewById(R.id.letterInfoHeadingTV), currentLetter)
         setText(
             v.findViewById(R.id.letterInfoTransliteratedHeadingTV),
-            tr!!.transliterate(currentLetter!!, viewModel!!.targetLanguage!!)
+            tr.transliterate(currentLetter!!, viewModel!!.targetLanguage!!)
         )
-        val letterExamples = viewModel!!.transliterator!!.language?.getLetterDefinition(currentLetter)?.getExamples()
+        val letterExamples = viewModel!!.transliterator.language?.getLetterDefinition(currentLetter)?.getExamples()
 
         // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
         val letterInfoWordAndMeaningLL =
@@ -82,7 +82,7 @@ class LetterInfoFragment : Fragment() {
                 ).toInt()
                 wordsAndMeaningView.setPadding(px, px, px, px)
                 val meaning =
-                    value[viewModel!!.transliterator!!.language!!.getLanguageCode(viewModel!!.targetLanguage)]
+                    value[viewModel!!.transliterator.language!!.getLanguageCode(viewModel!!.targetLanguage)]
                 logDebug(
                     logTag,
                     "targetLanguage: " + viewModel!!.targetLanguage + "; Word: " + key + "; meaning: " + meaning
@@ -91,7 +91,7 @@ class LetterInfoFragment : Fragment() {
                 setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningMeaningTV), meaning)
                 setText(
                     wordsAndMeaningView.findViewById(R.id.wordAndMeaningTransliterationTV),
-                    viewModel!!.transliterator!!.transliterate(
+                    viewModel!!.transliterator.transliterate(
                         key,
                         viewModel!!.targetLanguage!!
                     )
@@ -102,7 +102,7 @@ class LetterInfoFragment : Fragment() {
 
         // Check if extra info exists for this letter
         val letterInfo = viewModel!!.transliterator
-            ?.language!!.getLetterDefinition(currentLetter).getInfo()
+            .language!!.getLetterDefinition(currentLetter).getInfo()
         val letterInfoInfoTV = v.findViewById<TextView>(R.id.letterInfoInfoTV)
         if (letterInfo == null || letterInfo.isEmpty()) {
             logDebug(
@@ -117,12 +117,10 @@ class LetterInfoFragment : Fragment() {
         // For consonants and ligatures, show examples of how they can combine with
         // vowel diacritics. For consonants, display possible ligatures with other
         // consonants if ligatures_auto_generatable
-        val category = viewModel!!.transliterator
-            ?.language!!.getLetterDefinition(currentLetter)
+        val category = viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)
             .getType()
         var showDiacriticExamples = true
-        if (category != null && !viewModel!!.transliterator
-                ?.language!!.getLetterDefinition(currentLetter).shouldExcludeCombiExamples()
+        if (category != null && !viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter).shouldExcludeCombiExamples()
             && (category.equals("consonants", ignoreCase = true)
                     || category.equals("ligatures", ignoreCase = true))
         ) {
@@ -131,7 +129,7 @@ class LetterInfoFragment : Fragment() {
                     "consonants",
                     ignoreCase = true
                 )
-            ) if (viewModel!!.transliterator!!.language!!.areLigaturesAutoGeneratable()) displayLigatures(
+            ) if (viewModel!!.transliterator.language!!.areLigaturesAutoGeneratable()) displayLigatures(
                 v
             )
         } else showDiacriticExamples = false
@@ -159,9 +157,8 @@ class LetterInfoFragment : Fragment() {
         ligatureAfterHintTV.visibility = View.VISIBLE
         val ligatureBeforeHintTV = v.findViewById<TextView>(R.id.letterInfoLigaturesBeforeTV)
         ligatureBeforeHintTV.visibility = View.VISIBLE
-        val consonants: ArrayList<String>
-        consonants = viewModel!!.transliterator!!.language!!.consonants
-        val virama = viewModel!!.transliterator!!.language!!.virama
+        val consonants: ArrayList<String> = viewModel!!.transliterator.language!!.consonants
+        val virama = viewModel!!.transliterator.language!!.virama
 
         // v.findViewById(R.id.letterInfoLigaturesLL).setVisibility(View.VISIBLE);
         val ligaturesGLBefore = v.findViewById<GridLayout>(R.id.letterInfoLigaturesBeforeGL)
@@ -180,9 +177,8 @@ class LetterInfoFragment : Fragment() {
         )
         val size = Point()
         requireActivity().windowManager.defaultDisplay.getSize(size)
-        var i = 0
         val cols = 5
-        for (consonant in consonants) {
+        for ((i, consonant) in consonants.withIndex()) {
             val ligatureAfter = consonant + virama + currentLetter
             val ligatureBefore = currentLetter + virama + consonant
 
@@ -192,30 +188,29 @@ class LetterInfoFragment : Fragment() {
 
             // UI elements for ligatureBefore
             var textView = AutoAdjustingTextView(requireContext())
-            textView.setGravity(Gravity.CENTER)
+            textView.gravity = Gravity.CENTER
             val tvLayoutParams = GridLayout.LayoutParams(rowSpec, colSpec)
             tvLayoutParams.width = size.x / 6
-            textView.setLayoutParams(tvLayoutParams)
+            textView.layoutParams = tvLayoutParams
             var px = resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
             tvLayoutParams.setMargins(px, px, px, px)
             px = resources.getDimensionPixelSize(R.dimen.letter_grid_tv_padding)
             textView.setPadding(px, px, px, px)
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
-            textView.setText(ligatureBefore)
+            textView.text = ligatureBefore
             ligaturesGLBefore.addView(textView, tvLayoutParams)
 
             // UI elements for ligatureAfter
             textView = AutoAdjustingTextView(requireContext())
-            textView.setGravity(Gravity.CENTER)
+            textView.gravity = Gravity.CENTER
             px = resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
             tvLayoutParams.setMargins(px, px, px, px)
-            textView.setLayoutParams(tvLayoutParams)
+            textView.layoutParams = tvLayoutParams
             px = resources.getDimensionPixelSize(R.dimen.letter_grid_tv_padding)
             textView.setPadding(px, px, px, px)
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20f)
-            textView.setText(ligatureAfter)
+            textView.text = ligatureAfter
             ligaturesGLAfter.addView(textView, tvLayoutParams)
-            i++
         }
     }
 
@@ -229,8 +224,8 @@ class LetterInfoFragment : Fragment() {
                 R.string.consonants_with_diacritic,
                 currentLetter
             )
-            items = viewModel!!.transliterator!!.language!!.consonants
-            items.addAll(viewModel!!.transliterator!!.language!!.ligatures)
+            items = viewModel!!.transliterator.language!!.consonants
+            items.addAll(viewModel!!.transliterator.language!!.ligatures)
         } else if (type.equals("consonants", ignoreCase = true)
             || type.equals("ligatures", ignoreCase = true)
         ) {
@@ -238,7 +233,7 @@ class LetterInfoFragment : Fragment() {
                 R.string.diacritics_with_consonant,
                 currentLetter
             )
-            items = viewModel!!.transliterator!!.language!!.diacritics
+            items = viewModel!!.transliterator.language!!.diacritics
         }
         if (items == null) return
         logDebug(logTag, "Items obtained: $items")
@@ -264,7 +259,7 @@ class LetterInfoFragment : Fragment() {
             px = resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
             textView.setPadding(px, px, px, px)
             if (type.equals("signs", ignoreCase = true)
-                && !viewModel!!.transliterator!!.language
+                && !viewModel!!.transliterator.language
                     ?.getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
             ) {
                 textView.text = item + currentLetter
