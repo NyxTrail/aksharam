@@ -47,7 +47,9 @@ class LetterInfoFragment : Fragment() {
     // Set up the LetterInfo dialog
     @SuppressLint("SetTextI18n")
     private fun setUp(v: View, inflater: LayoutInflater) {
-        currentLetter = if (arguments != null) arguments!!.getString("letter") else {
+        currentLetter = if (arguments != null)
+            requireArguments().getString("letter")
+        else {
             logDebug(logTag, "Null arguments in Setup(View, LayoutInflater)")
             return
         }
@@ -58,7 +60,7 @@ class LetterInfoFragment : Fragment() {
             v.findViewById(R.id.letterInfoTransliteratedHeadingTV),
             tr.transliterate(currentLetter!!, viewModel!!.targetLanguage!!)
         )
-        val letterExamples = viewModel!!.transliterator.language?.getLetterDefinition(currentLetter)?.getExamples()
+        val letterExamples = viewModel!!.transliterator.language?.getLetterDefinition(currentLetter.toString())?.getExamples()
 
         // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
         val letterInfoWordAndMeaningLL =
@@ -102,7 +104,7 @@ class LetterInfoFragment : Fragment() {
 
         // Check if extra info exists for this letter
         val letterInfo = viewModel!!.transliterator
-            .language!!.getLetterDefinition(currentLetter).getInfo()
+            .language!!.getLetterDefinition(currentLetter)?.getInfo()
         val letterInfoInfoTV = v.findViewById<TextView>(R.id.letterInfoInfoTV)
         if (letterInfo == null || letterInfo.isEmpty()) {
             logDebug(
@@ -117,10 +119,10 @@ class LetterInfoFragment : Fragment() {
         // For consonants and ligatures, show examples of how they can combine with
         // vowel diacritics. For consonants, display possible ligatures with other
         // consonants if ligatures_auto_generatable
-        val category = viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)
-            .getType()
+        val category = viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.getType()
         var showDiacriticExamples = true
-        if (category != null && !viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter).shouldExcludeCombiExamples()
+        if (category != null
+            && !viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
             && (category.equals("consonants", ignoreCase = true)
                     || category.equals("ligatures", ignoreCase = true))
         ) {

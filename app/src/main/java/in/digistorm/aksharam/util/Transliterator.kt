@@ -82,13 +82,11 @@ class Transliterator {
         for (ch in str.toCharArray()) {
             character = "" + ch // convert to string
             out =
-                if (language!!.letterDefinitons.containsKey(character)) if (language!!.getLetterDefinition(
-                        character
-                    )
-                        .getTransliterationHints().containsKey(targetLangCode)
-                ) out.append(
-                    language!!.getLetterDefinition(character)
-                        .getTransliterationHints()[targetLangCode]?.get(0)
+                if (language!!.letterDefinitions.containsKey(character))
+                    if (language!!.getLetterDefinition(character)?.getTransliterationHints()!!
+                            .containsKey(targetLangCode))
+                        out.append(language!!.getLetterDefinition(character)!!
+                            .getTransliterationHints()[targetLangCode]?.get(0)
                 ) else {
                     logDebug(
                         logTag, "Could not find transliteration hints for character: "

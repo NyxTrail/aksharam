@@ -70,8 +70,7 @@ class LettersTabFragment : Fragment {
         logDebug(logTag, "onViewCreated")
 
         logDebug(logTag, "Creating/Getting View Model for LettersTabFragment")
-        val viewModel: LettersTabViewModel = ViewModelProvider(requireActivity())
-            .get(LettersTabViewModel::class.java)
+        val viewModel: LettersTabViewModel = ViewModelProvider(requireActivity())[LettersTabViewModel::class.java]
 
         adapter = viewModel.adapter
         logDebug(logTag, "Letters category wise: ${viewModel.transliterator.language?.lettersCategoryWise}")
@@ -82,12 +81,10 @@ class LettersTabFragment : Fragment {
             logDebug(logTag, "Info button clicked!")
             logDebug(logTag,
                 "Fetching info for transliterating ${viewModel.getLanguage()} to ${viewModel.targetLanguage}")
-            val info: Map<String, Map<String, String>> = viewModel.transliterator.language!!.info
+            val info: HashMap<String, Map<String, String>>? = viewModel.transliterator.language!!.info
             logDebug(logTag, "Data for info: $info")
             val lif = LanguageInfoFragment.newInstance(
-                info["general"]!!["en"] +
-                        info[viewModel.targetLanguage?.lowercase()]!!["en"]
-            )
+                info?.get("general")?.get("en") + info?.get(viewModel.targetLanguage?.lowercase())?.get("en"))
             MainActivity.replaceTabFragment(0, lif)
         }
         val expandableListView = ExpandableListView(requireContext())

@@ -23,6 +23,7 @@ import `in`.digistorm.aksharam.BuildConfig
 import android.content.Context
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.DeserializationFeature
+import java.io.BufferedReader
 import java.io.IOException
 import java.util.*
 
@@ -39,8 +40,9 @@ fun getLanguageData(file: String?, context: Context): Language? {
 
         // Log the entire data file in DEBUG mode; assume readable as string lines
         if (BuildConfig.DEBUG) {
-            for (line in context.openFileInput(fileLC).bufferedReader().lines())
-                logDebug(logTag, line)
+            // for (line in context.openFileInput(fileLC).bufferedReader().lines())
+            val reader: BufferedReader = context.openFileInput(fileLC).bufferedReader()
+            reader.forEachLine { line -> logDebug(logTag, line) }
         }
 
         val language = mapper.readValue(context.openFileInput(fileLC), Language::class.java)
