@@ -44,7 +44,7 @@ class SettingsActivity : AppCompatActivity() {
         val self = this
 
         // get files online
-        GlobalSettings.instance!!.threadPoolExecutor.execute {
+        GlobalSettings.instance?.threadPoolExecutor?.execute {
             val languageDataDownloader = LanguageDataDownloader()
             val onlineFiles: JSONArray
             try {
@@ -84,7 +84,7 @@ class SettingsActivity : AppCompatActivity() {
                     manageLanguagesRV.adapter = manageLanguageListAdapter
                 }
             }
-        }
+    } ?: logDebug(logTag, "test")
     }
 
     public override fun onCreate(savedInstanceState: Bundle?) {

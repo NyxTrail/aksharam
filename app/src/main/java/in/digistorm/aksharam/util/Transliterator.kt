@@ -83,17 +83,14 @@ class Transliterator {
             character = "" + ch // convert to string
             out =
                 if (language!!.letterDefinitions.containsKey(character))
-                    if (language!!.getLetterDefinition(character)?.getTransliterationHints()!!
-                            .containsKey(targetLangCode))
-                        out.append(language!!.getLetterDefinition(character)!!
-                            .getTransliterationHints()[targetLangCode]?.get(0)
-                ) else {
-                    logDebug(
-                        logTag, "Could not find transliteration hints for character: "
-                                + character + "of language: " + language!!.language
-                                + "for transliteration to language: " + targetLanguageLC
-                    )
-                    out.append(character)
+                    if (language!!.getLetterDefinition(character)?.transliterationHints!!.containsKey(targetLangCode))
+                        out.append(
+                            language?.getLetterDefinition(character)!!.transliterationHints!![targetLangCode]!![0])
+                    else {
+                        logDebug(logTag, "Could not find transliteration hints for character: "
+                                    + character + "of language: " + language!!.language
+                                    + "for transliteration to language: " + targetLanguageLC)
+                        out.append(character)
                 } else {
                     logDebug(
                         logTag, "Could not find letter definition for letter: "

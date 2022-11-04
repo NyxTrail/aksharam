@@ -77,12 +77,12 @@ class Language {
                 logDebug(logTag, "Finding letters category wise")
                 field = LinkedHashMap()
                 for ((key, value) in letterDefinitions) {
-                    if (field[value.getType()] != null) {
-                        field[value.getType()]!!.add(key)
+                    if (field[value.type] != null) {
+                        field[value.type]!!.add(key)
                     } else {
                         val letterList = ArrayList<String>()
                         letterList.add(key)
-                        field[value.getType()] = letterList
+                        field[value.type!!] = letterList
                     }
                 }
             }
