@@ -25,12 +25,14 @@ import java.util.ArrayList
 import kotlin.collections.LinkedHashMap
 
 class LetterDefinition {
-    var type: String? = null
-    var examples: Map<String, Map<String, String>>? = null
-    var info: Map<String, String>? = null
-    private var isVirama: Boolean? = null
+    val type: String = ""
 
-    var base: String? = null
+    val examples: LinkedHashMap<String, Map<String, String>> = LinkedHashMap()
+    val info: LinkedHashMap<String, String> = LinkedHashMap()
+
+    var isVirama: Boolean = false
+
+    var base: String = ""
 
     @JsonProperty("combine_after")
     var combineAfter: Boolean? = null
@@ -48,10 +50,6 @@ class LetterDefinition {
         if (transliterationHints == null)
             transliterationHints = LinkedHashMap()
         transliterationHints!![key] = list
-    }
-
-    fun isVirama(): Boolean {
-        return isVirama ?: false
     }
 
     fun shouldCombineAfter(): Boolean {

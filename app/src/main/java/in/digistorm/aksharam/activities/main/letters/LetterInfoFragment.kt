@@ -37,6 +37,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.get
 import java.util.ArrayList
 
 class LetterInfoFragment : Fragment() {
@@ -60,7 +61,7 @@ class LetterInfoFragment : Fragment() {
             v.findViewById(R.id.letterInfoTransliteratedHeadingTV),
             tr.transliterate(currentLetter!!, viewModel!!.targetLanguage!!)
         )
-        val letterExamples = viewModel!!.transliterator.language?.getLetterDefinition(currentLetter.toString())?.getExamples()
+        val letterExamples = viewModel!!.transliterator.language?.getLetterDefinition(currentLetter.toString())?.examples
 
         // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
         val letterInfoWordAndMeaningLL =
@@ -103,8 +104,7 @@ class LetterInfoFragment : Fragment() {
         }
 
         // Check if extra info exists for this letter
-        val letterInfo = viewModel!!.transliterator
-            .language!!.getLetterDefinition(currentLetter)?.getInfo()
+        val letterInfo = viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.info
         val letterInfoInfoTV = v.findViewById<TextView>(R.id.letterInfoInfoTV)
         if (letterInfo == null || letterInfo.isEmpty()) {
             logDebug(
@@ -119,9 +119,9 @@ class LetterInfoFragment : Fragment() {
         // For consonants and ligatures, show examples of how they can combine with
         // vowel diacritics. For consonants, display possible ligatures with other
         // consonants if ligatures_auto_generatable
-        val category = viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.getType()
+        val category: String = viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.type ?: ""
         var showDiacriticExamples = true
-        if (category != null
+        if (category.isNotEmpty()
             && !viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
             && (category.equals("consonants", ignoreCase = true)
                     || category.equals("ligatures", ignoreCase = true))
@@ -137,7 +137,7 @@ class LetterInfoFragment : Fragment() {
         } else showDiacriticExamples = false
 
         // For a sign, display how it combines with each consonant
-        if (category != null && category.equals(
+        if (category.isNotEmpty() && category.equals(
                 "signs",
                 ignoreCase = true
             )
@@ -148,7 +148,7 @@ class LetterInfoFragment : Fragment() {
     }
 
     // Lets try to combine current letter with all letters
-    fun displayLigatures(v: View) {
+    private fun displayLigatures(v: View) {
         /* ligatureAfterHintTV, ligaturesGLAfter, linearLayoutAfter, etc are all for
          * ligatures formed when currentLetter appears *after* the virama.
          * ligatureBeforeHintTV, ligaturesGLBefore, linearLayoutBefore, etc are all for
@@ -297,9 +297,7 @@ class LetterInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity()).get(
-            LettersTabViewModel::class.java
-        )
+        viewModel = ViewModelProvider(requireActivity()).get()
         setUp(view, layoutInflater)
     }
 

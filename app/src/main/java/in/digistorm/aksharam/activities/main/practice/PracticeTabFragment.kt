@@ -393,7 +393,7 @@ class PracticeTabFragment : Fragment() {
                             val isCombineBefore = viewModel?.transliterator?.language
                                 ?.getLetterDefinition(letter)?.shouldCombineBefore() ?: false
                             val base = viewModel?.transliterator?.language
-                                ?.getLetterDefinition(letter)?.getBase()
+                                ?.getLetterDefinition(letter)?.base
                             // Find the base of this ligature, if any.
                             // "base" of a ligature is the actual consonant used for combining with
                             // the vowel sign
@@ -430,7 +430,7 @@ class PracticeTabFragment : Fragment() {
                     logDebug(logTag, "Ligature obtained: $ligature")
                     // nextChar is base char if a base exists in the data file.
                     // if there is no base in the data file, nextChar equals ligature (variable above)
-                    val nextChar = viewModel?.transliterator?.language?.getLetterDefinition(ligature)?.getBase() ?: ligature
+                    val nextChar = viewModel?.transliterator?.language?.getLetterDefinition(ligature)?.base ?: ligature
 
                     // get the rules for combining this letter if such rule exists
                     val isCombineAfter = viewModel?.transliterator?.language

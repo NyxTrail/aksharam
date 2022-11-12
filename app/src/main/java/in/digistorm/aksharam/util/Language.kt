@@ -27,10 +27,10 @@ import kotlin.collections.LinkedHashMap
 
 class Language {
     @JsonIgnore
-    private val logTag = javaClass.simpleName
+    private val logTag: String = javaClass.simpleName
 
-    val comment: String? = null
-    val code: String? = null
+    val comment: String = ""
+    val code: String = ""
 
     @JsonIgnore
     var language: String = ""
@@ -39,26 +39,20 @@ class Language {
         }
 
     @JsonProperty("trans_langs")
-    private val transLanguages: ArrayList<HashMap<String, String>>? = null
+    val transLanguages: ArrayList<HashMap<String, String>> = ArrayList()
         get() {
-            return if (field != null) {
-                ArrayList(field)
-            } else
-                ArrayList()
+            return ArrayList(field)
         }
 
-    val info: HashMap<String, Map<String, String>>? = null
+    val info: HashMap<String, Map<String, String>> = HashMap()
         get() {
-            return if (field != null) {
-                HashMap(field)
-            } else
-                HashMap()
+            return HashMap(field)
         }
 
-    val virama: String? = null
+    val virama: String = ""
 
     @JsonProperty("ligatures_auto_generatable")
-    private val ligaturesAutoGeneratable: Boolean? = null
+    private val ligaturesAutoGeneratable: Boolean = false
 
     @JsonProperty("data")
     val letterDefinitions: LinkedHashMap<String, LetterDefinition> = LinkedHashMap()
@@ -71,30 +65,28 @@ class Language {
 
     // {"vowels": ["a", "e", "i"...], "consonants": ["b", "c", "d"...]...}
     @JsonIgnore
-    var lettersCategoryWise: LinkedHashMap<String, ArrayList<String>?> = LinkedHashMap()
+    val lettersCategoryWise: LinkedHashMap<String, ArrayList<String>> = LinkedHashMap()
         get() {
             if (field.isEmpty()) {
                 logDebug(logTag, "Finding letters category wise")
-                field = LinkedHashMap()
                 for ((key, value) in letterDefinitions) {
                     if (field[value.type] != null) {
                         field[value.type]!!.add(key)
                     } else {
                         val letterList = ArrayList<String>()
                         letterList.add(key)
-                        field[value.type!!] = letterList
+                        field[value.type] = letterList
                     }
                 }
             }
             return LinkedHashMap(field)
         }
-        private set
 
     // Uppercase the first letter
     val supportedLanguagesForTransliteration: ArrayList<String>
         get() {
             val languagesForTransliteration = ArrayList<String>()
-            for (language in transLanguages!!) {
+            for (language in transLanguages) {
                 var lang = language.keys.toTypedArray()[0].lowercase()
                 // Uppercase the first letter
                 lang = lang.substring(0, 1).uppercase() + lang.substring(1)
@@ -104,7 +96,7 @@ class Language {
         }
 
     fun areLigaturesAutoGeneratable(): Boolean {
-        return ligaturesAutoGeneratable!!
+        return ligaturesAutoGeneratable
     }
 
     fun getLetterDefinition(letter: String?): LetterDefinition? {
@@ -131,7 +123,7 @@ class Language {
             return null
 
         val lowercaseLanguage = language.lowercase()
-        for (item in transLanguages!!) {
+        for (item in transLanguages) {
             if (item.containsKey(lowercaseLanguage))
                 return item[lowercaseLanguage]
         }
