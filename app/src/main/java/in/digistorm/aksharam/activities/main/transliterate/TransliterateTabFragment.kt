@@ -51,7 +51,7 @@ class TransliterateTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         if (tr == null) {
-            tr = Transliterator(context!!)
+            tr = Transliterator(requireContext())
         }
         (view.findViewById<View>(R.id.TransliterateTabInputTextField) as EditText)
             .addTextChangedListener(object : TextWatcher {
@@ -84,7 +84,7 @@ class TransliterateTabFragment : Fragment() {
         if (s.length == 0 || view == null) return
         val lang = detectLanguage(s)
         if (lang != null && !lang.equals(tr!!.language!!.language, ignoreCase = true)) {
-            tr = Transliterator(lang, context!!)
+            tr = Transliterator(lang, requireContext())
             initialiseSpinner(null)
         }
         logDebug(logTag, lang + "; " + tr!!.language!!.language)
@@ -137,7 +137,7 @@ class TransliterateTabFragment : Fragment() {
         var languageSelectionSpinner: Spinner? = null
         if (view != null) languageSelectionSpinner =
             view.findViewById(R.id.LanguageSelectionSpinner) else if (activity != null) {
-            languageSelectionSpinner = activity!!.findViewById(R.id.LanguageSelectionSpinner)
+            languageSelectionSpinner = requireActivity().findViewById(R.id.LanguageSelectionSpinner)
         }
         if (languageSelectionSpinner == null) {
             logDebug(logTag, "Language selection spinner could not be found. Unable to initialise.")

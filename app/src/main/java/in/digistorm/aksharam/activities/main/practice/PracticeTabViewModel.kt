@@ -25,7 +25,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 
 class PracticeTabViewModel : ViewModel() {
-    private val logTag = PracticeTabViewModel::class.simpleName
+    private val logTag = this.javaClass.simpleName
 
     var transliterator: Transliterator? = null
         private set
