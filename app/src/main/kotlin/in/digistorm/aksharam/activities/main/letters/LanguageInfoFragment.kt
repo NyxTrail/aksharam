@@ -44,7 +44,7 @@ class LanguageInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         var info: String? = null
-        if (arguments != null) info = arguments!!.getString("info")
+        if (arguments != null) info = requireArguments().getString("info")
         if (info == null) logDebug(logTag, "Info is null")
         (view.findViewById<View>(R.id.languageInfoTV) as TextView).text = Html.fromHtml(info)
     }
