@@ -151,6 +151,7 @@ class InitialiseAppActivity : AppCompatActivity() {
         // Attempt to start main activity
         val mainActivityStarted = startMainActivity()
         if (!mainActivityStarted) {
+
             // if we are not able to start the main activity...
             // continue setting up the initialisation activity (current activity)
             setContentView(R.layout.initialise_app_activity)
@@ -169,14 +170,23 @@ class InitialiseAppActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         logDebug(logTag, "Starting app...")
+        logDebug(logTag, "${android.os.Build.VERSION.SDK_INT}")
         GlobalSettings.createInstance(this)
+        logDebug(logTag, "GlobalSettings created")
         if (GlobalSettings.instance?.darkMode == true) {
             // which mode did the activity start in?
             val nightMode = AppCompatDelegate.getDefaultNightMode()
-            // If dark mode is enabled, this causes activity to restart
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-            // continue activity initialisation only if activity started in night mode
-            if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) setUpActivity()
+            if (nightMode == AppCompatDelegate.MODE_NIGHT_YES) {
+                logDebug(logTag, "Dark mode already enabled")
+                setUpActivity()
+            }
+            else {
+                logDebug(logTag, "Setting default night mode")
+                // If dark mode is enabled as a result of the next step, the activity will restart
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                // this will run only if the previous step did not do anything
+                setUpActivity()
+            }
         } else { // if light mode; nothing special, it should be light mode by default
             setUpActivity()
         }

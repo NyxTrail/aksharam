@@ -19,40 +19,32 @@
  */
 package `in`.digistorm.aksharam.activities.main.practice
 
+import `in`.digistorm.aksharam.util.Language
 import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.logDebug
+import android.app.Application
 import android.content.Context
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 
-class PracticeTabViewModel : ViewModel() {
+class PracticeTabViewModel(application: Application) : AndroidViewModel(application) {
     private val logTag = this.javaClass.simpleName
 
-    var transliterator: Transliterator? = null
-        private set
-    var transLang: String? = null
-    var practiceType: String? = null
-    fun getTransliterator(context: Context?): Transliterator {
-        if (transliterator == null) transliterator = Transliterator(
-            context!!
-        )
-        return transliterator!!
+    var transliterator: Transliterator = Transliterator(application)
+    var transLang: String = ""
+    var practiceType: String = ""
+    var practiceString: String = ""
+
+    fun setTransliterator(language: String, context: Context) {
+        if (transliterator.languageData.language.lowercase() != language.lowercase())
+            transliterator = Transliterator(language, context)
     }
 
-    fun resetTransliterator(context: Context?) {
-        if (transliterator == null) {
-            logDebug(logTag, "Transliterator is null. Initialising...")
-            transliterator = Transliterator(context!!)
-        }
+    fun getLanguage(): String {
+        return transliterator.languageData.language
     }
 
-    fun setTransliterator(language: String, context: Context?) {
-        if (transliterator != null) {
-            if (transliterator!!.language!!.language.lowercase() != language.lowercase()) transliterator =
-                Transliterator(language, context!!)
-        }
-        transliterator = Transliterator(language, context!!)
+    fun getLanguageData(): Language {
+        return transliterator.languageData
     }
-
-    val language: String
-        get() = transliterator!!.language!!.language
 }

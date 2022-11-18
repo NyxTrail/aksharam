@@ -59,9 +59,9 @@ class LetterInfoFragment : Fragment() {
         setText(v.findViewById(R.id.letterInfoHeadingTV), currentLetter)
         setText(
             v.findViewById(R.id.letterInfoTransliteratedHeadingTV),
-            tr.transliterate(currentLetter!!, viewModel!!.targetLanguage!!)
+            tr.transliterate(currentLetter!!, viewModel!!.targetLanguage)
         )
-        val letterExamples = viewModel!!.transliterator.language?.getLetterDefinition(currentLetter.toString())?.examples
+        val letterExamples = viewModel!!.getLanguageData().getLetterDefinition(currentLetter.toString())?.examples
 
         // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
         val letterInfoWordAndMeaningLL =
@@ -85,7 +85,7 @@ class LetterInfoFragment : Fragment() {
                 ).toInt()
                 wordsAndMeaningView.setPadding(px, px, px, px)
                 val meaning =
-                    value[viewModel!!.transliterator.language!!.getLanguageCode(viewModel!!.targetLanguage)]
+                    value[viewModel!!.getLanguageData().getLanguageCode(viewModel!!.targetLanguage)]
                 logDebug(
                     logTag,
                     "targetLanguage: " + viewModel!!.targetLanguage + "; Word: " + key + "; meaning: " + meaning
@@ -104,7 +104,7 @@ class LetterInfoFragment : Fragment() {
         }
 
         // Check if extra info exists for this letter
-        val letterInfo = viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.info
+        val letterInfo = viewModel!!.getLanguageData().getLetterDefinition(currentLetter)?.info
         val letterInfoInfoTV = v.findViewById<TextView>(R.id.letterInfoInfoTV)
         if (letterInfo == null || letterInfo.isEmpty()) {
             logDebug(
@@ -119,10 +119,10 @@ class LetterInfoFragment : Fragment() {
         // For consonants and ligatures, show examples of how they can combine with
         // vowel diacritics. For consonants, display possible ligatures with other
         // consonants if ligatures_auto_generatable
-        val category: String = viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.type ?: ""
+        val category: String = viewModel!!.getLanguageData().getLetterDefinition(currentLetter)?.type ?: ""
         var showDiacriticExamples = true
         if (category.isNotEmpty()
-            && !viewModel!!.transliterator.language!!.getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
+            && !viewModel!!.getLanguageData().getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
             && (category.equals("consonants", ignoreCase = true)
                     || category.equals("ligatures", ignoreCase = true))
         ) {
@@ -131,7 +131,7 @@ class LetterInfoFragment : Fragment() {
                     "consonants",
                     ignoreCase = true
                 )
-            ) if (viewModel!!.transliterator.language!!.areLigaturesAutoGeneratable()) displayLigatures(
+            ) if (viewModel!!.getLanguageData().areLigaturesAutoGeneratable()) displayLigatures(
                 v
             )
         } else showDiacriticExamples = false
@@ -159,8 +159,8 @@ class LetterInfoFragment : Fragment() {
         ligatureAfterHintTV.visibility = View.VISIBLE
         val ligatureBeforeHintTV = v.findViewById<TextView>(R.id.letterInfoLigaturesBeforeTV)
         ligatureBeforeHintTV.visibility = View.VISIBLE
-        val consonants: ArrayList<String> = viewModel!!.transliterator.language!!.consonants
-        val virama = viewModel!!.transliterator.language!!.virama
+        val consonants: ArrayList<String> = viewModel!!.getLanguageData().consonants
+        val virama = viewModel!!.getLanguageData().virama
 
         // v.findViewById(R.id.letterInfoLigaturesLL).setVisibility(View.VISIBLE);
         val ligaturesGLBefore = v.findViewById<GridLayout>(R.id.letterInfoLigaturesBeforeGL)
@@ -226,8 +226,8 @@ class LetterInfoFragment : Fragment() {
                 R.string.consonants_with_diacritic,
                 currentLetter
             )
-            items = viewModel!!.transliterator.language!!.consonants
-            items.addAll(viewModel!!.transliterator.language!!.ligatures)
+            items = viewModel!!.getLanguageData().consonants
+            items.addAll(viewModel!!.getLanguageData().ligatures)
         } else if (type.equals("consonants", ignoreCase = true)
             || type.equals("ligatures", ignoreCase = true)
         ) {
@@ -235,7 +235,7 @@ class LetterInfoFragment : Fragment() {
                 R.string.diacritics_with_consonant,
                 currentLetter
             )
-            items = viewModel!!.transliterator.language!!.diacritics
+            items = viewModel!!.getLanguageData().diacritics
         }
         if (items == null) return
         logDebug(logTag, "Items obtained: $items")
@@ -261,14 +261,12 @@ class LetterInfoFragment : Fragment() {
             px = resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
             textView.setPadding(px, px, px, px)
             if (type.equals("signs", ignoreCase = true)
-                && !viewModel!!.transliterator.language
-                    ?.getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
+                && !viewModel!!.getLanguageData().getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
             ) {
                 textView.text = item + currentLetter
             } else if ((type.equals("consonants", ignoreCase = true)
                         || type.equals("ligatures", ignoreCase = true))
-                && !(viewModel?.transliterator?.language
-                    ?.getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples())!!
+                && !(viewModel?.getLanguageData()?.getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples())!!
             ) textView.text = currentLetter + item
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
             // Add the textView and its parent linear layout only if the textview has some content

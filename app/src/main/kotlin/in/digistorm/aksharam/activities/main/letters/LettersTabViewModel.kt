@@ -21,34 +21,32 @@ package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.LabelledArrayAdapter
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.util.Language
 import android.app.Application
 
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 
-class LettersTabViewModel(application: Application) : AndroidViewModel(application) {
+class LettersTabViewModel(application: Application): AndroidViewModel(application) {
     private val logTag = LettersTabViewModel::class.simpleName
 
-    var targetLanguage: String? = null
-
-    var transliterator: Transliterator
-        private set
-
-    init {
-        logDebug(logTag, "Initialising transliterator")
-        transliterator = Transliterator(application)
-    }
-
+    // The target language string as displayed by lettersTabTransSpinner
+    var targetLanguage: String = ""
     var adapter: LabelledArrayAdapter<String>? = null
+    var transliterator: Transliterator = Transliterator(application)
 
     // Set the transliterator based on a specific language
     fun setTransliterator(language: String, context: Context) {
-        if (transliterator.language!!.language.lowercase() != language.lowercase())
+        if (transliterator.getLanguage().lowercase() != language.lowercase())
             transliterator = Transliterator(language, context)
     }
 
-    fun getLanguage(): String? {
-        return transliterator?.language?.language
+    fun getLanguage(): String {
+        return transliterator.languageData.language
+    }
+
+    // A convenience method to obtain language data
+    fun getLanguageData(): Language {
+        return transliterator.languageData
     }
 }

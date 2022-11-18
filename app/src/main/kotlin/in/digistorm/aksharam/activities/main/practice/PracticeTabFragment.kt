@@ -21,6 +21,7 @@ package `in`.digistorm.aksharam.activities.main.practice
 
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.MainActivity
+import `in`.digistorm.aksharam.activities.main.letters.LettersTabViewModel
 import `in`.digistorm.aksharam.util.*
 
 import android.widget.Spinner
@@ -36,30 +37,32 @@ import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import android.widget.AdapterView
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.lang.StringBuilder
 import java.util.*
+import kotlin.math.log
 
 class PracticeTabFragment : Fragment() {
     private val logTag = PracticeTabFragment::class.simpleName
 
     private var practiceTabLangSpinner: Spinner? = null
-    private var practiceString: String? = null
-    private var viewModel: PracticeTabViewModel? = null
 
-    private inner class TextChangedListener : TextWatcher {
+    private inner class TextChangedListener(val viewModel: PracticeTabViewModel) : TextWatcher {
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             val practiceTextTV =
                 requireActivity().findViewById<TextView>(R.id.PracticeTabPracticeTextTV)
             var correctInProgress = true
             val markup = StringBuilder()
-            val transliteratedString = viewModel!!.transliterator!!.transliterate(
-                practiceString!!, viewModel!!.transLang!!
-            )
+            // TODO: Store both the practice text and transliterated string in the view model, so that we do not
+            // have to transliterate the practice text every time
+            val transliteratedString = viewModel.transliterator.transliterate(
+                viewModel.practiceString,
+                viewModel.transLang)
             logDebug(
-                logTag, "Practice text " + practiceString + " was transliterated to "
+                logTag, "Practice text " + viewModel.practiceString + " was transliterated to "
                         + transliteratedString
             )
             logDebug(logTag, "Text entered was: $s")
@@ -67,7 +70,7 @@ class PracticeTabFragment : Fragment() {
                 clearInput()
                 practiceTextTV.text = Html.fromHtml(
                     "<font color=\"#7FFF00\">"
-                            + practiceString + "</font>"
+                            + viewModel.practiceString + "</font>"
                 )
                 Toast.makeText(
                     context, R.string.practice_tab_correct_text_entered,
@@ -84,18 +87,18 @@ class PracticeTabFragment : Fragment() {
                         markup.append("</font><font color=\"#7FFF00\">")
                         correctInProgress = true
                     }
-                    markup.append(practiceString!![i])
+                    markup.append(viewModel.practiceString[i])
                 } else {
                     if (correctInProgress) {
                         correctInProgress = false
                         markup.append("</font><font color=\"#DC143C\">")
                     }
-                    markup.append(practiceString!![i])
+                    markup.append(viewModel.practiceString[i])
                 }
                 i++
             }
             markup.append("</font>")
-            markup.append(practiceString!!.substring(i))
+            markup.append(viewModel.practiceString.substring(i))
             logDebug(logTag, "Marked up string: $markup")
             practiceTextTV.text = Html.fromHtml(markup.toString())
         }
@@ -103,7 +106,8 @@ class PracticeTabFragment : Fragment() {
         override fun afterTextChanged(s: Editable) {}
     }
 
-    private val textChangedListener = TextChangedListener()
+    private lateinit var textChangedListener: TextChangedListener
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -114,17 +118,14 @@ class PracticeTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
-        if (viewModel == null) {
-            logDebug(logTag, "Creating View Model for PracticeTabFragment")
-            viewModel = ViewModelProvider(requireActivity()).get(
-                PracticeTabViewModel::class.java
-            )
-        }
+        val viewModel: PracticeTabViewModel = ViewModelProvider(requireActivity())[
+                PracticeTabViewModel::class.java]
+        textChangedListener = TextChangedListener(viewModel)
+
         // Initialise viewModel with a Transliterator
-        viewModel!!.resetTransliterator(context)
-        view.findViewById<View>(R.id.PracticeTabRefreshButton).setOnClickListener { v: View? ->
+        view.findViewById<View>(R.id.PracticeTabRefreshButton).setOnClickListener {
             clearInput()
-            startPractice()
+            startPractice(viewModel)
             view.findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = true
         }
         initialisePracticeTabLangSpinner(view)
@@ -133,60 +134,62 @@ class PracticeTabFragment : Fragment() {
     // Return an empty array list if we could not find any
     // downloaded files. Should not be a problem since we
     // are anyways exiting this activity.
-    private val downloadedLanguages: ArrayList<String>
-        get() {
-            val languages: ArrayList<String> =
-                getDownloadedLanguages(requireContext())
-            if (languages.size == 0) {
-                (requireActivity() as MainActivity).startInitialisationAcitivity()
-                return ArrayList() // Return an empty array list if we could not find any
-                // downloaded files. Should not be a problem since we
-                // are anyways exiting this activity.
-            }
-            return languages
+    private fun getAllDownloadedLanguages(): ArrayList<String> {
+        val languages: ArrayList<String> = getDownloadedLanguages(requireContext())
+        if (languages.size == 0) {
+            (requireActivity() as MainActivity).startInitialisationAcitivity()
+            return ArrayList()
         }
+        return languages
+    }
 
-    private fun initialisePracticeTabLangSpinner(v: View) {
+    private fun initialisePracticeTabLangSpinner(view: View) {
         logDebug(logTag, "Initialising PracticeTabLangSpinner")
-        practiceTabLangSpinner = v.findViewById(R.id.PracticeTabLangSpinner)
+        val practiceTabLangSpinner: Spinner = view.findViewById(R.id.PracticeTabLangSpinner)
+        val viewModel: PracticeTabViewModel = ViewModelProvider(requireActivity())[
+                PracticeTabViewModel::class.java]
+
         val adapter: LabelledArrayAdapter<String> = LabelledArrayAdapter<String>(
             requireContext(),
             R.layout.spinner_item,
             R.id.spinnerItemTV,
-            downloadedLanguages,
+            getAllDownloadedLanguages(),
             R.id.spinnerLabelTV, getString(R.string.practice_tab_lang_hint)
         )
         adapter.setDropDownViewResource(R.layout.spinner_drop_down)
         adapter.setNotifyOnChange(true)
-        practiceTabLangSpinner?.adapter = adapter
-        practiceTabLangSpinner?.setSelection(0)
+        practiceTabLangSpinner.adapter = adapter
+        practiceTabLangSpinner.setSelection(0)
+
         GlobalSettings.instance?.addDataFileListChangedListener("PracticeTabFragmentListener",
             object: DataFileListChanged {
                 override fun onDataFileListChanged() {
                     logDebug("PTFListener", "Change in data files detected. Updating adapter.")
-                    if (context == null) return
-                    viewModel!!.resetTransliterator(context)
+                    if (context == null)
+                        return
                     adapter.clear()
-                    adapter.addAll(downloadedLanguages)
+                    adapter.addAll(getAllDownloadedLanguages())
                     // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
                     // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
                     // think of to fix this
                     logDebug("PTFListener", "Resetting spinner adapter")
-                    practiceTabLangSpinner?.adapter = adapter
+                    practiceTabLangSpinner.adapter = adapter
                 }
             })
-        practiceTabLangSpinner?.onItemSelectedListener = object :
+
+        logDebug(logTag, "Setting up item selected listener for the \"Language\" selectiion spinner")
+        practiceTabLangSpinner.onItemSelectedListener = object :
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
-                parent: AdapterView<*>,
-                view: View,
+                parent: AdapterView<*>?,
+                view: View?,
                 position: Int,
                 id: Long
             ) {
                 logDebug(logTag, "onItemSelected invoked by $parent")
                 clearInput()
-                val language = parent.getItemAtPosition(position).toString()
-                viewModel?.setTransliterator(language, context)
+                val language = parent?.getItemAtPosition(position).toString()
+                viewModel.setTransliterator(language, requireContext())
 
                 // re-initialise the "practice in" spinner
                 initialisePracticeTabPracticeInSpinner()
@@ -210,14 +213,17 @@ class PracticeTabFragment : Fragment() {
 
     fun initialisePracticeTabPracticeInSpinner() {
         clearInput()
+
+        logDebug(logTag, "Initialising \"Practice In\" spinner.")
         val practiceTabPracticeInSpinner = requireActivity().findViewById<Spinner>(
-            R.id.PracticeTabPracticeInSpinner
-        )
-        val practiceInAdapter: LabelledArrayAdapter<String> = LabelledArrayAdapter<String>(
+            R.id.PracticeTabPracticeInSpinner)
+        val viewModel: PracticeTabViewModel = ViewModelProvider(requireActivity())[
+                PracticeTabViewModel::class.java]
+        val practiceInAdapter: LabelledArrayAdapter<String> = LabelledArrayAdapter(
             requireContext(),
             R.layout.spinner_item,
             R.id.spinnerItemTV,
-            viewModel!!.transliterator!!.language!!.supportedLanguagesForTransliteration,
+            viewModel.transliterator.languageData.supportedLanguagesForTransliteration,
             R.id.spinnerLabelTV, getString(R.string.practice_tab_practice_in_hint)
         )
         practiceInAdapter.setDropDownViewResource(R.layout.spinner_drop_down)
@@ -232,9 +238,9 @@ class PracticeTabFragment : Fragment() {
                     id: Long
                 ) {
                     clearInput()
-                    viewModel!!.transLang = parent.getItemAtPosition(position).toString()
+                    viewModel.transLang = parent.getItemAtPosition(position).toString()
                     (requireActivity().findViewById<View>(R.id.PracticeTabInputTIL) as TextInputLayout).hint =
-                        getString(R.string.practice_tab_practice_input_hint, viewModel!!.transLang)
+                        getString(R.string.practice_tab_practice_input_hint, viewModel.transLang)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -242,12 +248,16 @@ class PracticeTabFragment : Fragment() {
     }
 
     fun initialisePracticeTabPracticeTypeSpinner() {
-        val practiceTabPracticeTypeSpinner = requireActivity().findViewById<Spinner>(
-            R.id.PracticeTabPracticeTypeSpinner
-        )
+
+        logDebug(logTag, "Initialising \"Practice Type\" spinner.")
+        val practiceTabPracticeTypeSpinner: Spinner = requireActivity().findViewById(
+            R.id.PracticeTabPracticeTypeSpinner)
+
+        val viewModel: PracticeTabViewModel = ViewModelProvider(requireActivity())[
+                PracticeTabViewModel::class.java]
         val practiceTypes = ArrayList<String>()
         val categories: Set<String> =
-            viewModel!!.transliterator!!.language!!.lettersCategoryWise.keys
+            viewModel.transliterator.languageData.lettersCategoryWise.keys
         for (category in categories) {
             practiceTypes.add(
                 category.substring(0, 1).uppercase()
@@ -262,7 +272,7 @@ class PracticeTabFragment : Fragment() {
         // Most of the combinations in these languages do not result in a meaningful ligature and
         // are usually represented using a half-consonant (with a virama). So, we will add random
         // ligatures only if the language's data file says we should.
-        if (viewModel!!.transliterator!!.language!!.areLigaturesAutoGeneratable()) practiceTypes.add(
+        if (viewModel.transliterator.languageData.areLigaturesAutoGeneratable()) practiceTypes.add(
             "Random Ligatures"
         )
         practiceTypes.add("Random Words")
@@ -285,37 +295,37 @@ class PracticeTabFragment : Fragment() {
                     id: Long
                 ) {
                     clearInput()
-                    viewModel!!.practiceType = parent.getItemAtPosition(position).toString()
-                    startPractice()
+                    viewModel.practiceType = parent.getItemAtPosition(position).toString()
+                    startPractice(viewModel)
                 }
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
     }
 
-    fun startPractice() {
-        if (viewModel!!.practiceType == null || viewModel!!.practiceType == "") return
+    fun startPractice(viewModel: PracticeTabViewModel) {
+        if (viewModel.practiceType.isEmpty())
+            return
 
         // get all letters of current language, category-wise
-        val vowels = viewModel!!.transliterator!!.language!!.vowels
-        val consonants = viewModel!!.transliterator!!.language!!.consonants
-        val ligatures = viewModel!!.transliterator!!.language!!.ligatures
-        val signs = viewModel!!.transliterator!!.language!!.diacritics
-        val chillu = viewModel!!.transliterator!!.language!!.chillu
+        val vowels = viewModel.getLanguageData().vowels
+        val consonants = viewModel.getLanguageData().consonants
+        val ligatures = viewModel.getLanguageData().ligatures
+        val signs = viewModel.getLanguageData().diacritics
+        val chillu = viewModel.getLanguageData().chillu
         val random = Random()
         var practiceString = StringBuilder()
 
         // Special variable to hold the Virama.
         // Useful to detect chillu letters in Malayalam
-        val virama = viewModel!!.transliterator!!.language!!.virama
-        when (viewModel!!.practiceType!!.lowercase()) {
-            "random words" ->                 // Let's construct a made-up word in current language
-                // First letter can be a vowel or consonant (not a sign)
-                // Second letter onwards can be a vowel sign or consonant (not a vowel)
-            {
+        val virama = viewModel.getLanguageData().virama
+        when (viewModel.practiceType.lowercase()) {
+            // Let's construct a made-up word in current language
+            // First letter can be a vowel or consonant (not a sign)
+            // Second letter onwards can be a vowel sign or consonant (not a vowel)
+            "random words" -> {
                 var i = 0
                 while (i < 5) {
-
                     // What should be the length of a word?
                     val wordLength = random.nextInt(6) + 3 // length is 3 to 6 + 3
                     logDebug(logTag, "Constructing word of length $wordLength")
@@ -336,14 +346,13 @@ class PracticeTabFragment : Fragment() {
                         if (random.nextInt(100) < 21 && prevChar != virama) {
                             // for malayalam, there is also a chance the next character is a chillu
                             nextChar =
-                                if (viewModel!!.language.equals("malayalam", ignoreCase = true)) {
+                                if (viewModel.getLanguage().equals("malayalam", ignoreCase = true)) {
                                     if (random.nextInt(100) < 31)
                                         chillu[random.nextInt(chillu.size)]
                                     else  // Since it's malayalam, we can just get one of the ligatures at random
                                         ligatures[random.nextInt(ligatures.size)]
                                 } else  // construct ligature
-                                    consonants[random.nextInt(consonants.size)]
-                                        .toString() + virama + consonants[random.nextInt(consonants.size)]
+                                    consonants[random.nextInt(consonants.size)] + virama + consonants[random.nextInt(consonants.size)]
                         } else if (vowels.contains(prevChar) || signs.contains(prevChar)) {
                             // ...next char must be a consonant
                             nextChar = consonants[random.nextInt(consonants.size)]
@@ -388,12 +397,12 @@ class PracticeTabFragment : Fragment() {
                             // Following for ligatures that have combining rules.
                             // Certain consonants (right now, only ರ್ in Kannada), form different types of
                             // ligatures before and after a consonant.
-                            val isCombineAfter = viewModel?.transliterator?.language
-                                ?.getLetterDefinition(letter)?.shouldCombineAfter() ?: false
-                            val isCombineBefore = viewModel?.transliterator?.language
-                                ?.getLetterDefinition(letter)?.shouldCombineBefore() ?: false
-                            val base = viewModel?.transliterator?.language
-                                ?.getLetterDefinition(letter)?.base
+                            val isCombineAfter = viewModel.getLanguageData()
+                                .getLetterDefinition(letter)?.shouldCombineAfter() ?: false
+                            val isCombineBefore = viewModel.getLanguageData()
+                                .getLetterDefinition(letter)?.shouldCombineBefore() ?: false
+                            val base = viewModel.getLanguageData().getLetterDefinition(letter)?.base
+
                             // Find the base of this ligature, if any.
                             // "base" of a ligature is the actual consonant used for combining with
                             // the vowel sign
@@ -403,13 +412,12 @@ class PracticeTabFragment : Fragment() {
                                 // If letter can be combined before and after another letter,
                                 // do one at random.
                                 predecessor =
-                                    if (random.nextBoolean()) consonants[random.nextInt(consonants.size)].toString() +
+                                    if (random.nextBoolean()) consonants[random.nextInt(consonants.size)] +
                                             virama + predecessor else predecessor + virama + consonants[random.nextInt(
                                         consonants.size
                                     )]
                             } else if (isCombineAfter) {
-                                predecessor = consonants[random.nextInt(consonants.size)]
-                                    .toString() + virama + predecessor
+                                predecessor = consonants[random.nextInt(consonants.size)] + virama + predecessor
                             } else if (isCombineBefore) {
                                 predecessor = predecessor + virama + consonants[random.nextInt(
                                     consonants.size
@@ -418,7 +426,7 @@ class PracticeTabFragment : Fragment() {
                         }
                     }
                     // what happens if sign selected is a virama?
-                    val sign: String? = signs[random.nextInt(signs.size)]
+                    val sign: String = signs[random.nextInt(signs.size)]
                     practiceString.append(predecessor).append(sign).append(" ")
                     i++
                 }
@@ -430,13 +438,13 @@ class PracticeTabFragment : Fragment() {
                     logDebug(logTag, "Ligature obtained: $ligature")
                     // nextChar is base char if a base exists in the data file.
                     // if there is no base in the data file, nextChar equals ligature (variable above)
-                    val nextChar = viewModel?.transliterator?.language?.getLetterDefinition(ligature)?.base ?: ligature
+                    val nextChar = viewModel.getLanguageData().getLetterDefinition(ligature)?.base ?: ligature
 
                     // get the rules for combining this letter if such rule exists
-                    val isCombineAfter = viewModel?.transliterator?.language
-                        ?.getLetterDefinition(ligature)?.shouldCombineAfter() ?: false
-                    val isCombineBefore = viewModel?.transliterator?.language
-                        ?.getLetterDefinition(ligature)?.shouldCombineBefore() ?: false
+                    val isCombineAfter = viewModel.getLanguageData()
+                        .getLetterDefinition(ligature)?.shouldCombineAfter() ?: false
+                    val isCombineBefore = viewModel.getLanguageData()
+                        .getLetterDefinition(ligature)?.shouldCombineBefore() ?: false
                     if (isCombineAfter && isCombineBefore) {
                         // randomly select either combineBefore or combineAfter
                         when (random.nextInt(2)) {
@@ -489,7 +497,7 @@ class PracticeTabFragment : Fragment() {
                 practiceString.length - 1
             )
         )
-        this.practiceString = practiceString.toString()
+        viewModel.practiceString = practiceString.toString()
         (requireActivity().findViewById<View>(R.id.PracticeTabPracticeTextTV) as TextView).text =
             practiceString.toString()
     }

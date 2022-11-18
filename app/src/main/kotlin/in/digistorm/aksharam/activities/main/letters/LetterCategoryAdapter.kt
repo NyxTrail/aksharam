@@ -45,12 +45,10 @@ class LetterCategoryAdapter(
 
     private val logTag = LetterCategoryAdapter::class.simpleName
 
-    private val headers: Array<String> = viewModel.transliterator.language!!.lettersCategoryWise
-        .keys.toTypedArray()
-
+    private val headers: Array<String> = viewModel.getLanguageData().lettersCategoryWise.keys.toTypedArray()
 
     override fun getGroupCount(): Int {
-        return viewModel.transliterator.language!!.lettersCategoryWise.size
+        return viewModel.getLanguageData().lettersCategoryWise.size
     }
 
     override fun getChildrenCount(groupPosition: Int): Int {
@@ -63,7 +61,7 @@ class LetterCategoryAdapter(
     }
 
     override fun getChild(groupPosition: Int, childPosition: Int): Any? {
-        return viewModel.transliterator.language?.lettersCategoryWise?.get(headers[groupPosition])
+        return viewModel.getLanguageData().lettersCategoryWise[headers[groupPosition]]
     }
 
     override fun getGroupId(groupPosition: Int): Long {
@@ -108,7 +106,7 @@ class LetterCategoryAdapter(
         groupPosition: Int, childPosition: Int, isLastChild: Boolean,
         convertView: View?, parent: ViewGroup
     ): View {
-        logDebug(logTag, "creating grid for group: $groupPosition")
+        logDebug(logTag, "Creating grid for group: $groupPosition")
 
         val previousView: View = convertView
             ?: LayoutInflater.from(parent.context).inflate(R.layout.letter_category_content, parent, false)
@@ -116,18 +114,23 @@ class LetterCategoryAdapter(
         gridLayout.removeAllViews()
         gridLayout.isClickable = true
 
-        val letters = viewModel.transliterator.language
-            ?.lettersCategoryWise?.get(headers[groupPosition])?.toTypedArray() ?: return previousView
+        val letters = viewModel.getLanguageData().lettersCategoryWise[headers[groupPosition]]?.toTypedArray() ?: return previousView
 
-        logDebug(logTag, "group is: " + letters.contentToString())
+        logDebug(logTag, "Group is: " + letters.contentToString())
         val cols = 5
 
         for ((i, letter) in letters.withIndex()) {
             val rowSpec = GridLayout.spec(i / cols, GridLayout.CENTER)
             val colSpec = GridLayout.spec(i % cols, GridLayout.CENTER)
             val tv = AutoAdjustingTextView(parent.context)
+            /*
+            We use the tag to uniquely identify the textview that contains a letter. This is used in
+            testing to click the letter accurately even after the actual text contained in the textview
+            changes. This should work as long as the language has unique letters in each category.
+             */
+            tv.tag = letter
             tv.gravity = Gravity.CENTER
-            tv.text = letter
+            tv.myText = letter
             val tvLayoutParams = GridLayout.LayoutParams(rowSpec, colSpec)
             tvLayoutParams.width = size.x / 6
             var pixels = parent.resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
@@ -144,14 +147,14 @@ class LetterCategoryAdapter(
             }
             tv.setOnClickListener {
                 logDebug(logTag, "$letter clicked!")
-                if (tv.text.toString() == letter) {
+                if (tv.myText == letter) {
                     if (!viewModel.getLanguage()
                             .equals(viewModel.targetLanguage, ignoreCase = true)
-                    ) tv.text = viewModel.transliterator.transliterate(
+                    ) tv.myText = viewModel.transliterator.transliterate(
                         letter,
-                        viewModel.targetLanguage!!
-                    ) else logDebug(logTag, "source lang = target lang... Error is data file?")
-                } else tv.text = letter
+                        viewModel.targetLanguage
+                    ) else logDebug(logTag, "source lang = target lang... Error in data file?")
+                } else tv.myText = letter
             }
             gridLayout.addView(tv, tvLayoutParams)
         }

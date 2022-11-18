@@ -23,19 +23,24 @@ import android.content.Context
 import android.content.Intent
 import java.lang.StringBuilder
 import `in`.digistorm.aksharam.activities.initialise.InitialiseAppActivity
+import kotlin.math.log
 
 // This class is responsible for the actual transliteration
 class Transliterator {
     // The JSON mapping used to transliterate
     private val logTag = Transliterator::class.simpleName
 
-    // The backing langDataReader for all tabs
-    var language: Language? = null
+    lateinit var languageData: Language
         private set
 
-    private fun initialise(inputLang: String, context: Context) {
+    fun setInputLanguage(inputLang: String, context: Context) {
         logDebug(logTag, "Initialising transliterator for: $inputLang")
-        language = getLanguageData(inputLang, context)
+        val mLanguageData: Language? = getLanguageData(inputLang, context)
+        if (mLanguageData == null) {
+            // TODO: How should we fail?
+            logDebug(logTag, "Failure handling unimplemented.")
+        } else
+            languageData = mLanguageData
     }
 
     // Constructor for when we don't know which language to load
@@ -56,12 +61,25 @@ class Transliterator {
             context.startActivity(intent)
         } else {
             logDebug(logTag, "Found language file: " + fileList[0] + "... Initialising it.")
-            initialise(fileList[0], context)
+            setInputLanguage(fileList[0], context)
         }
     }
 
     constructor(inputLang: String, context: Context) {
-        initialise(inputLang, context)
+        setInputLanguage(inputLang, context)
+    }
+
+    // Returns whether language is the language we are currently using for transliteration
+    fun isTransliteratingLanguage(language: String): Boolean {
+        val transliteratingLanguage = languageData.language
+        return if(language.isEmpty() || transliteratingLanguage.isEmpty())
+            false
+        else language.equals(transliteratingLanguage, ignoreCase = true)
+    }
+
+    // Get the language current data is based on
+    fun getLanguage(): String {
+        return languageData.language
     }
 
     // Transliterate the input string using the mapping and return the transliterated string
@@ -69,10 +87,10 @@ class Transliterator {
     // targetLanguage is the language to which the string needs to be converted
     fun transliterate(str: String, targetLanguage: String): String {
         val targetLanguageLC = targetLanguage.lowercase()
-        val targetLangCode = language!!.getLanguageCode(targetLanguageLC)
+        val targetLangCode = languageData.getLanguageCode(targetLanguageLC)
         logDebug(
             logTag, "Transliterating " + str
-                    + " (" + language!!.language + ") to " + targetLanguageLC
+                    + " (" + languageData.language + ") to " + targetLanguageLC
                     + "(code: " + targetLangCode + ")"
         )
         var out = StringBuilder()
@@ -82,19 +100,19 @@ class Transliterator {
         for (ch in str.toCharArray()) {
             character = "" + ch // convert to string
             out =
-                if (language!!.letterDefinitions.containsKey(character))
-                    if (language!!.getLetterDefinition(character)?.transliterationHints!!.containsKey(targetLangCode))
+                if (languageData.letterDefinitions.containsKey(character))
+                    if (languageData.getLetterDefinition(character)?.transliterationHints!!.containsKey(targetLangCode))
                         out.append(
-                            language?.getLetterDefinition(character)!!.transliterationHints!![targetLangCode]!![0])
+                            languageData.getLetterDefinition(character)!!.transliterationHints!![targetLangCode]!![0])
                     else {
-                        logDebug(logTag, "Could not find transliteration hints for character: "
-                                    + character + "of language: " + language!!.language
+                        logDebug(logTag, "Could not find transliteration hints for character: \""
+                                    + character + "\" of language: " + languageData.language
                                     + "for transliteration to language: " + targetLanguageLC)
                         out.append(character)
                 } else {
                     logDebug(
-                        logTag, "Could not find letter definition for letter: "
-                                + character + " in language: " + language!!.language
+                        logTag, "Could not find letter definition for letter: \""
+                                + character + "\" in language: " + languageData.language
                     )
                     out.append(character)
                 }
