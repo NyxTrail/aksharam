@@ -21,92 +21,93 @@ package `in`.digistorm.aksharam.activities.main.practice
 
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.MainActivity
-import `in`.digistorm.aksharam.activities.main.letters.LettersTabViewModel
 import `in`.digistorm.aksharam.util.*
 
 import android.widget.Spinner
 import android.text.TextWatcher
 import android.widget.TextView
-import android.text.Html
-import android.widget.Toast
 import android.text.Editable
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
+import android.text.InputFilter
 import android.view.View
 import androidx.lifecycle.ViewModelProvider
 import android.widget.AdapterView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import java.lang.StringBuilder
 import java.util.*
-import kotlin.math.log
 
 class PracticeTabFragment : Fragment() {
     private val logTag = PracticeTabFragment::class.simpleName
 
-    private var practiceTabLangSpinner: Spinner? = null
+    private lateinit var textChangedListener: TextChangedListener
 
     private inner class TextChangedListener(val viewModel: PracticeTabViewModel) : TextWatcher {
+        private val logTag = this.javaClass.simpleName
+        override fun afterTextChanged(s: Editable) {}
         override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
         override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            if(s.isEmpty())
+                return
+
             val practiceTextTV =
                 requireActivity().findViewById<TextView>(R.id.PracticeTabPracticeTextTV)
-            var correctInProgress = true
-            val markup = StringBuilder()
-            // TODO: Store both the practice text and transliterated string in the view model, so that we do not
-            // have to transliterate the practice text every time
-            val transliteratedString = viewModel.transliterator.transliterate(
-                viewModel.practiceString,
-                viewModel.transLang)
-            logDebug(
-                logTag, "Practice text " + viewModel.practiceString + " was transliterated to "
-                        + transliteratedString
-            )
-            logDebug(logTag, "Text entered was: $s")
-            if (transliteratedString == s.toString()) {
+
+            // If entered string matches expected transliteration, show suitable message and return
+            if(s == viewModel.transliteratedString) {
                 clearInput()
-                practiceTextTV.text = Html.fromHtml(
-                    "<font color=\"#7FFF00\">"
-                            + viewModel.practiceString + "</font>"
-                )
-                Toast.makeText(
-                    context, R.string.practice_tab_correct_text_entered,
-                    Toast.LENGTH_SHORT
-                ).show()
-                requireActivity().findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = false
+                practiceTextTV.text = setGreen(viewModel.practiceString, requireContext())
+                Toast.makeText(requireContext(), R.string.practice_tab_correct_text_entered, Toast.LENGTH_SHORT).show()
+                requireActivity().findViewById<TextInputEditText>(R.id.PracticeTabInputTIET).isEnabled = false
                 return
             }
-            markup.append("<font color=\"#7FFF00\">")
-            var i = 0
-            while (i < transliteratedString.length && i < s.length) {
-                if (transliteratedString[i] == s[i]) {
-                    if (!correctInProgress) {
-                        markup.append("</font><font color=\"#7FFF00\">")
-                        correctInProgress = true
+
+            // If we reach here, user has not finished entering text
+            var correctInProgress = true
+
+            // - CharSequence s is usually shorter than practiceString and transliteratedString.
+            // - TransliteratedString and practiceString may not always be of the same length.
+            var positionInCopy: Int = 0
+            val spans: MutableList<Triple<Boolean, Int, Int>> = mutableListOf(Triple(true, 0, 0))
+            for((positionInPracticeString: Int, char) in viewModel.practiceString.withIndex()) {
+                if(positionInCopy >= s.length)
+                    break
+                val transChar = viewModel.transliterator.transliterate(char.toString(), viewModel.transLang)
+
+                // get transChar.length characters from sCopy
+                var charsToCheck = ""
+                charsToCheck = s.substring(positionInCopy until (transChar.length + positionInCopy))
+                logDebug(logTag, "Characters to check: \"$charsToCheck\"")
+                positionInCopy += transChar.length
+
+                if(transChar == charsToCheck) {
+                    if(correctInProgress)
+                        spans[spans.lastIndex] = Triple(true, spans[spans.lastIndex].second, positionInPracticeString)
+                    else {
+                        if(char == ' ')
+                            spans[spans.lastIndex] = Triple(false, spans[spans.lastIndex].second, positionInPracticeString)
+                        else {
+                            correctInProgress = true
+                            spans.add(Triple(true, positionInPracticeString, positionInPracticeString))
+                        }
                     }
-                    markup.append(viewModel.practiceString[i])
-                } else {
-                    if (correctInProgress) {
+                } else { // characters entered do not match
+                    if(correctInProgress) {
                         correctInProgress = false
-                        markup.append("</font><font color=\"#DC143C\">")
+                        spans.add(Triple(false, positionInPracticeString, positionInPracticeString))
+                    } else {
+                        spans[spans.lastIndex] = Triple(false, spans[spans.lastIndex].second, positionInPracticeString)
                     }
-                    markup.append(viewModel.practiceString[i])
                 }
-                i++
             }
-            markup.append("</font>")
-            markup.append(viewModel.practiceString.substring(i))
-            logDebug(logTag, "Marked up string: $markup")
-            practiceTextTV.text = Html.fromHtml(markup.toString())
+            logDebug(logTag, spans.toString())
+            practiceTextTV.text = setRedGreen(viewModel.practiceString, spans, requireContext())
         }
-
-        override fun afterTextChanged(s: Editable) {}
     }
-
-    private lateinit var textChangedListener: TextChangedListener
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -232,13 +233,13 @@ class PracticeTabFragment : Fragment() {
         practiceTabPracticeInSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View,
+                    parent: AdapterView<*>?,
+                    view: View?,
                     position: Int,
                     id: Long
                 ) {
                     clearInput()
-                    viewModel.transLang = parent.getItemAtPosition(position).toString()
+                    viewModel.transLang = parent?.getItemAtPosition(position).toString()
                     (requireActivity().findViewById<View>(R.id.PracticeTabInputTIL) as TextInputLayout).hint =
                         getString(R.string.practice_tab_practice_input_hint, viewModel.transLang)
                 }
@@ -289,13 +290,13 @@ class PracticeTabFragment : Fragment() {
         practiceTabPracticeTypeSpinner.onItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
-                    parent: AdapterView<*>,
-                    view: View,
+                    parent: AdapterView<*>?,
+                    view: View?,
                     position: Int,
                     id: Long
                 ) {
                     clearInput()
-                    viewModel.practiceType = parent.getItemAtPosition(position).toString()
+                    viewModel.practiceType = parent?.getItemAtPosition(position).toString()
                     startPractice(viewModel)
                 }
 
@@ -498,7 +499,12 @@ class PracticeTabFragment : Fragment() {
             )
         )
         viewModel.practiceString = practiceString.toString()
-        (requireActivity().findViewById<View>(R.id.PracticeTabPracticeTextTV) as TextView).text =
+        viewModel.transliteratedString = viewModel.transliterator
+            .transliterate(viewModel.practiceString, viewModel.transLang)
+        // Set max input length of the EditText to the length of the transliterated string
+        requireActivity().findViewById<TextInputEditText>(R.id.PracticeTabInputTIET).filters =
+            arrayOf(InputFilter.LengthFilter(viewModel.transliteratedString.length))
+        requireActivity().findViewById<TextView>(R.id.PracticeTabPracticeTextTV).text =
             practiceString.toString()
     }
 }

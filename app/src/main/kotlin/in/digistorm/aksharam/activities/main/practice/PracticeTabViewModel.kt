@@ -34,6 +34,7 @@ class PracticeTabViewModel(application: Application) : AndroidViewModel(applicat
     var transLang: String = ""
     var practiceType: String = ""
     var practiceString: String = ""
+    var transliteratedString: String = ""
 
     fun setTransliterator(language: String, context: Context) {
         if (transliterator.languageData.language.lowercase() != language.lowercase())

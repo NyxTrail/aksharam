@@ -89,8 +89,8 @@ class Transliterator {
         val targetLanguageLC = targetLanguage.lowercase()
         val targetLangCode = languageData.getLanguageCode(targetLanguageLC)
         logDebug(
-            logTag, "Transliterating " + str
-                    + " (" + languageData.language + ") to " + targetLanguageLC
+            logTag, "Transliterating \"" + str
+                    + "\" (" + languageData.language + ") to " + targetLanguageLC
                     + "(code: " + targetLangCode + ")"
         )
         var out = StringBuilder()
@@ -117,7 +117,7 @@ class Transliterator {
                     out.append(character)
                 }
         }
-        logDebug(logTag, "Constructed string: $out")
+        logDebug(logTag, "Constructed string: \"$out\"")
         return out.toString()
     }
 }
