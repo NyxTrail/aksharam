@@ -33,6 +33,7 @@ class Transliterator {
     lateinit var languageData: Language
         private set
 
+    // TODO: Make this private?
     fun setInputLanguage(inputLang: String, context: Context) {
         logDebug(logTag, "Initialising transliterator for: $inputLang")
         val mLanguageData: Language? = getLanguageData(inputLang, context)
@@ -46,6 +47,7 @@ class Transliterator {
     // Constructor for when we don't know which language to load
     // load the first one we can find
     // if we can't, start initialisation activity
+    // TODO: how can we remove this constructor?
     constructor(context: Context) {
         // Called the constructor without any input lang, find one.
         // Files are already downloaded, this constructor is called in MainActivity
@@ -65,6 +67,7 @@ class Transliterator {
         }
     }
 
+    // TODO: Handle inputLang being empty
     constructor(inputLang: String, context: Context) {
         setInputLanguage(inputLang, context)
     }

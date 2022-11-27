@@ -25,16 +25,28 @@ import `in`.digistorm.aksharam.util.logDebug
 import android.app.Application
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.launch
 
 class PracticeTabViewModel(application: Application) : AndroidViewModel(application) {
     private val logTag = this.javaClass.simpleName
 
-    var transliterator: Transliterator = Transliterator(application)
-    var transLang: String = ""
-    var practiceType: String = ""
-    var practiceString: String = ""
-    var transliteratedString: String = ""
+    // State variables for Practice Tab
+    lateinit var transliterator: Transliterator
+
+    var language: MutableLiveData<String> = MutableLiveData()
+    var practiceIn: MutableLiveData<String> = MutableLiveData()
+    var practiceType: MutableLiveData<String> = MutableLiveData()
+    var practiceString: MutableLiveData<String> = MutableLiveData()
+    var transliteratedString: MutableLiveData<String> = MutableLiveData()
+
+    init {
+        viewModelScope.launch {
+            transliterator = Transliterator(application)
+        }
+    }
 
     fun setTransliterator(language: String, context: Context) {
         if (transliterator.languageData.language.lowercase() != language.lowercase())
