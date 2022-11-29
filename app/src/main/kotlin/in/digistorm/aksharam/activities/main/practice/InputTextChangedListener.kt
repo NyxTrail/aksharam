@@ -18,8 +18,6 @@ class InputTextChangedListener(
     private val viewModel: PracticeTabViewModel by practiceTabFragment.viewModels()
     private val practiceTextTV: TextView = practiceTabFragment.requireView()
         .requireViewById(R.id.PracticeTabPracticeTextTV)
-    private val practiceTextInputEditText: TextInputEditText = practiceTabFragment.requireView()
-        .requireViewById(R.id.PracticeTabInputTIET)
 
     override fun afterTextChanged(s: Editable) {}
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -28,14 +26,13 @@ class InputTextChangedListener(
             return
 
         // If entered string matches expected transliteration, show suitable message and return
-        logDebug(logTag, "Entered string: \"$s\" transliterates to: \"${viewModel.transliteratedString}\".")
+        logDebug(logTag, "Entered string: \"$s\"\n" +
+                "Transliteration of practice string: \"${viewModel.transliteratedString.value}\".")
         if(s.toString() == viewModel.transliteratedString.value) {
             logDebug(logTag, "Entered text matches transliteration correctly.")
             practiceTabFragment.clearInput()
             practiceTextTV.text = setGreen(viewModel.practiceString.value!!, practiceTabFragment.requireContext())
-            Toast.makeText(practiceTabFragment.requireContext(), R.string.practice_tab_correct_text_entered,
-                Toast.LENGTH_SHORT).show()
-            practiceTextInputEditText.isEnabled = false
+            viewModel.practiceSuccessCheck.value = true
             return
         }
 

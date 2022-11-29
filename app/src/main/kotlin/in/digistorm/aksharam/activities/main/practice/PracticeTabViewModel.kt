@@ -29,18 +29,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import kotlin.reflect.jvm.internal.impl.util.CheckResult
 
 class PracticeTabViewModel(application: Application) : AndroidViewModel(application) {
     private val logTag = this.javaClass.simpleName
 
-    // State variables for Practice Tab
     lateinit var transliterator: Transliterator
 
+    // State variables for Practice Tab
     var language: MutableLiveData<String> = MutableLiveData()
     var practiceIn: MutableLiveData<String> = MutableLiveData()
     var practiceType: MutableLiveData<String> = MutableLiveData()
     var practiceString: MutableLiveData<String> = MutableLiveData()
     var transliteratedString: MutableLiveData<String> = MutableLiveData()
+    // Variable is true if user's transliteration is correct
+    var practiceSuccessCheck: MutableLiveData<Boolean> = MutableLiveData(false)
 
     init {
         viewModelScope.launch {

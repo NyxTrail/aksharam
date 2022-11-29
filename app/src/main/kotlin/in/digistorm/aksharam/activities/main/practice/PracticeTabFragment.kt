@@ -23,13 +23,11 @@ import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.MainActivity
 import `in`.digistorm.aksharam.util.*
 
-import android.widget.Spinner
-import android.widget.TextView
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.textfield.TextInputEditText
@@ -38,7 +36,7 @@ import java.util.*
 import androidx.lifecycle.Observer
 
 class PracticeTabFragment : Fragment() {
-    private val logTag = PracticeTabFragment::class.simpleName
+    private val logTag = this.javaClass.simpleName
 
     private val viewModel: PracticeTabViewModel by viewModels()
 
@@ -53,6 +51,8 @@ class PracticeTabFragment : Fragment() {
         logDebug(logTag, "onViewCreated")
         super.onViewCreated(view, savedInstanceState)
 
+        initialisePracticeTabLangSpinner(view)
+
         /* When "Language" is updated:
            1. Reset the transliterator
            2. Disable input edit text
@@ -62,6 +62,7 @@ class PracticeTabFragment : Fragment() {
            6. Enable input edit text
          */
         viewModel.language.observe(viewLifecycleOwner) {
+            logDebug(logTag, "viewModel.language changed to ${viewModel.language.value}")
             // re-initialise the "practice in" spinner
             viewModel.setTransliterator(viewModel.language.value!!, requireContext())
             requireActivity().findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = false
@@ -69,43 +70,78 @@ class PracticeTabFragment : Fragment() {
             initialisePracticeTabPracticeInSpinner()
             initialisePracticeTabPracticeTypeSpinner()
             requireActivity().findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = true
+            view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+                .visibility = View.INVISIBLE
         }
 
         // When "Practice In" language is updated, update the corresponding hint in EditText
         viewModel.practiceIn.observe(viewLifecycleOwner) {
+            logDebug(logTag, "viewModel.practiceIn changed to ${viewModel.practiceIn.value}")
+            clearInput()
             (requireActivity().findViewById<View>(R.id.PracticeTabInputTIL) as TextInputLayout).hint =
                 getString(R.string.practice_tab_practice_input_hint, viewModel.practiceIn.value)
+            if(viewModel.practiceString.value != null) {
+                viewModel.transliteratedString.value = viewModel.transliterator
+                    .transliterate(viewModel.practiceString.value!!, viewModel.practiceIn.value!!)
+                view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+                    .visibility = View.INVISIBLE
+            }
         }
 
         // When practice type is updated, create new practice string
         viewModel.practiceType.observe(viewLifecycleOwner) {
+            logDebug(logTag, "viewModel.practiceType changed to ${viewModel.practiceType.value}")
+            requireActivity().findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = true
+            view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+                .visibility = View.INVISIBLE
             viewModel.practiceString.value = generatePracticeString(viewModel)
         }
 
         // When practice string is updated, display it and re-calculate the transliterated string
         val practiceStringTextViewUpdater = Observer<String> {
+            logDebug(logTag, "viewModel.practiceString changed to ${viewModel.practiceString.value}")
             val practiceTabTextView: TextView = view.findViewById(R.id.PracticeTabPracticeTextTV)
             practiceTabTextView.text = it
-
             viewModel.transliteratedString.value = viewModel.transliterator.transliterate(it,
                 viewModel.practiceIn.value!!)
         }
         viewModel.practiceString.observe(viewLifecycleOwner, practiceStringTextViewUpdater)
 
         // When transliterated string is updated, clear the input edit text
-        viewModel.transliteratedString.observe(viewLifecycleOwner) { clearInput() }
+        viewModel.transliteratedString.observe(viewLifecycleOwner) {
+            logDebug(logTag, "viewModel.transliteratedString changed to ${viewModel.transliteratedString.value}")
+            clearInput()
+        }
 
         // When refresh button is clicked, generate a new practice string
         view.findViewById<View>(R.id.PracticeTabRefreshButton).setOnClickListener {
             viewModel.practiceString.value = generatePracticeString(viewModel)
             view.findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = true
+            view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+                .visibility = View.INVISIBLE
+        }
+
+        // Display a success message and a check mark when user input matches transliterated string
+        viewModel.practiceSuccessCheck.observe(viewLifecycleOwner) {
+            logDebug(logTag, "viewModel.practiceSuccessCheck changed to ${viewModel.practiceSuccessCheck.value}")
+            val successCheck: Boolean = viewModel.practiceSuccessCheck.value ?: false
+            if(successCheck) {
+                view.requireViewById<View>(R.id.PracticeTabInputTIET)
+                    .isEnabled = false
+                view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+                    .visibility = View.VISIBLE
+                Toast.makeText(
+                    requireContext(),
+                    R.string.practice_tab_correct_text_entered,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
         // Connect the input EditText with its listener
         val textChangedListener = InputTextChangedListener(this)
-        view.findViewById<TextInputEditText>(R.id.PracticeTabInputTIET).addTextChangedListener(textChangedListener)
-
-        initialisePracticeTabLangSpinner(view)
+        view.findViewById<TextInputEditText>(R.id.PracticeTabInputTIET)
+            .addTextChangedListener(textChangedListener)
     }
 
     // Start Initialisation activity if we could not find any downloaded languages.
@@ -143,7 +179,7 @@ class PracticeTabFragment : Fragment() {
                     adapter.clear()
                     adapter.addAll(getAllDownloadedLanguages())
                     // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
-                    // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
+                    // a non-existent item (say, if the item is deleted). Resetting the adapter was the only way I could
                     // think of to fix this
                     logDebug("PTFListener", "Resetting spinner adapter")
                     practiceTabLangSpinner.adapter = adapter
@@ -168,10 +204,10 @@ class PracticeTabFragment : Fragment() {
     }
 
     fun clearInput() {
+        logDebug(logTag, "Clearing input edit text")
         val textInputEditText =
             requireActivity().findViewById<TextInputEditText>(R.id.PracticeTabInputTIET)
                 ?: return
-        logDebug(logTag, "Clearing input edit text")
         // TODO: validate removal of commented lines
         // textInputEditText.removeTextChangedListener(textChangedListener)
         textInputEditText.setText("")
