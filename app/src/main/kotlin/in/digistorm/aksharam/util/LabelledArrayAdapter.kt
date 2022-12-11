@@ -11,7 +11,7 @@ class LabelledArrayAdapter<T>(
     private val labelTextViewResourceId: Int, private val label: String
 ) : ArrayAdapter<T>(context, resource, textViewResourceId, objects){
 
-    private val logTag: String = this.javaClass.simpleName
+    private val logTag = javaClass.simpleName
 
     private fun setLabel(view: View) {
         // TODO: Label is being "set" multiple times for each item in adapter

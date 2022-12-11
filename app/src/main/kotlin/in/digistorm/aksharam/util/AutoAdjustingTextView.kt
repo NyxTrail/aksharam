@@ -26,7 +26,7 @@ import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatTextView
 
 class AutoAdjustingTextView : AppCompatTextView {
-    private var logTag: String = this.javaClass.simpleName
+    private val logTag = javaClass.simpleName
 
     // This variable was added to debug a "rogue" non-blocking space (0x00A0) being added to the
     // text sent to TextView. Set to false to disable logging these.

@@ -32,7 +32,7 @@ import kotlinx.coroutines.launch
 import kotlin.reflect.jvm.internal.impl.util.CheckResult
 
 class PracticeTabViewModel(application: Application) : AndroidViewModel(application) {
-    private val logTag = this.javaClass.simpleName
+    private val logTag = javaClass.simpleName
 
     lateinit var transliterator: Transliterator
 

@@ -43,7 +43,7 @@ class LetterCategoryAdapter(
     private val viewModel: LettersTabViewModel,
     private val size: Point) : BaseExpandableListAdapter() {
 
-    private val logTag = LetterCategoryAdapter::class.simpleName
+    private val logTag = javaClass.simpleName
 
     private val headers: Array<String> = viewModel.getLanguageData().lettersCategoryWise.keys.toTypedArray()
 

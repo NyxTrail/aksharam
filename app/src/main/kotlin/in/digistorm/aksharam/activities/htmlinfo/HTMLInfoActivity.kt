@@ -32,7 +32,7 @@ import android.text.Html
    help, privacy policy etc
  */
 class HTMLInfoActivity : AppCompatActivity() {
-    private val logTag = HTMLInfoActivity::class.simpleName
+    private val logTag = javaClass.simpleName
 
     companion object {
         var EXTRA_NAME = "HTMLINFO_EXTRA"

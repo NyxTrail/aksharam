@@ -24,7 +24,7 @@ import java.util.HashMap
 import java.util.LinkedHashMap
 
 class LanguageDetector(context: Context?) {
-    private val logTag = LanguageDetector::class.simpleName
+    private val logTag = javaClass.simpleName
     private val languages: LinkedHashMap<String, Language>
     fun detectLanguage(input: String, context: Context?): String? {
         logDebug(logTag, "Detecting language for $input")

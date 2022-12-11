@@ -31,7 +31,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.util.*
 
 class PageCollectionAdapter(fragmentActivity: FragmentActivity?) : FragmentStateAdapter(fragmentActivity!!) {
-    private val logTag = PageCollectionAdapter::class.simpleName
+    private val logTag = javaClass.simpleName
     private val fragments = ArrayList<Fragment>()
     private val backStack = ArrayList<Stack<Fragment>>()
     override fun getItemId(position: Int): Long {

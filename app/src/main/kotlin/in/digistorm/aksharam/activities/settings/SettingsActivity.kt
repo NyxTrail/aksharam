@@ -33,7 +33,7 @@ import java.io.IOException
 import java.util.ArrayList
 
 class SettingsActivity : AppCompatActivity() {
-    private val logTag = SettingsActivity::class.simpleName
+    private val logTag = javaClass.simpleName
 
     private fun populateLanguageList() {
         val manageLanguagesRV = findViewById<RecyclerView>(R.id.SettingsActivityManageLanguagesRV)

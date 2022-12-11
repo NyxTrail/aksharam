@@ -13,7 +13,7 @@ import com.google.android.material.textfield.TextInputEditText
 
 class InputTextChangedListener(
     private val practiceTabFragment: PracticeTabFragment): TextWatcher {
-    private val logTag = this.javaClass.simpleName
+    private val logTag = javaClass.simpleName
 
     private val viewModel: PracticeTabViewModel by practiceTabFragment.viewModels()
     private val practiceTextTV: TextView = practiceTabFragment.requireView()

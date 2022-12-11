@@ -41,7 +41,7 @@ import java.io.IOException
 import java.lang.Exception
 
 class InitialiseAppActivity : AppCompatActivity() {
-    private val logTag = InitialiseAppActivity::class.simpleName
+    private val logTag = javaClass.simpleName
     private val languageDataDownloader: LanguageDataDownloader = LanguageDataDownloader()
     private var adapter: LanguageDataFileListAdapter? = null
     private fun showLanguageDataSelectionList(languageDataFiles: JSONArray) {

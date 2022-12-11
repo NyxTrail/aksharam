@@ -28,7 +28,7 @@ import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 
 class LettersTabViewModel(application: Application): AndroidViewModel(application) {
-    private val logTag = LettersTabViewModel::class.simpleName
+    private val logTag = javaClass.simpleName
 
     // The target language string as displayed by lettersTabTransSpinner
     var targetLanguage: String = ""

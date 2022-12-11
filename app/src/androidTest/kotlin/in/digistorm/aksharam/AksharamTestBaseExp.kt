@@ -12,7 +12,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import org.hamcrest.Matcher
 
 open class AksharamTestBaseExp {
-    protected val logTag: String = this.javaClass.simpleName
+    protected val logTag: String = javaClass.simpleName
 
     protected fun upperCaseFirstLetter(s: String): String? {
         return s.substring(0, 1).uppercase() + s.substring(1)

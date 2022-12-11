@@ -28,7 +28,7 @@ import kotlin.math.log
 // This class is responsible for the actual transliteration
 class Transliterator {
     // The JSON mapping used to transliterate
-    private val logTag = Transliterator::class.simpleName
+    private val logTag = javaClass.simpleName
 
     lateinit var languageData: Language
         private set

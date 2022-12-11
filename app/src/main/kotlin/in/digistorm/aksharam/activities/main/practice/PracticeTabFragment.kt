@@ -36,7 +36,7 @@ import java.util.*
 import androidx.lifecycle.Observer
 
 class PracticeTabFragment : Fragment() {
-    private val logTag = this.javaClass.simpleName
+    private val logTag = javaClass.simpleName
 
     private val viewModel: PracticeTabViewModel by viewModels()
 

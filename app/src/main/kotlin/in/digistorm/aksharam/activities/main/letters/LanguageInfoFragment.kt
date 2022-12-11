@@ -31,7 +31,7 @@ import android.view.View
 import androidx.fragment.app.Fragment
 
 class LanguageInfoFragment : Fragment() {
-    private val logTag = LanguageInfoFragment::class.simpleName
+    private val logTag = javaClass.simpleName
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

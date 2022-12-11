@@ -7,7 +7,7 @@ import androidx.lifecycle.AndroidViewModel
 
 // View model for the 'Transliterate' tab fragment
 class TransliterateTabViewModel(application: Application): AndroidViewModel(application) {
-    private val logTag = this.javaClass.simpleName
+    private val logTag = javaClass.simpleName
 
     /*
        The target language to transliterate a string to. This is set by a spinner in the

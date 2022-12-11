@@ -27,7 +27,7 @@ import kotlin.collections.LinkedHashMap
 
 class Language {
     @JsonIgnore
-    private val logTag: String = javaClass.simpleName
+    private val logTag = javaClass.simpleName
 
     val comment: String = ""
     val code: String = ""

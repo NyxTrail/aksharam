@@ -35,7 +35,7 @@ import org.json.JSONObject
 class LanguageDataFileListAdapter(val dataFileList: JSONArray) :
     RecyclerView.Adapter<LanguageDataFileListAdapter.ViewHolder>() {
     // apparently log tag can at most be 23 characters
-    private val logTag = LanguageDataFileListAdapter::class.simpleName
+    private val logTag = javaClass.simpleName
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         logDebug(logTag, "Initialising adapter for language data file list...")

@@ -44,7 +44,7 @@ class SettingsLanguageListAdapter(
     private val onlineFiles: JSONArray?,
     private val activity: Activity
 ) : RecyclerView.Adapter<SettingsLanguageListAdapter.ViewHolder>() {
-    private val logTag = SettingsLanguageListAdapter::class.simpleName
+    private val logTag = javaClass.simpleName
 
     private inner class DownloadClickListener(
         private val holder: ViewHolder,

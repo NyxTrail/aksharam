@@ -39,7 +39,7 @@ import java.util.ArrayList
 import kotlin.math.log
 
 class LettersTabFragment : Fragment {
-    private val logTag = LettersTabFragment::class.simpleName
+    private val logTag = javaClass.simpleName
 
     // This will hold the id for the ExpandableListView for easily finding it later
     private var expandableListViewId = -1
