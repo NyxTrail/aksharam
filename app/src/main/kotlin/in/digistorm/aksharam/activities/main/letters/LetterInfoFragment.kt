@@ -21,6 +21,7 @@ package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.util.AutoAdjustingTextView
+import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.logDebug
 
 import android.annotation.SuppressLint
@@ -36,32 +37,25 @@ import android.util.TypedValue
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.gridlayout.widget.GridLayout
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.get
 import java.util.ArrayList
 
-class LetterInfoFragment : Fragment() {
+class LetterInfoFragment(
+    private val currentLetter: String,
+    private val targetLanguage: String,
+    private val transliterator: Transliterator,
+) : Fragment() {
     private val logTag = javaClass.simpleName
-    private var currentLetter: String? = ""
-    private var viewModel: LettersTabViewModel? = null
 
     // Set up the LetterInfo dialog
     @SuppressLint("SetTextI18n")
     private fun setUp(v: View, inflater: LayoutInflater) {
-        currentLetter = if (arguments != null)
-            requireArguments().getString("letter")
-        else {
-            logDebug(logTag, "Null arguments in Setup(View, LayoutInflater)")
-            return
-        }
         logDebug(logTag, "Showing info dialog for: $currentLetter")
-        val tr = viewModel!!.transliterator
         setText(v.findViewById(R.id.letterInfoHeadingTV), currentLetter)
         setText(
             v.findViewById(R.id.letterInfoTransliteratedHeadingTV),
-            tr.transliterate(currentLetter!!, viewModel!!.targetLanguage)
+            transliterator.transliterate(currentLetter, targetLanguage)
         )
-        val letterExamples = viewModel!!.getLanguageData().getLetterDefinition(currentLetter.toString())?.examples
+        val letterExamples = transliterator.languageData.getLetterDefinition(currentLetter)?.examples
 
         // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
         val letterInfoWordAndMeaningLL =
@@ -81,30 +75,26 @@ class LetterInfoFragment : Fragment() {
                 )
                 val px = TypedValue.applyDimension(
                     TypedValue.COMPLEX_UNIT_SP, 4f,
-                    resources.displayMetrics
-                ).toInt()
+                    resources.displayMetrics).toInt()
                 wordsAndMeaningView.setPadding(px, px, px, px)
                 val meaning =
-                    value[viewModel!!.getLanguageData().getLanguageCode(viewModel!!.targetLanguage)]
+                    value[transliterator.languageData.getLanguageCode(targetLanguage)]
                 logDebug(
                     logTag,
-                    "targetLanguage: " + viewModel!!.targetLanguage + "; Word: " + key + "; meaning: " + meaning
+                    "targetLanguage: $targetLanguage; Word: $key; meaning: $meaning"
                 )
                 setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningWordTV), key)
                 setText(wordsAndMeaningView.findViewById(R.id.wordAndMeaningMeaningTV), meaning)
                 setText(
                     wordsAndMeaningView.findViewById(R.id.wordAndMeaningTransliterationTV),
-                    viewModel!!.transliterator.transliterate(
-                        key,
-                        viewModel!!.targetLanguage!!
-                    )
+                    transliterator.transliterate(key, targetLanguage)
                 )
                 letterInfoWordAndMeaningLL.addView(wordsAndMeaningView)
             }
         }
 
         // Check if extra info exists for this letter
-        val letterInfo = viewModel!!.getLanguageData().getLetterDefinition(currentLetter)?.info
+        val letterInfo = transliterator.languageData.getLetterDefinition(currentLetter)?.info
         val letterInfoInfoTV = v.findViewById<TextView>(R.id.letterInfoInfoTV)
         if (letterInfo == null || letterInfo.isEmpty()) {
             logDebug(
@@ -119,29 +109,24 @@ class LetterInfoFragment : Fragment() {
         // For consonants and ligatures, show examples of how they can combine with
         // vowel diacritics. For consonants, display possible ligatures with other
         // consonants if ligatures_auto_generatable
-        val category: String = viewModel!!.getLanguageData().getLetterDefinition(currentLetter)?.type ?: ""
+        val category: String = transliterator.languageData.getLetterDefinition(currentLetter)?.type ?: ""
         var showDiacriticExamples = true
         if (category.isNotEmpty()
-            && !viewModel!!.getLanguageData().getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
-            && (category.equals("consonants", ignoreCase = true)
-                    || category.equals("ligatures", ignoreCase = true))
-        ) {
+            && !transliterator.languageData.getLetterDefinition(currentLetter)!!.shouldExcludeCombiExamples()
+            && (areStringsEqual(category, "consonants")
+                    || areStringsEqual(category, "ligatures"))) {
             displaySignConsonantCombinations(v, category)
-            if (category.equals(
-                    "consonants",
-                    ignoreCase = true
-                )
-            ) if (viewModel!!.getLanguageData().areLigaturesAutoGeneratable()) displayLigatures(
-                v
-            )
-        } else showDiacriticExamples = false
+            if (areStringsEqual(category, "consonants"))
+                if (transliterator.languageData.areLigaturesAutoGeneratable())
+                    displayLigatures(v)
+        }
+        else
+            showDiacriticExamples = false
 
         // For a sign, display how it combines with each consonant
-        if (category.isNotEmpty() && category.equals(
-                "signs",
-                ignoreCase = true
-            )
-        ) displaySignConsonantCombinations(v, category) else if (!showDiacriticExamples) {
+        if (category.isNotEmpty() && areStringsEqual(category, "signs"))
+            displaySignConsonantCombinations(v, category)
+        else if (!showDiacriticExamples) {
             v.findViewById<View>(R.id.diacriticSelectorHintTV).visibility = View.GONE
             v.findViewById<View>(R.id.diacriticExamplesGL).visibility = View.GONE
         }
@@ -159,10 +144,9 @@ class LetterInfoFragment : Fragment() {
         ligatureAfterHintTV.visibility = View.VISIBLE
         val ligatureBeforeHintTV = v.findViewById<TextView>(R.id.letterInfoLigaturesBeforeTV)
         ligatureBeforeHintTV.visibility = View.VISIBLE
-        val consonants: ArrayList<String> = viewModel!!.getLanguageData().consonants
-        val virama = viewModel!!.getLanguageData().virama
+        val consonants: ArrayList<String> = transliterator.languageData.consonants
+        val virama = transliterator.languageData.virama
 
-        // v.findViewById(R.id.letterInfoLigaturesLL).setVisibility(View.VISIBLE);
         val ligaturesGLBefore = v.findViewById<GridLayout>(R.id.letterInfoLigaturesBeforeGL)
         ligaturesGLBefore.removeAllViews()
         ligaturesGLBefore.visibility = View.VISIBLE
@@ -218,6 +202,7 @@ class LetterInfoFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     fun displaySignConsonantCombinations(v: View, type: String) {
+        logDebug(logTag, "Displaying combinations for $currentLetter")
         val diacriticSelectorHintTV = v.findViewById<TextView>(R.id.diacriticSelectorHintTV)
         var items: ArrayList<String>? = null
         // We need to display examples for a sign
@@ -226,16 +211,15 @@ class LetterInfoFragment : Fragment() {
                 R.string.consonants_with_diacritic,
                 currentLetter
             )
-            items = viewModel!!.getLanguageData().consonants
-            items.addAll(viewModel!!.getLanguageData().ligatures)
+            items = transliterator.languageData.consonants
+            items.addAll(transliterator.languageData.ligatures)
         } else if (type.equals("consonants", ignoreCase = true)
-            || type.equals("ligatures", ignoreCase = true)
-        ) {
+            || type.equals("ligatures", ignoreCase = true)) {
             diacriticSelectorHintTV.text = getString(
                 R.string.diacritics_with_consonant,
                 currentLetter
             )
-            items = viewModel!!.getLanguageData().diacritics
+            items = transliterator.languageData.diacritics
         }
         if (items == null) return
         logDebug(logTag, "Items obtained: $items")
@@ -260,20 +244,23 @@ class LetterInfoFragment : Fragment() {
             textView.layoutParams = tvLayoutParams
             px = resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
             textView.setPadding(px, px, px, px)
-            if (type.equals("signs", ignoreCase = true)
-                && !viewModel!!.getLanguageData().getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
-            ) {
+            val shouldExcludeCombiExamples: Boolean = transliterator.languageData
+                .getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples()!!
+            if (areStringsEqual(type, "signs") && !shouldExcludeCombiExamples) {
                 textView.text = item + currentLetter
-            } else if ((type.equals("consonants", ignoreCase = true)
-                        || type.equals("ligatures", ignoreCase = true))
-                && !(viewModel?.getLanguageData()?.getLetterDefinition(currentLetter)?.shouldExcludeCombiExamples())!!
-            ) textView.text = currentLetter + item
+            } else if ((areStringsEqual(type, "consonants")
+                        || areStringsEqual(type, "ligatures")) && !shouldExcludeCombiExamples)
+                textView.text = currentLetter + item
             textView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
             // Add the textView and its parent linear layout only if the textview has some content
             if (textView.text != null && textView.text != "") {
                 diacriticExamplesGridLayout.addView(textView, tvLayoutParams)
             }
         }
+    }
+
+    private fun areStringsEqual(string: String, target: String): Boolean {
+        return string.equals(target, ignoreCase = true)
     }
 
     // A wrapper for setText to add a space at the end, to work around clipping of long characters
@@ -295,17 +282,6 @@ class LetterInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProvider(requireActivity()).get()
         setUp(view, layoutInflater)
-    }
-
-    companion object {
-        fun newInstance(letter: String?): LetterInfoFragment {
-            val letterInfoFragment = LetterInfoFragment()
-            val args = Bundle()
-            args.putString("letter", letter)
-            letterInfoFragment.arguments = args
-            return letterInfoFragment
-        }
     }
 }

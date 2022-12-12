@@ -141,7 +141,11 @@ class LetterCategoryAdapter(
             tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
             tv.setOnLongClickListener {
                 logDebug(logTag, "$letter long clicked!")
-                val letterInfoFragment = LetterInfoFragment.newInstance(letter)
+                val letterInfoFragment = LetterInfoFragment(
+                    letter,
+                    viewModel.targetLanguage,
+                    viewModel.transliterator,
+                )
                 MainActivity.replaceTabFragment(0, letterInfoFragment)
                 true
             }
