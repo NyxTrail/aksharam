@@ -41,7 +41,7 @@ import java.util.*
 
 class LetterCategoryAdapter(
     private val viewModel: LettersTabViewModel,
-    private val size: Point) : BaseExpandableListAdapter() {
+) : BaseExpandableListAdapter() {
 
     private val logTag = javaClass.simpleName
 
@@ -122,45 +122,40 @@ class LetterCategoryAdapter(
         for ((i, letter) in letters.withIndex()) {
             val rowSpec = GridLayout.spec(i / cols, GridLayout.CENTER)
             val colSpec = GridLayout.spec(i % cols, GridLayout.CENTER)
-            val tv = AutoAdjustingTextView(parent.context)
-            /*
-            We use the tag to uniquely identify the textview that contains a letter. This is used in
-            testing to click the letter accurately even after the actual text contained in the textview
-            changes. This should work as long as the language has unique letters in each category.
-             */
-            tv.tag = letter
-            tv.gravity = Gravity.CENTER
-            tv.myText = letter
-            val tvLayoutParams = GridLayout.LayoutParams(rowSpec, colSpec)
-            tvLayoutParams.width = size.x / 6
-            var pixels = parent.resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
-            tvLayoutParams.setMargins(pixels, pixels, pixels, pixels)
-            tv.layoutParams = tvLayoutParams
-            pixels = parent.resources.getDimensionPixelSize(R.dimen.letter_grid_tv_padding)
-            tv.setPadding(pixels, pixels, pixels, pixels)
-            tv.setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
-            tv.setOnLongClickListener {
-                logDebug(logTag, "$letter long clicked!")
-                val letterInfoFragment = LetterInfoFragment(
-                    letter,
-                    viewModel.targetLanguage,
-                    viewModel.transliterator,
-                )
-                MainActivity.replaceTabFragment(0, letterInfoFragment)
-                true
-            }
-            tv.setOnClickListener {
-                logDebug(logTag, "$letter clicked!")
-                if (tv.myText == letter) {
-                    if (!viewModel.getLanguage()
-                            .equals(viewModel.targetLanguage, ignoreCase = true)
-                    ) tv.myText = viewModel.transliterator.transliterate(
+            val letterView = LetterView(letter, parent.context)
+            letterView.apply {
+                val tvLayoutParams = GridLayout.LayoutParams(rowSpec, colSpec)
+                tvLayoutParams.width = getScreenWidth(parent.context) / 6
+                var pixels = parent.resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
+                tvLayoutParams.setMargins(pixels, pixels, pixels, pixels)
+                layoutParams = tvLayoutParams
+                pixels = parent.resources.getDimensionPixelSize(R.dimen.letter_grid_tv_padding)
+                setPadding(pixels, pixels, pixels, pixels)
+                setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+                setOnLongClickListener {
+                    logDebug(logTag, "$letter long clicked!")
+                    val letterInfoFragment = LetterInfoFragment(
                         letter,
-                        viewModel.targetLanguage
-                    ) else logDebug(logTag, "source lang = target lang... Error in data file?")
-                } else tv.myText = letter
+                        viewModel.targetLanguage,
+                        viewModel.transliterator,
+                    )
+                    MainActivity.replaceTabFragment(0, letterInfoFragment)
+                    true
+                }
+                setOnClickListener {
+                    logDebug(logTag, "$letter clicked!")
+                    if (letterView.text == letter) {
+                        if (!viewModel.getLanguage()
+                                .equals(viewModel.targetLanguage, ignoreCase = true)
+                        ) letterView.text = viewModel.transliterator.transliterate(
+                            letter,
+                            viewModel.targetLanguage
+                        ) else logDebug(logTag, "source lang = target lang... Error in data file?")
+                    } else letterView.text = letter
+                }
             }
-            gridLayout.addView(tv, tvLayoutParams)
+            // gridLayout.addView(letterView, tvLayoutParams)
+            gridLayout.addView(letterView)
         }
         return previousView
     }

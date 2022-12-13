@@ -87,7 +87,7 @@ class LettersTabFragment : Fragment {
         )
         val size = Point()
         requireActivity().windowManager.defaultDisplay.getSize(size)
-        expandableListView.setAdapter(LetterCategoryAdapter(viewModel, size))
+        expandableListView.setAdapter(LetterCategoryAdapter(viewModel))
         val sv = view.findViewById<ScrollView>(R.id.LettersView)
         sv.addView(expandableListView)
         for (i in 0 until expandableListView.expandableListAdapter.groupCount) {
@@ -158,11 +158,9 @@ class LettersTabFragment : Fragment {
                 val language = parent?.getItemAtPosition(position).toString()
                 logDebug("LangSpinner", "Item selected $language")
                 viewModel.setTransliterator(language, requireContext())
-                val size = Point()
-                requireActivity().windowManager.defaultDisplay.getSize(size)
                 // ExpandableListView should have an ID set in onViewCreated()
                 val expandableListView = requireActivity().findViewById<ExpandableListView>(expandableListViewId)
-                expandableListView.setAdapter(LetterCategoryAdapter(viewModel, size))
+                expandableListView.setAdapter(LetterCategoryAdapter(viewModel))
                 for (i in 0 until expandableListView.expandableListAdapter.groupCount) {
                     expandableListView.expandGroup(i)
                 }

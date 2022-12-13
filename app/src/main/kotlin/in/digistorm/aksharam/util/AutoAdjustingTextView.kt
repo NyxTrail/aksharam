@@ -25,47 +25,47 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatTextView
 
-class AutoAdjustingTextView : AppCompatTextView {
+open class AutoAdjustingTextView : AppCompatTextView {
     private val logTag = javaClass.simpleName
 
     // This variable was added to debug a "rogue" non-blocking space (0x00A0) being added to the
     // text sent to TextView. Set to false to disable logging these.
     private val DEBUG_NBSP = false
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context?, attrs: AttributeSet?) : super(
+        context!!, attrs
+    )
+    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
+        context!!, attrs, defStyleAttr
+    )
+
     private fun logNBSPIssue(message: String) {
         if(DEBUG_NBSP)
             logDebug(logTag, message)
     }
 
-    var myText: String = ""
+    var text: String
         get() {
-            val text: CharSequence = super.getText()
-            if(text.toString().contains('\u00A0')) {
-                logNBSPIssue("Text contains a non-breaking space (\\u00A0) when getting text: $text")
-                return text.removeSuffix("\u00A0").toString()
+            val _text: CharSequence = super.getText()
+            if(_text.toString().contains('\u00A0')) {
+                logNBSPIssue("Text contains a non-breaking space (\\u00A0) when getting text: $_text")
+                return _text.removeSuffix("\u00A0").toString()
             }
             logNBSPIssue("nbsp not found when getting text")
-            return text.toString()
+            return _text.toString()
         }
         set(value) {
-            field = value
             if(value.contains('\u00A0')) {
                 logNBSPIssue("Text contains a non-breaking space (\\u00A0) when setting text: $value")
                 super.setText(value.removeSuffix("\u00A0"))
             }
             logNBSPIssue("nbsp not found when setting text")
             super.setText(value)
+
             if (super.getText().contains("\u00A0"))
                 logNBSPIssue("text already contains nbsp")
         }
-
-    constructor(context: Context) : super(context)
-    constructor(context: Context?, attrs: AttributeSet?) : super(
-        context!!, attrs
-    )
-
-    constructor(context: Context?, attrs: AttributeSet?, defStyleAttr: Int) : super(
-        context!!, attrs, defStyleAttr
-    )
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
