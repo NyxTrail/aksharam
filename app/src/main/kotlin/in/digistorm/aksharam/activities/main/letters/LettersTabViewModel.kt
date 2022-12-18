@@ -26,12 +26,20 @@ import android.app.Application
 
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.MutableLiveData
 
 class LettersTabViewModel(application: Application): AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
 
     // The target language string as displayed by lettersTabTransSpinner
-    var targetLanguage: String = ""
+    var targetLanguageLiveData: MutableLiveData<String> = MutableLiveData()
+    var targetLanguage: String
+        get() {
+            return targetLanguageLiveData.value!!
+        }
+        set(value) {
+            targetLanguageLiveData.value = value
+        }
     var adapter: LabelledArrayAdapter<String>? = null
     var transliterator: Transliterator = Transliterator(application)
 

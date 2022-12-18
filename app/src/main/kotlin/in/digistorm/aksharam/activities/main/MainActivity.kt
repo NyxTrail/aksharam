@@ -44,20 +44,18 @@ import androidx.fragment.app.Fragment
 class MainActivity : AppCompatActivity(), OnTabSelectedListener {
     private var tabPosition = 0
     private val logTag = javaClass.simpleName
-    private var tabHeads: Array<String>? = null
+    private lateinit var tabHeads: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        if (tabHeads == null) {
-            tabHeads = arrayOf(
-                getText(R.string.letters_tab_header).toString(),
-                getText(R.string.transliterate_tab_header).toString(),
-                getText(R.string.practice_tab_header).toString()
-            )
-        }
+
         if (GlobalSettings.instance == null) GlobalSettings.createInstance(this)
-        logDebug(logTag, "Initialising transliterator...")
+        tabHeads = arrayOf(
+            getText(R.string.letters_tab_header).toString(),
+            getText(R.string.transliterate_tab_header).toString(),
+            getText(R.string.practice_tab_header).toString()
+        )
         pageCollectionAdapter = PageCollectionAdapter(this)
         val viewPager = findViewById<ViewPager2>(R.id.pager)
         viewPager.adapter = pageCollectionAdapter
@@ -65,7 +63,7 @@ class MainActivity : AppCompatActivity(), OnTabSelectedListener {
         tabLayout.addOnTabSelectedListener(this)
         val tabLayoutMediator = TabLayoutMediator(
             tabLayout, viewPager
-        ) { tab: TabLayout.Tab, position: Int -> tab.text = tabHeads!![position] }
+        ) { tab: TabLayout.Tab, position: Int -> tab.text = tabHeads[position] }
         tabLayoutMediator.attach()
     }
 

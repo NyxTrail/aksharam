@@ -23,31 +23,24 @@ import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.MainActivity
 import `in`.digistorm.aksharam.util.*
 
-import android.content.Context
-import android.graphics.Point
 import android.widget.ExpandableListView
 import android.widget.Spinner
-import android.view.LayoutInflater
-import android.view.ViewGroup
 import android.os.Bundle
-import android.view.View
-import androidx.lifecycle.ViewModelProvider
+import android.view.*
 import android.widget.ScrollView
 import android.widget.AdapterView
 import androidx.fragment.app.Fragment
-import java.util.ArrayList
-import kotlin.math.log
+import androidx.fragment.app.viewModels
+import kotlin.collections.ArrayList
 
-class LettersTabFragment : Fragment {
+class LettersTabFragment: Fragment() {
     private val logTag = javaClass.simpleName
+
+    private val viewModel: LettersTabViewModel by viewModels()
+    private var letterCategoryAdapter: LetterCategoryAdapter? = null
 
     // This will hold the id for the ExpandableListView for easily finding it later
     private var expandableListViewId = -1
-
-    // Default constructor, used by PageCollectionAdapter to initialise the
-    // fragment. The Fragment's children views are created via its onCreate
-    // methods.
-    constructor(): super() {}
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,13 +54,12 @@ class LettersTabFragment : Fragment {
         logDebug(logTag, "onViewCreated")
 
         logDebug(logTag, "Creating/Getting View Model for LettersTabFragment")
-        // TODO: initialise a specific language based on last user selection
-        val viewModel: LettersTabViewModel = ViewModelProvider(requireActivity())[LettersTabViewModel::class.java]
 
         logDebug(logTag, "Letters category wise: ${viewModel.transliterator.languageData.lettersCategoryWise}")
         initialiseLettersTabLangSpinner(view)
+        initialiseLettersTabTransSpinner(view)
 
-        // set up the info button
+        // Set up the info button
         view.findViewById<View>(R.id.lettersTabInfoButton).setOnClickListener { v: View? ->
             logDebug(logTag, "Info button clicked!")
             logDebug(logTag,
@@ -78,20 +70,52 @@ class LettersTabFragment : Fragment {
                 info["general"]?.get("en") + info[viewModel.targetLanguage.lowercase()]?.get("en"))
             MainActivity.replaceTabFragment(0, lif)
         }
+
         val expandableListView = ExpandableListView(requireContext())
-        expandableListView.id = View.generateViewId()
-        expandableListViewId = expandableListView.id
-        expandableListView.layoutParams = ViewGroup.LayoutParams(
-            ViewGroup.LayoutParams.MATCH_PARENT,
-            ViewGroup.LayoutParams.MATCH_PARENT
-        )
-        val size = Point()
-        requireActivity().windowManager.defaultDisplay.getSize(size)
-        expandableListView.setAdapter(LetterCategoryAdapter(viewModel))
-        val sv = view.findViewById<ScrollView>(R.id.LettersView)
-        sv.addView(expandableListView)
-        for (i in 0 until expandableListView.expandableListAdapter.groupCount) {
-            expandableListView.expandGroup(i)
+        expandableListView.apply {
+            id = View.generateViewId()
+            expandableListViewId = expandableListView.id
+            layoutParams = ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+            letterCategoryAdapter = LetterCategoryAdapter(viewModel)
+            setAdapter(letterCategoryAdapter)
+
+            val sv = view.findViewById<ScrollView>(R.id.LettersView)
+            sv.addView(expandableListView)
+
+            for (i in 0 until expandableListAdapter.groupCount) {
+                expandGroup(i)
+            }
+        }
+        initObservers()
+    }
+
+    private fun initObservers() {
+        // When targetLanguage is updated, update transliterated letter
+        viewModel.targetLanguageLiveData.observe(viewLifecycleOwner) {
+            logDebug(logTag, "targetLanguageObserver: change detected")
+            val expandableListView = activity?.findViewById<ExpandableListView>(expandableListViewId)
+            val lettersCategoryWise: LinkedHashMap<String, ArrayList<String>> =
+                viewModel.transliterator.languageData.lettersCategoryWise
+            for(letters: ArrayList<String> in lettersCategoryWise.values) {
+                for(letter in letters) {
+                    val letterView = expandableListView?.findViewWithTag<LetterView>(letter)
+                    if(letterView != null) {
+                        logDebug(logTag, "Found LetterView with tag: $letter.")
+                        letterView.transliteratedLetter = viewModel.transliterator.transliterate(
+                            letter,
+                            viewModel.targetLanguage
+                        )
+                        // Update the current displayed string if necessary
+                        if(letterView.text != letterView.letter)
+                            letterView.text = letterView.transliteratedLetter
+                    } else {
+                        logDebug(logTag, "Could not find LetterView with tag: $letter.")
+                    }
+                }
+            }
         }
     }
 
@@ -118,16 +142,10 @@ class LettersTabFragment : Fragment {
             R.id.spinnerLabelTV, getString(R.string.letters_tab_lang_input_hint)
         )
 
-        val viewModel: LettersTabViewModel = ViewModelProvider(requireActivity())[LettersTabViewModel::class.java]
         viewModel.adapter = adapter
         adapter.setDropDownViewResource(R.layout.spinner_drop_down)
         adapter.setNotifyOnChange(true)
         lettersTabLangSpinner.adapter = adapter
-        // TODO: Can this be simplified? See PracticeTabFragment
-        if (adapter.getPosition(viewModel.targetLanguage) != -1)
-            lettersTabLangSpinner.setSelection(adapter.getPosition(viewModel.targetLanguage))
-        else
-            lettersTabLangSpinner.setSelection(0)
 
         GlobalSettings.instance?.addDataFileListChangedListener("LettersTabFragmentListener",
             object: DataFileListChanged {
@@ -151,7 +169,7 @@ class LettersTabFragment : Fragment {
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
-                view: View?,
+                mView: View?,
                 position: Int,
                 id: Long
             ) {
@@ -164,39 +182,37 @@ class LettersTabFragment : Fragment {
                 for (i in 0 until expandableListView.expandableListAdapter.groupCount) {
                     expandableListView.expandGroup(i)
                 }
-                // At this point, langDataReader should be re-initialised
-                initialiseLettersTabTransSpinner()
+                initialiseLettersTabTransSpinner(view)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
+        lettersTabLangSpinner.setSelection(0)
     }
 
     private fun setTargetLanguage(viewModel: LettersTabViewModel,
                                   spinner: Spinner,
                                   adapter: LabelledArrayAdapter<String>) {
-        if(viewModel.targetLanguage.isEmpty()) {
-            logDebug(logTag, "Target language not set in view model. Selecting item 0...")
-            spinner.setSelection(0)
-            viewModel.targetLanguage = spinner.selectedItem.toString()
-            logDebug(logTag, "Item 0 selected was ${viewModel.targetLanguage}")
-        } else { // TODO: When will this branch be entered
+        try {
             if (adapter.getPosition(viewModel.targetLanguage) == -1) {
                 logDebug(logTag, "Target language not found in adapter. Selecting item 0...")
                 spinner.setSelection(0)
                 viewModel.targetLanguage = spinner.selectedItem.toString()
                 logDebug(logTag, "Item 0 selected was ${viewModel.targetLanguage}")
-            }
-            else
+            } else
                 spinner.setSelection(adapter.getPosition(viewModel.targetLanguage))
+        } catch (e: NullPointerException) {
+            logDebug(logTag, "NPE caught!!")
+            logDebug(logTag, "Setting targetLanguage for first time in view model.")
+            spinner.setSelection(0)
+            viewModel.targetLanguage = spinner.selectedItem.toString()
+            logDebug(logTag, "Item 0 selected was ${viewModel.targetLanguage}")
         }
     }
 
-    fun initialiseLettersTabTransSpinner() {
+    fun initialiseLettersTabTransSpinner(view: View) {
         logDebug(logTag, "Initialising \"Convert To\" spinner.")
-        val lettersTabTransSpinner: Spinner = requireActivity().findViewById(R.id.lettersTabTransSpinner)
-        val viewModel: LettersTabViewModel = ViewModelProvider(requireActivity())[
-                LettersTabViewModel::class.java]
+        val lettersTabTransSpinner: Spinner = view.findViewById(R.id.lettersTabTransSpinner)
 
         val adapter: LabelledArrayAdapter<String> = LabelledArrayAdapter(
             requireContext(),
@@ -224,5 +240,6 @@ class LettersTabFragment : Fragment {
 
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
+        lettersTabTransSpinner.setSelection(0)
     }
 }

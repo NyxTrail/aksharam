@@ -20,24 +20,22 @@
 package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.util.AutoAdjustingTextView
 import `in`.digistorm.aksharam.activities.main.MainActivity
+import `in`.digistorm.aksharam.util.getScreenWidth
 import `in`.digistorm.aksharam.util.logDebug
 
 import android.widget.BaseExpandableListAdapter
-import android.annotation.SuppressLint
-import android.graphics.Point
 import android.view.ViewGroup
 import android.widget.TextView
 import android.graphics.Typeface
 import androidx.annotation.RequiresApi
 import android.os.Build
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import androidx.gridlayout.widget.GridLayout
 import java.util.*
+import kotlin.collections.ArrayList
 
 class LetterCategoryAdapter(
     private val viewModel: LettersTabViewModel,
@@ -46,6 +44,7 @@ class LetterCategoryAdapter(
     private val logTag = javaClass.simpleName
 
     private val headers: Array<String> = viewModel.getLanguageData().lettersCategoryWise.keys.toTypedArray()
+    private val letterViews: ArrayList<LetterView> = ArrayList()
 
     override fun getGroupCount(): Int {
         return viewModel.getLanguageData().lettersCategoryWise.size
@@ -76,7 +75,6 @@ class LetterCategoryAdapter(
         return false
     }
 
-    @SuppressLint("InflateParams")
     override fun getGroupView(
         groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup
     ): View {
@@ -108,13 +106,16 @@ class LetterCategoryAdapter(
     ): View {
         logDebug(logTag, "Creating grid for group: $groupPosition")
 
-        val previousView: View = convertView
-            ?: LayoutInflater.from(parent.context).inflate(R.layout.letter_category_content, parent, false)
+        val previousView: View = convertView ?: LayoutInflater.from(parent.context).inflate(
+                R.layout.letter_category_content,
+                parent,
+                false)
         val gridLayout = previousView.findViewById<GridLayout>(R.id.LetterGrid)
         gridLayout.removeAllViews()
         gridLayout.isClickable = true
 
-        val letters = viewModel.getLanguageData().lettersCategoryWise[headers[groupPosition]]?.toTypedArray() ?: return previousView
+        val letters = viewModel.getLanguageData().lettersCategoryWise[headers[groupPosition]]
+            ?.toTypedArray() ?: return previousView
 
         logDebug(logTag, "Group is: " + letters.contentToString())
         val cols = 5
@@ -122,7 +123,13 @@ class LetterCategoryAdapter(
         for ((i, letter) in letters.withIndex()) {
             val rowSpec = GridLayout.spec(i / cols, GridLayout.CENTER)
             val colSpec = GridLayout.spec(i % cols, GridLayout.CENTER)
-            val letterView = LetterView(letter, parent.context)
+            val letterView = LetterView(
+                letter,
+                viewModel.transliterator.transliterate(
+                    letter,
+                    viewModel.targetLanguage
+                ),
+                parent.context)
             letterView.apply {
                 val tvLayoutParams = GridLayout.LayoutParams(rowSpec, colSpec)
                 tvLayoutParams.width = getScreenWidth(parent.context) / 6
@@ -142,22 +149,24 @@ class LetterCategoryAdapter(
                     MainActivity.replaceTabFragment(0, letterInfoFragment)
                     true
                 }
-                setOnClickListener {
-                    logDebug(logTag, "$letter clicked!")
-                    if (letterView.text == letter) {
-                        if (!viewModel.getLanguage()
-                                .equals(viewModel.targetLanguage, ignoreCase = true)
-                        ) letterView.text = viewModel.transliterator.transliterate(
-                            letter,
-                            viewModel.targetLanguage
-                        ) else logDebug(logTag, "source lang = target lang... Error in data file?")
-                    } else letterView.text = letter
-                }
             }
             // gridLayout.addView(letterView, tvLayoutParams)
+            letterViews.add(letterView)
             gridLayout.addView(letterView)
         }
         return previousView
+    }
+
+    fun updateLetterViews() {
+        for(letterView in letterViews) {
+            letterView.callOnClick()
+            letterView.transliteratedLetter = viewModel.transliterator.transliterate(
+                letterView.letter,
+                viewModel.targetLanguage
+            )
+            logDebug(logTag, "targetLanguage: ${viewModel.targetLanguage}")
+            logDebug(logTag, "transliteratedLetter: ${letterView.transliteratedLetter}")
+        }
     }
 
     override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {
