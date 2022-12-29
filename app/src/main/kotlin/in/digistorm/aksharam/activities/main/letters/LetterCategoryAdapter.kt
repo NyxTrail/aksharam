@@ -1,172 +1,153 @@
-/*
- * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
- *
- * This files is part of Aksharam, a script teaching app for Indic
- * languages.
- *
- * Aksharam is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Aksharam is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even teh implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- */
 package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.activities.main.MainActivity
-import `in`.digistorm.aksharam.util.getScreenWidth
+import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.logDebug
-
-import android.widget.BaseExpandableListAdapter
-import android.view.ViewGroup
-import android.widget.TextView
-import android.graphics.Typeface
-import androidx.annotation.RequiresApi
-import android.os.Build
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
-import androidx.gridlayout.widget.GridLayout
-import java.util.*
-import kotlin.collections.ArrayList
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
 
+/* RecyclerView adapter for each category of letters (e.g. Vowels, Consonants, etc).
+   Each category is displayed in a separate Material 3 Card View.
+ */
 class LetterCategoryAdapter(
-    private val viewModel: LettersTabViewModel,
-) : BaseExpandableListAdapter() {
+    private var lettersCategoryWise: LinkedHashMap<String, ArrayList<String>>,
+    private var transliterator: Transliterator,
+    private var targetLanguage: String,
+): ListAdapter<String, LetterCategoryAdapter.LetterCategoryCardViewHolder>(
+    LetterCategoryDiff()
+) {
+    private val logTag = this.javaClass.simpleName
 
-    private val logTag = javaClass.simpleName
+    private val categories: Array<String>
+        get() {
+            return lettersCategoryWise.keys.toTypedArray()
+        }
 
-    private val headers: Array<String> = viewModel.getLanguageData().lettersCategoryWise.keys.toTypedArray()
-    private val letterViews: ArrayList<LetterView> = ArrayList()
+    // A list of references to currently active view holders
+    private var letterCategoryViewHolders: MutableList<LetterCategoryCardViewHolder> = mutableListOf()
 
-    override fun getGroupCount(): Int {
-        return viewModel.getLanguageData().lettersCategoryWise.size
+    fun setLettersCategoryWise(letters: LinkedHashMap<String, ArrayList<String>>) {
+        lettersCategoryWise = letters
     }
 
-    override fun getChildrenCount(groupPosition: Int): Int {
-        // Each category has a single child - a list of all letters in that category
-        return 1
+    private class LetterCategoryDiff: DiffUtil.ItemCallback<String>() {
+        private val logTag = this.javaClass.simpleName
+        override fun areItemsTheSame(
+            oldItem: String,
+            newItem: String
+        ): Boolean {
+            logDebug(logTag, "Are oldItem: $oldItem and newItem: $newItem the same:" +
+                    " ${oldItem == newItem}")
+            return oldItem == newItem
+        }
+
+        // Iff items are same, the system checks whether their contents are also same
+        override fun areContentsTheSame(
+            oldItem: String,
+            newItem: String
+        ): Boolean {
+            logDebug(logTag, "Are contents of oldItem: $oldItem and " +
+                    "newItem: $newItem the same: false")
+            return false
+        }
     }
 
-    override fun getGroup(groupPosition: Int): Any {
-        return headers[groupPosition]
+    class LetterCategoryCardViewHolder(cardView: View): RecyclerView.ViewHolder(cardView) {
+        val categoryHeader: ConstraintLayout
+        val letterCategoryHeaderText: TextView
+        val letterGrid: RecyclerView
+        var letterGridAdapter: LetterGridAdapter? = null
+
+        init {
+            categoryHeader = cardView.findViewById(R.id.letter_category_header)
+            letterCategoryHeaderText = cardView.findViewById(R.id.letter_category_header_text)
+            letterGrid = cardView.findViewById(R.id.letter_grid)
+        }
     }
 
-    override fun getChild(groupPosition: Int, childPosition: Int): Any? {
-        return viewModel.getLanguageData().lettersCategoryWise[headers[groupPosition]]
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LetterCategoryCardViewHolder {
+        val view = LayoutInflater.from(parent.context).inflate(R.layout.letter_category, parent, false)
+        // Populate the gridLayout with the required number of
+        return LetterCategoryCardViewHolder(view)
     }
 
-    override fun getGroupId(groupPosition: Int): Long {
-        return groupPosition.toLong()
+    override fun onBindViewHolder(holder: LetterCategoryCardViewHolder, position: Int) {
+        logDebug(logTag, "Binding view for position: $position")
+        logDebug(logTag, "Items: $currentList")
+        holder.letterCategoryHeaderText.text = getItem(position).replaceFirstChar {
+            if(it.isLowerCase())
+                it.titlecase()
+            else
+                it.toString()
+        }
+
+        if(letterCategoryViewHolders.size <= position)
+            letterCategoryViewHolders.add(position, holder)
+        else
+            letterCategoryViewHolders[position] = holder
+
+        initialiseLetterGrid(holder, position)
     }
 
-    override fun getChildId(groupPosition: Int, childPosition: Int): Long {
-        return childPosition.toLong()
-    }
+    /* Initialises the LetterGrid for a category of letters (i.e, this is run once for every
+       ViewHolder. */
+    private fun initialiseLetterGrid(
+        letterCategoryCardViewHolder: LetterCategoryCardViewHolder,
+        position: Int,
+    ) {
+        letterCategoryCardViewHolder.letterGrid.apply {
+            val mAdapter = LetterGridAdapter(lettersCategoryWise[getItem(position)]!!)
 
-    override fun hasStableIds(): Boolean {
-        return false
-    }
-
-    override fun getGroupView(
-        groupPosition: Int, isExpanded: Boolean, convertView: View?, parent: ViewGroup
-    ): View {
-        logDebug(logTag, "Getting GroupView for position $groupPosition")
-
-        val previousView: View = convertView
-            ?: LayoutInflater.from(parent.context).inflate(R.layout.letter_category_header, parent, false)
-
-        val letterCategoryHeaderTV =
-            previousView.findViewById<TextView>(R.id.LetterCategoryHeaderText)
-        letterCategoryHeaderTV?.text =
-            headers[groupPosition].lowercase().replaceFirstChar {
-                if(it.isLowerCase())
-                    it.titlecase()
-                else
-                    it.toString()
+            // Create a list of letter, transliteration pairs
+            lettersCategoryWise[getItem(position)]?.map {
+                Pair(it, transliterator.transliterate(it, targetLanguage))
+            }.let {
+                logDebug(logTag, "Submitting list $it for category: ${getItem(position)}")
+                mAdapter.submitList(it!!)
             }
-        return previousView
+
+            adapter = mAdapter
+        }
+        letterCategoryCardViewHolder.letterGridAdapter =
+            letterCategoryCardViewHolder.letterGrid.adapter as LetterGridAdapter
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    override fun getChildView(
-        groupPosition: Int, childPosition: Int, isLastChild: Boolean,
-        convertView: View?, parent: ViewGroup
-    ): View {
-        logDebug(logTag, "Creating grid for group: $groupPosition")
+    fun updateTargetLanguage(language: String) {
+        targetLanguage = language
+        logDebug(logTag, "TargeLanguage updated to $targetLanguage")
+    }
 
-        val previousView: View = convertView ?: LayoutInflater.from(parent.context).inflate(
-                R.layout.letter_category_content,
-                parent,
-                false)
-        previousView.tag = "GroupAt$groupPosition"
-        val gridLayout = previousView.findViewById<GridLayout>(R.id.LetterGrid)
-        gridLayout.removeAllViews()
-        gridLayout.isClickable = true
+    fun updateTransliterator(transliterator: Transliterator) {
+        this.transliterator = transliterator
+        logDebug(logTag, "Transliterator updated")
+    }
 
-        val letters = viewModel.getLanguageData().lettersCategoryWise[headers[groupPosition]]
-            ?.toTypedArray() ?: return previousView
+    fun updateLetterGrids() {
+        logDebug(logTag, "Updating letter grids...")
+        logDebug(logTag, "Size of CardViewHolder list: ${letterCategoryViewHolders.size}")
 
-        logDebug(logTag, "Group is: " + letters.contentToString())
-        val cols = 5
-
-        for ((i, letter) in letters.withIndex()) {
-            val rowSpec = GridLayout.spec(i / cols, GridLayout.CENTER)
-            val colSpec = GridLayout.spec(i % cols, GridLayout.CENTER)
-            val letterView = LetterView(
-                letter,
-                viewModel.transliterator.transliterate(
-                    letter,
-                    viewModel.targetLanguage
-                ),
-                parent.context)
-            letterView.apply {
-                val tvLayoutParams = GridLayout.LayoutParams(rowSpec, colSpec)
-                tvLayoutParams.width = getScreenWidth(parent.context) / 6
-                var pixels = parent.resources.getDimensionPixelSize(R.dimen.letter_grid_tv_margin)
-                tvLayoutParams.setMargins(pixels, pixels, pixels, pixels)
-                layoutParams = tvLayoutParams
-                pixels = parent.resources.getDimensionPixelSize(R.dimen.letter_grid_tv_padding)
-                setPadding(pixels, pixels, pixels, pixels)
-                setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
-                setOnLongClickListener {
-                    logDebug(logTag, "$letter long clicked!")
-                    val letterInfoFragment = LetterInfoFragment(
-                        letter,
-                        viewModel.targetLanguage,
-                        viewModel.transliterator,
+        if(letterCategoryViewHolders.size > 0) {
+            for ((i: Int, viewHolder: LetterCategoryCardViewHolder) in letterCategoryViewHolders.withIndex()) {
+                logDebug(logTag, "Creating letter list for ${categories[i]}")
+                lettersCategoryWise[categories[i]]?.map {
+                    Pair(it, transliterator.transliterate(it, targetLanguage))
+                }.let {
+                    logDebug(logTag, "Submitting list $it for category: " +
+                            viewHolder.letterCategoryHeaderText.toString().lowercase()
                     )
-                    MainActivity.replaceTabFragment(0, letterInfoFragment)
-                    true
+                    viewHolder.letterGridAdapter!!.submitList(it!!)
                 }
             }
-            // gridLayout.addView(letterView, tvLayoutParams)
-            letterViews.add(letterView)
-            gridLayout.addView(letterView)
-        }
-        return previousView
-    }
-
-    fun updateLetterViews() {
-        for(letterView in letterViews) {
-            letterView.callOnClick()
-            letterView.transliteratedLetter = viewModel.transliterator.transliterate(
-                letterView.letter,
-                viewModel.targetLanguage
-            )
-            logDebug(logTag, "targetLanguage: ${viewModel.targetLanguage}")
-            logDebug(logTag, "transliteratedLetter: ${letterView.transliteratedLetter}")
         }
     }
 
-    override fun isChildSelectable(groupPosition: Int, childPosition: Int): Boolean {
-        return false
+    override fun getItemCount(): Int {
+        return lettersCategoryWise.size
     }
 }

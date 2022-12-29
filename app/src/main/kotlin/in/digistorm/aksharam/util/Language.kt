@@ -82,6 +82,11 @@ class Language {
             return LinkedHashMap(field)
         }
 
+    val categories: List<String>
+        get() {
+            return lettersCategoryWise.keys.toList()
+        }
+
     // Uppercase the first letter
     val supportedLanguagesForTransliteration: ArrayList<String>
         get() {

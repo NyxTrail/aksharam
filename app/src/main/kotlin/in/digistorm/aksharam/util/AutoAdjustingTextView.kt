@@ -45,7 +45,7 @@ open class AutoAdjustingTextView : AppCompatTextView {
             logDebug(logTag, message)
     }
 
-    var text: String
+    protected var text: String
         get() {
             val _text: CharSequence = super.getText()
             if(_text.toString().contains('\u00A0')) {
@@ -55,7 +55,7 @@ open class AutoAdjustingTextView : AppCompatTextView {
             logNBSPIssue("nbsp not found when getting text")
             return _text.toString()
         }
-        set(value) {
+        protected set(value) {
             if(value.contains('\u00A0')) {
                 logNBSPIssue("Text contains a non-breaking space (\\u00A0) when setting text: $value")
                 super.setText(value.removeSuffix("\u00A0"))

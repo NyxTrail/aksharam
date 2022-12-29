@@ -21,6 +21,7 @@ package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.Language
+import `in`.digistorm.aksharam.util.logDebug
 import android.app.Application
 
 import android.content.Context
@@ -39,6 +40,7 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
             return languageLiveData.value!!
         }
         set(value) {
+            logDebug(logTag, "Language live data set to value: $value")
             languageLiveData.value = value
         }
 
@@ -53,7 +55,7 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
         }
 
     init {
-        language = transliterator.getLanguage()
+        // language = transliterator.getLanguage()
     }
 
     // Set the transliterator based on a specific language

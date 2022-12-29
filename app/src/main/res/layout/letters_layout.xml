@@ -80,32 +80,23 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
         android:minWidth="30dp"
-        app:layout_constraintBottom_toTopOf="@+id/LettersView"
+        app:layout_constraintBottom_toTopOf="@+id/letter_categories"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/convert_to_selector"
         app:layout_constraintTop_toBottomOf="@id/progress_indicator"
         app:icon="@drawable/ic_baseline_info_24" />
 
-    <ScrollView
-        android:id="@+id/LettersView"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/letter_categories"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:layout_marginBottom="16dp"
-        android:fillViewport="true"
-        android:orientation="vertical"
-        android:paddingStart="5dp"
-        android:paddingEnd="5dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/language_selector"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/language_selector">
-        <ExpandableListView
-            android:id="@+id/letter_list"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
-    </ScrollView>
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -28,19 +28,34 @@ import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
 
 class LettersTabFragment: Fragment() {
     private val logTag = javaClass.simpleName
 
     private val viewModel: LettersTabViewModel by viewModels()
-    private var letterCategoryAdapter: LetterCategoryAdapter? = null
+    private lateinit var languageListAdapter: ArrayAdapter<String>
+    private lateinit var convertToListAdapter: ArrayAdapter<String>
+
+    private lateinit var letterCategoryListView: RecyclerView
+    private lateinit var convertToSelector: TextInputLayout
+    private val convertToTextView: AutoCompleteTextView?
+        get() {
+            return convertToSelector.editText as? MaterialAutoCompleteTextView
+        }
+    private lateinit var languageSelector: TextInputLayout
+    private val languageTextView: AutoCompleteTextView?
+        get() {
+            return languageSelector.editText as? MaterialAutoCompleteTextView
+        }
+
+    // A simple lock to prevent multiple observers from trying to update the UI
+    private var uiUpdateLock: Boolean = false
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,9 +68,11 @@ class LettersTabFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
 
-        logDebug(logTag, "Creating/Getting View Model for LettersTabFragment")
-
         logDebug(logTag, "Letters category wise: ${viewModel.transliterator.languageData.lettersCategoryWise}")
+        letterCategoryListView = view.findViewById(R.id.letter_categories)!!
+        languageSelector = view.findViewById(R.id.language_selector)
+        convertToSelector = view.findViewById(R.id.convert_to_selector)
+
         initialiseLanguageSelector(view)
         initialiseLettersTabTransSpinner(view)
 
@@ -71,15 +88,15 @@ class LettersTabFragment: Fragment() {
             MainActivity.replaceTabFragment(0, lif)
         }
 
-        val expandableListView = view.findViewById<ExpandableListView>(R.id.letter_list)
-        expandableListView.apply {
-            letterCategoryAdapter = LetterCategoryAdapter(viewModel)
-            setAdapter(letterCategoryAdapter)
+        val categoryListViewAdapter = LetterCategoryAdapter(
+            viewModel.getLanguageData().lettersCategoryWise,
+            viewModel.transliterator,
+            viewModel.targetLanguage,
+        )
+        letterCategoryListView.adapter = categoryListViewAdapter
+        categoryListViewAdapter.submitList(viewModel.transliterator.languageData.categories)
 
-            for (i in 0 until expandableListAdapter.groupCount) {
-                expandGroup(i)
-            }
-        }
+        logDebug(logTag, "Setting up observers for view model data")
         initObservers(view)
         view.findViewById<LinearProgressIndicator>(R.id.progress_indicator).visibility = View.GONE
     }
@@ -98,30 +115,31 @@ class LettersTabFragment: Fragment() {
 
     private fun initialiseLanguageSelector(view: View) {
         logDebug(logTag, "Initialising LettersTabLangSpinner")
-        val languageSelector: TextInputLayout = view.findViewById(R.id.language_selector)
-        val adapter: ArrayAdapter<String> = ArrayAdapter(
+        languageListAdapter = ArrayAdapter(
             requireContext(),
             R.layout.drop_down_item,
             getAllDownloadedLanguages(),
         )
-        adapter.setNotifyOnChange(true)
+        languageListAdapter.setNotifyOnChange(true)
 
-        val autoCompleteTextView = languageSelector.editText as? MaterialAutoCompleteTextView
-        autoCompleteTextView?.setAdapter(adapter)
-        val upperCased = viewModel.language.replaceFirstChar {
+        languageTextView?.setAdapter(languageListAdapter)
+        val upperCasedLanguage = viewModel.transliterator.getLanguage().replaceFirstChar {
             if (it.isLowerCase())
-                it.titlecase(Locale.getDefault())
+                it.titlecase()
             else
                 it.toString()
         }
-        logDebug(logTag, "Setting current selection to $upperCased")
-        logDebug(logTag, "Its adapter position is ${adapter.getPosition(upperCased)}")
-        autoCompleteTextView?.setText(upperCased, false)
+        logDebug(logTag, "Setting current selection to $upperCasedLanguage")
+        logDebug(logTag, "Its adapter position is ${languageListAdapter.getPosition(upperCasedLanguage)}")
+        // Initialise the dropdown
+        languageTextView?.setText(upperCasedLanguage, false)
+        // Initialise in the viewModel too
+        viewModel.language = upperCasedLanguage
         // Update view model when language selection changes
-        autoCompleteTextView?.onItemClickListener = AdapterView.OnItemClickListener(
+        languageTextView?.onItemClickListener = AdapterView.OnItemClickListener(
             fun (parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                logDebug(logTag, "LanguageSelector: ${adapter.getItem(position)} clicked.")
-                viewModel.language = adapter.getItem(position)!!
+                logDebug(logTag, "LanguageSelector: ${languageListAdapter.getItem(position)} clicked.")
+                viewModel.language = languageListAdapter.getItem(position)!!
             }
         )
 
@@ -133,8 +151,8 @@ class LettersTabFragment: Fragment() {
                     logDebug("LTFListener", "Refreshing LettersTabFragment adapter")
                     if (context == null)
                         return
-                    adapter.clear()
-                    adapter.addAll(getAllDownloadedLanguages())
+                    languageListAdapter.clear()
+                    languageListAdapter.addAll(getAllDownloadedLanguages())
                     // adapter.notifyDataSetChanged();
                     // While the spinner shows updated text, its (Spinner's) getSelectedView() was sometimes returning
                     // a non-existant item (say, if the item is deleted). Resetting the adapter was the only way I could
@@ -147,25 +165,28 @@ class LettersTabFragment: Fragment() {
 
     private fun initialiseLettersTabTransSpinner(view: View) {
         logDebug(logTag, "Initialising \"Convert To\" spinner.")
-        val convertToSelector: TextInputLayout = view.findViewById(R.id.convert_to_selector)
         val transliterationLanguages = viewModel.getLanguageData().supportedLanguagesForTransliteration
-        val adapter: ArrayAdapter<String> = ArrayAdapter(
+        convertToListAdapter = ArrayAdapter(
             requireContext(),
             R.layout.drop_down_item,
             transliterationLanguages,
         )
-        adapter.setNotifyOnChange(true)
-        val autoCompleteTextView = convertToSelector.editText as? MaterialAutoCompleteTextView
-        autoCompleteTextView?.setAdapter(adapter)
+        convertToListAdapter.setNotifyOnChange(true)
 
+        convertToTextView?.setAdapter(convertToListAdapter)
+
+        // viewModel.targetLanguage = transliterationLanguages[0]
+        logDebug(logTag, "Set initial target language to: ${transliterationLanguages[0]}")
+        logDebug(logTag, "Its adapter position is ${convertToListAdapter.getPosition(transliterationLanguages[0])}")
+        // Initialise the drop down
+        convertToTextView?.setText(transliterationLanguages[0], false)
+        // Initialise in the view model too
         viewModel.targetLanguage = transliterationLanguages[0]
-        logDebug(logTag, "Set initial target language to: ${viewModel.targetLanguage}")
-        autoCompleteTextView?.setText(viewModel.targetLanguage, false)
 
-        autoCompleteTextView?.onItemClickListener = AdapterView.OnItemClickListener(
+        convertToTextView?.onItemClickListener = AdapterView.OnItemClickListener(
             fun (parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                logDebug(logTag, "ConvertToSelector: ${adapter.getItem(position)} clicked.")
-                viewModel.targetLanguage = adapter.getItem(position)!!
+                logDebug(logTag, "ConvertToSelector: ${convertToListAdapter.getItem(position)} clicked.")
+                viewModel.targetLanguage = convertToListAdapter.getItem(position)!!
             }
         )
     }
@@ -174,50 +195,52 @@ class LettersTabFragment: Fragment() {
         // When language is updated, update the entire grid
         viewModel.languageLiveData.observe(viewLifecycleOwner) {
             logDebug(logTag, "languageObserver: change detected")
-            val linearProgressIndicator: LinearProgressIndicator? = view.findViewById(R.id.progress_indicator)
-            linearProgressIndicator?.visibility = View.VISIBLE
+            // We lock the UI. If the other observer is invoked, it should revert this lock and
+            // return without touching the UI. We should not revert this lock in this observer.
+            uiUpdateLock = true
             viewModel.setTransliterator(viewModel.language, requireContext())
-            val expandableListView: ExpandableListView? = view.findViewById(R.id.letter_list)
-            if(expandableListView != null) {
-                expandableListView.setAdapter(LetterCategoryAdapter(viewModel))
-                for (i in 0 until expandableListView.expandableListAdapter.groupCount) {
-                    expandableListView.expandGroup(i)
-                }
-                initialiseLettersTabTransSpinner(view)
+
+            // Update the Convert To adapter
+            val transliterationLanguages = viewModel.getLanguageData().supportedLanguagesForTransliteration
+            logDebug(logTag, "Updating Convert To drop down with $transliterationLanguages")
+            convertToListAdapter.apply {
+                clear()
+                addAll(transliterationLanguages)
+                notifyDataSetChanged()
             }
-            else
-                logDebug(logTag, "Could not find ExpandableListView")
-            linearProgressIndicator?.visibility = View.GONE
+            convertToTextView?.setText(convertToListAdapter.getItem(0)!!, false)
+            viewModel.targetLanguage = convertToListAdapter.getItem(0)!!
+
+            val list = ArrayList<String>(viewModel.getLanguageData().lettersCategoryWise.keys)
+            (letterCategoryListView.adapter as LetterCategoryAdapter).apply {
+                setLettersCategoryWise(viewModel.getLanguageData().lettersCategoryWise)
+                updateTargetLanguage(viewModel.targetLanguage)
+                updateTransliterator(viewModel.transliterator)
+                logDebug(logTag, "LetterCategoryAdapter Inspection: \n" +
+                        "Item count: ${itemCount} \n" +
+                        "Current List: ${currentList}")
+                submitList(list)
+            }
         }
 
         // When targetLanguage is updated, update transliterated letter
         viewModel.targetLanguageLiveData.observe(viewLifecycleOwner) {
-            logDebug(logTag, "targetLanguageObserver: change detected")
-            val expandableListView: ExpandableListView? = activity?.findViewById(R.id.letter_list)
-            if(expandableListView != null) {
-                val lettersCategoryWise: LinkedHashMap<String, ArrayList<String>> =
-                    viewModel.transliterator.languageData.lettersCategoryWise
-                for (letters: ArrayList<String> in lettersCategoryWise.values) {
-                    for (letter in letters) {
-                        val letterView = expandableListView.findViewWithTag<LetterView>(letter)
-                        if (letterView != null) {
-                            logDebug(logTag, "Found LetterView with tag: $letter.")
-                            letterView.transliteratedLetter =
-                                viewModel.transliterator.transliterate(
-                                    letter,
-                                    viewModel.targetLanguage
-                                )
-                            // Update the current displayed string if necessary
-                            if (letterView.text != letterView.letter)
-                                letterView.text = letterView.transliteratedLetter
-                        } else {
-                            logDebug(logTag, "Could not find LetterView with tag: $letter.")
-                        }
-                    }
-                }
+            val logBegin = "targetLanguageObserver:"
+            logDebug(logTag, "$logBegin Change detected")
+            if(uiUpdateLock) {
+                logDebug(logTag, "$logBegin UI Locked. Returning...")
+                uiUpdateLock = false
+            } else {
+                logDebug(logTag, "$logBegin UI not locked. We are free to update.")
+                val list = ArrayList<String>()
+                list.addAll(viewModel.getLanguageData().lettersCategoryWise.keys)
+                val adapter: LetterCategoryAdapter =
+                    letterCategoryListView.adapter as LetterCategoryAdapter
+                adapter.updateTargetLanguage(viewModel.targetLanguage)
+                adapter.updateLetterGrids()
             }
-            else
-                logDebug(logTag, "Could not find ExpandableListView")
         }
+
+
     }
 }

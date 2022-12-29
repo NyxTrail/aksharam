@@ -21,7 +21,6 @@
 package `in`.digistorm.aksharam.activities.main.transliterate
 
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.activities.main.letters.LettersTabViewModel
 import `in`.digistorm.aksharam.util.*
 
 import android.view.LayoutInflater
