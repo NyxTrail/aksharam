@@ -85,17 +85,13 @@ class LetterCategoryAdapter(
 
         val letterCategoryHeaderTV =
             previousView.findViewById<TextView>(R.id.LetterCategoryHeaderText)
-        // Set some padding on the left so that the text does not overwrite the expand indicator
-        letterCategoryHeaderTV?.setPadding(
-            100,
-            letterCategoryHeaderTV.paddingTop,
-            letterCategoryHeaderTV.paddingRight,
-            letterCategoryHeaderTV.paddingBottom
-        )
-        letterCategoryHeaderTV?.setTypeface(null, Typeface.BOLD)
         letterCategoryHeaderTV?.text =
-            headers[groupPosition].uppercase(Locale.getDefault())
-        letterCategoryHeaderTV?.setTextSize(TypedValue.COMPLEX_UNIT_SP, 25f)
+            headers[groupPosition].lowercase().replaceFirstChar {
+                if(it.isLowerCase())
+                    it.titlecase()
+                else
+                    it.toString()
+            }
         return previousView
     }
 
@@ -110,6 +106,7 @@ class LetterCategoryAdapter(
                 R.layout.letter_category_content,
                 parent,
                 false)
+        previousView.tag = "GroupAt$groupPosition"
         val gridLayout = previousView.findViewById<GridLayout>(R.id.LetterGrid)
         gridLayout.removeAllViews()
         gridLayout.isClickable = true

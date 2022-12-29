@@ -22,19 +22,10 @@
  ~
  -->
 
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/LetterCategoryHeaderText"
-        style="@style/TextAppearance.Material3.HeadlineMedium"
-        tools:text="@string/test_text"
-        android:textSize="@dimen/text_category_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingStart="40sp"
-        android:paddingEnd="40sp"/>
-</LinearLayout>
+    android:layout_height="wrap_content"
+    android:padding="16dp"
+    android:ellipsize="end"
+    android:maxLines="1"
+    android:textAppearance="?attr/textAppearanceTitleMedium" />

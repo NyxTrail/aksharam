@@ -70,7 +70,7 @@ class PracticeTabFragment : Fragment() {
             initialisePracticeTabPracticeInSpinner()
             initialisePracticeTabPracticeTypeSpinner()
             requireActivity().findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = true
-            view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+            view.findViewById<ImageView>(R.id.PracticeTabSuccessCheck)
                 .visibility = View.INVISIBLE
         }
 
@@ -83,7 +83,7 @@ class PracticeTabFragment : Fragment() {
             if(viewModel.practiceString.value != null) {
                 viewModel.transliteratedString.value = viewModel.transliterator
                     .transliterate(viewModel.practiceString.value!!, viewModel.practiceIn.value!!)
-                view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+                view.findViewById<ImageView>(R.id.PracticeTabSuccessCheck)
                     .visibility = View.INVISIBLE
             }
         }
@@ -92,7 +92,7 @@ class PracticeTabFragment : Fragment() {
         viewModel.practiceType.observe(viewLifecycleOwner) {
             logDebug(logTag, "viewModel.practiceType changed to ${viewModel.practiceType.value}")
             requireActivity().findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = true
-            view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+            view.findViewById<ImageView>(R.id.PracticeTabSuccessCheck)
                 .visibility = View.INVISIBLE
             viewModel.practiceString.value = generatePracticeString(viewModel)
         }
@@ -117,7 +117,7 @@ class PracticeTabFragment : Fragment() {
         view.findViewById<View>(R.id.PracticeTabRefreshButton).setOnClickListener {
             viewModel.practiceString.value = generatePracticeString(viewModel)
             view.findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = true
-            view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+            view.findViewById<ImageView>(R.id.PracticeTabSuccessCheck)
                 .visibility = View.INVISIBLE
         }
 
@@ -126,9 +126,9 @@ class PracticeTabFragment : Fragment() {
             logDebug(logTag, "viewModel.practiceSuccessCheck changed to ${viewModel.practiceSuccessCheck.value}")
             val successCheck: Boolean = viewModel.practiceSuccessCheck.value ?: false
             if(successCheck) {
-                view.requireViewById<View>(R.id.PracticeTabInputTIET)
+                view.findViewById<View>(R.id.PracticeTabInputTIET)
                     .isEnabled = false
-                view.requireViewById<ImageView>(R.id.PracticeTabSuccessCheck)
+                view.findViewById<ImageView>(R.id.PracticeTabSuccessCheck)
                     .visibility = View.VISIBLE
                 Toast.makeText(
                     requireContext(),

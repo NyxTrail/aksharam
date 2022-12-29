@@ -28,40 +28,63 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <Spinner
-        android:id="@+id/lettersTabLangSpinner"
-        style="@style/drop_down_style"
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/progress_indicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        app:showAnimationBehavior="outward"
+        app:hideAnimationBehavior="inward"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/language_selector"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toStartOf="@+id/lettersTabTransSpinner"
+        android:hint="@string/letters_tab_lang_input_hint"
+        app:layout_constraintEnd_toStartOf="@+id/convert_to_selector"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/progress_indicator">
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            app:simpleItems="@array/dummy_list"/>
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <Spinner
-        android:id="@+id/lettersTabTransSpinner"
-        style="@style/drop_down_style"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/convert_to_selector"
+        style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
+        android:hint="@string/letters_tab_trans_hint"
         app:layout_constraintEnd_toStartOf="@+id/lettersTabInfoButton"
-        app:layout_constraintStart_toEndOf="@id/lettersTabLangSpinner"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintStart_toEndOf="@id/language_selector"
+        app:layout_constraintTop_toBottomOf="@id/progress_indicator" >
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="none"
+            app:simpleItems="@array/dummy_list" />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <ImageButton
+    <Button
         android:id="@+id/lettersTabInfoButton"
+        style="?attr/materialIconButtonFilledStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="4dp"
-        android:foregroundTintMode="add"
         android:minWidth="30dp"
-        style="@style/RoundedImageButton"
         app:layout_constraintBottom_toTopOf="@+id/LettersView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/lettersTabTransSpinner"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_baseline_info_24" />
+        app:layout_constraintStart_toEndOf="@id/convert_to_selector"
+        app:layout_constraintTop_toBottomOf="@id/progress_indicator"
+        app:icon="@drawable/ic_baseline_info_24" />
 
     <ScrollView
         android:id="@+id/LettersView"
@@ -78,6 +101,11 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lettersTabLangSpinner" />
+        app:layout_constraintTop_toBottomOf="@id/language_selector">
+        <ExpandableListView
+            android:id="@+id/letter_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+    </ScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

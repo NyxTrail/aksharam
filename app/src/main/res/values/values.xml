@@ -50,4 +50,11 @@
 
     <!-- this thing is not used yet. should be used in LetterCategoryAdapter.java around line 161 !-->
     <dimen name="letter_grid_text_size">22dp</dimen>
+
+    <array name="dummy_list">
+        <item>Item 1</item>
+        <item>Item 2</item>
+        <item>Item 3</item>
+        <item>Item 4</item>
+    </array>
 </resources>
