@@ -17,7 +17,7 @@ class InputTextChangedListener(
 
     private val viewModel: PracticeTabViewModel by practiceTabFragment.viewModels()
     private val practiceTextTV: TextView = practiceTabFragment.requireView()
-        .requireViewById(R.id.PracticeTabPracticeTextTV)
+        .findViewById(R.id.PracticeTabPracticeTextTV)!!
 
     override fun afterTextChanged(s: Editable) {}
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}

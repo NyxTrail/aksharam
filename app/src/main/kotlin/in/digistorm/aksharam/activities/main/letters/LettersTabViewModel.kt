@@ -31,7 +31,7 @@ import androidx.lifecycle.MutableLiveData
 class LettersTabViewModel(application: Application): AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
 
-    var transliterator: Transliterator = Transliterator(application)
+    var transliterator: Transliterator? = null
 
     // The current language displayed in letters tab
     var languageLiveData: MutableLiveData<String> = MutableLiveData()
@@ -54,18 +54,14 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
             targetLanguageLiveData.value = value
         }
 
-    init {
-        // language = transliterator.getLanguage()
-    }
-
     // Set the transliterator based on a specific language
     fun setTransliterator(language: String, context: Context) {
-        if (transliterator.getLanguage().lowercase() != language.lowercase())
+        if (transliterator!!.getLanguage().lowercase() != language.lowercase())
             transliterator = Transliterator(language, context)
     }
 
     // A convenience method to obtain language data
     fun getLanguageData(): Language {
-        return transliterator.languageData
+        return transliterator!!.languageData
     }
 }

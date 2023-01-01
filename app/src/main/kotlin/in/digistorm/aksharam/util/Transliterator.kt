@@ -23,7 +23,6 @@ import android.content.Context
 import android.content.Intent
 import java.lang.StringBuilder
 import `in`.digistorm.aksharam.activities.initialise.InitialiseAppActivity
-import kotlin.math.log
 
 // This class is responsible for the actual transliteration
 class Transliterator {

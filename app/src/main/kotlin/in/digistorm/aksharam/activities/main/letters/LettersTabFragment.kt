@@ -29,7 +29,6 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.progressindicator.LinearProgressIndicator
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
 import kotlin.collections.ArrayList
@@ -68,7 +67,9 @@ class LettersTabFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
 
-        logDebug(logTag, "Letters category wise: ${viewModel.transliterator.languageData.lettersCategoryWise}")
+        // Initialise the transliterator
+        viewModel.transliterator = Transliterator(requireContext())
+        logDebug(logTag, "Letters category wise: ${viewModel.transliterator!!.languageData.lettersCategoryWise}")
         letterCategoryListView = view.findViewById(R.id.letter_categories)!!
         languageSelector = view.findViewById(R.id.language_selector)
         convertToSelector = view.findViewById(R.id.convert_to_selector)
@@ -80,8 +81,9 @@ class LettersTabFragment: Fragment() {
         view.findViewById<View>(R.id.lettersTabInfoButton).setOnClickListener { v: View? ->
             logDebug(logTag, "Info button clicked!")
             logDebug(logTag,
-                "Fetching info for transliterating ${viewModel.transliterator.languageData.language} to ${viewModel.targetLanguage}")
-            val info: HashMap<String, Map<String, String>> = viewModel.transliterator.languageData.info
+                "Fetching info for transliterating ${viewModel.transliterator!!.languageData.language} " +
+                        "to ${viewModel.targetLanguage}")
+            val info: HashMap<String, Map<String, String>> = viewModel.transliterator!!.languageData.info
             logDebug(logTag, "Data for info: $info")
             val lif = LanguageInfoFragment.newInstance(
                 info["general"]?.get("en") + info[viewModel.targetLanguage.lowercase()]?.get("en"))
@@ -90,15 +92,14 @@ class LettersTabFragment: Fragment() {
 
         val categoryListViewAdapter = LetterCategoryAdapter(
             viewModel.getLanguageData().lettersCategoryWise,
-            viewModel.transliterator,
+            viewModel.transliterator!!,
             viewModel.targetLanguage,
         )
         letterCategoryListView.adapter = categoryListViewAdapter
-        categoryListViewAdapter.submitList(viewModel.transliterator.languageData.categories)
+        categoryListViewAdapter.submitList(viewModel.transliterator!!.languageData.categories)
 
         logDebug(logTag, "Setting up observers for view model data")
         initObservers(view)
-        view.findViewById<LinearProgressIndicator>(R.id.progress_indicator).visibility = View.GONE
     }
 
     // Return an empty array list if we could not find any
@@ -123,7 +124,7 @@ class LettersTabFragment: Fragment() {
         languageListAdapter.setNotifyOnChange(true)
 
         languageTextView?.setAdapter(languageListAdapter)
-        val upperCasedLanguage = viewModel.transliterator.getLanguage().replaceFirstChar {
+        val upperCasedLanguage = viewModel.transliterator!!.getLanguage().replaceFirstChar {
             if (it.isLowerCase())
                 it.titlecase()
             else
@@ -215,7 +216,7 @@ class LettersTabFragment: Fragment() {
             (letterCategoryListView.adapter as LetterCategoryAdapter).apply {
                 setLettersCategoryWise(viewModel.getLanguageData().lettersCategoryWise)
                 updateTargetLanguage(viewModel.targetLanguage)
-                updateTransliterator(viewModel.transliterator)
+                updateTransliterator(viewModel.transliterator!!)
                 logDebug(logTag, "LetterCategoryAdapter Inspection: \n" +
                         "Item count: ${itemCount} \n" +
                         "Current List: ${currentList}")
@@ -240,7 +241,5 @@ class LettersTabFragment: Fragment() {
                 adapter.updateLetterGrids(letterCategoryListView)
             }
         }
-
-
     }
 }
