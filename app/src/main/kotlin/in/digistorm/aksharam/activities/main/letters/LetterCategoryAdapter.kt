@@ -1,6 +1,7 @@
 package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.activities.main.MainActivity
 import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.logDebug
 import android.view.LayoutInflater
@@ -98,11 +99,21 @@ class LetterCategoryAdapter(
         letterCategoryCardViewHolder.letterGrid.apply {
             removeAllViews()
 
-            for((letterPosition, letter) in lettersCategoryWise[categories[position]]!!.withIndex()) {
+            for(letter in lettersCategoryWise[categories[position]]!!) {
                 val letterView: LetterView = LayoutInflater
                     .from(letterCategoryCardViewHolder.letterGrid.context)
                     .inflate(R.layout.letter_view,
                         letterCategoryCardViewHolder.letterGrid, false) as LetterView
+                letterView.setOnLongClickListener {
+                    logDebug(logTag, "$letter long clicked!")
+                    val letterInfoFragment = LetterInfoFragment(
+                        letter,
+                        targetLanguage,
+                        transliterator,
+                    )
+                    MainActivity.replaceTabFragment(0, letterInfoFragment)
+                    true
+                }
                 letterView.letters = Pair(letter, transliterator.transliterate(letter, targetLanguage))
                 letterCategoryCardViewHolder.letterGrid.addView(letterView)
             }
