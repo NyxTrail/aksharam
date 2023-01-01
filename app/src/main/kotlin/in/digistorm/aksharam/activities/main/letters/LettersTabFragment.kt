@@ -237,7 +237,7 @@ class LettersTabFragment: Fragment() {
                 val adapter: LetterCategoryAdapter =
                     letterCategoryListView.adapter as LetterCategoryAdapter
                 adapter.updateTargetLanguage(viewModel.targetLanguage)
-                adapter.updateLetterGrids()
+                adapter.updateLetterGrids(letterCategoryListView)
             }
         }
 

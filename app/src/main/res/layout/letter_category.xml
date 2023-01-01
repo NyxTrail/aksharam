@@ -44,14 +44,14 @@
                 app:layout_constraintEnd_toEndOf="parent"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <androidx.gridlayout.widget.GridLayout
             android:id="@+id/letter_grid"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
             android:descendantFocusability="afterDescendants"
-            app:spanCount="5"
-            app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+            app:columnCount="5"
+            app:alignmentMode="alignBounds"
             app:layout_constraintTop_toBottomOf="@id/letter_category_header"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />

@@ -6,8 +6,12 @@ import `in`.digistorm.aksharam.util.logDebug
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.gridlayout.widget.GridLayout
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.children
+import androidx.core.view.size
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -28,9 +32,6 @@ class LetterCategoryAdapter(
         get() {
             return lettersCategoryWise.keys.toTypedArray()
         }
-
-    // A list of references to currently active view holders
-    private var letterCategoryViewHolders: MutableList<LetterCategoryCardViewHolder> = mutableListOf()
 
     fun setLettersCategoryWise(letters: LinkedHashMap<String, ArrayList<String>>) {
         lettersCategoryWise = letters
@@ -61,8 +62,7 @@ class LetterCategoryAdapter(
     class LetterCategoryCardViewHolder(cardView: View): RecyclerView.ViewHolder(cardView) {
         val categoryHeader: ConstraintLayout
         val letterCategoryHeaderText: TextView
-        val letterGrid: RecyclerView
-        var letterGridAdapter: LetterGridAdapter? = null
+        val letterGrid: GridLayout
 
         init {
             categoryHeader = cardView.findViewById(R.id.letter_category_header)
@@ -73,7 +73,6 @@ class LetterCategoryAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LetterCategoryCardViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.letter_category, parent, false)
-        // Populate the gridLayout with the required number of
         return LetterCategoryCardViewHolder(view)
     }
 
@@ -87,11 +86,6 @@ class LetterCategoryAdapter(
                 it.toString()
         }
 
-        if(letterCategoryViewHolders.size <= position)
-            letterCategoryViewHolders.add(position, holder)
-        else
-            letterCategoryViewHolders[position] = holder
-
         initialiseLetterGrid(holder, position)
     }
 
@@ -102,25 +96,22 @@ class LetterCategoryAdapter(
         position: Int,
     ) {
         letterCategoryCardViewHolder.letterGrid.apply {
-            val mAdapter = LetterGridAdapter(lettersCategoryWise[getItem(position)]!!)
+            removeAllViews()
 
-            // Create a list of letter, transliteration pairs
-            lettersCategoryWise[getItem(position)]?.map {
-                Pair(it, transliterator.transliterate(it, targetLanguage))
-            }.let {
-                logDebug(logTag, "Submitting list $it for category: ${getItem(position)}")
-                mAdapter.submitList(it!!)
+            for((letterPosition, letter) in lettersCategoryWise[categories[position]]!!.withIndex()) {
+                val letterView: LetterView = LayoutInflater
+                    .from(letterCategoryCardViewHolder.letterGrid.context)
+                    .inflate(R.layout.letter_view,
+                        letterCategoryCardViewHolder.letterGrid, false) as LetterView
+                letterView.letters = Pair(letter, transliterator.transliterate(letter, targetLanguage))
+                letterCategoryCardViewHolder.letterGrid.addView(letterView)
             }
-
-            adapter = mAdapter
         }
-        letterCategoryCardViewHolder.letterGridAdapter =
-            letterCategoryCardViewHolder.letterGrid.adapter as LetterGridAdapter
     }
 
     fun updateTargetLanguage(language: String) {
         targetLanguage = language
-        logDebug(logTag, "TargeLanguage updated to $targetLanguage")
+        logDebug(logTag, "TargetLanguage updated to $targetLanguage")
     }
 
     fun updateTransliterator(transliterator: Transliterator) {
@@ -128,23 +119,22 @@ class LetterCategoryAdapter(
         logDebug(logTag, "Transliterator updated")
     }
 
-    fun updateLetterGrids() {
+    fun updateLetterGrids(categoryView: RecyclerView) {
         logDebug(logTag, "Updating letter grids...")
-        logDebug(logTag, "Size of CardViewHolder list: ${letterCategoryViewHolders.size}")
 
-        if(letterCategoryViewHolders.size > 0) {
-            for ((i: Int, viewHolder: LetterCategoryCardViewHolder) in letterCategoryViewHolders.withIndex()) {
-                logDebug(logTag, "Creating letter list for ${categories[i]}")
-                lettersCategoryWise[categories[i]]?.map {
+        for((i, category) in categories.withIndex()) {
+            logDebug(logTag, "Finding viewHolder for adapter position: $i")
+            (categoryView.findViewHolderForAdapterPosition(i) as? LetterCategoryCardViewHolder?)?.apply {
+                lettersCategoryWise[category]!!.map {
                     Pair(it, transliterator.transliterate(it, targetLanguage))
                 }.let {
-                    logDebug(logTag, "Submitting list $it for category: " +
-                            viewHolder.letterCategoryHeaderText.toString().lowercase()
-                    )
-                    viewHolder.letterGridAdapter!!.submitList(it!!)
+                        logDebug(logTag, "List contains: $it")
+                        letterGrid.children.forEachIndexed { i, view ->
+                            (view as LetterView).letters = it[i]
+                        }
+                    }
                 }
             }
-        }
     }
 
     override fun getItemCount(): Int {
