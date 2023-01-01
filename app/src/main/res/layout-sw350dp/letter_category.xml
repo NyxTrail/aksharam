@@ -26,7 +26,7 @@
             <TextView
                 android:id="@+id/letter_category_header_text"
                 android:layout_width="wrap_content"
-                style="@style/TextAppearance.Material3.HeadlineSmall"
+                style="@style/TextAppearance.Material3.HeadlineMedium"
                 android:layout_height="wrap_content"
                 tools:text="@string/test_text"
                 app:layout_constraintStart_toStartOf="parent"

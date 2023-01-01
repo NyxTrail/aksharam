@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <!--
  ~
  ~ Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
@@ -35,14 +36,14 @@
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:hint="@string/letters_tab_lang_input_hint"
+        app:layout_constraintEnd_toStartOf="@+id/convert_to_selector"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
-
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="none"
-            app:simpleItems="@array/dummy_list" />
+            app:simpleItems="@array/dummy_list"/>
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -51,11 +52,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
         android:hint="@string/letters_tab_trans_hint"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
+        app:layout_constraintEnd_toStartOf="@+id/lettersTabInfoButton"
+        app:layout_constraintStart_toEndOf="@id/language_selector"
+        app:layout_constraintTop_toTopOf="parent" >
         <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -65,28 +65,27 @@
 
     <Button
         android:id="@+id/lettersTabInfoButton"
-        style="@style/Widget.Material3.Button.OutlinedButton"
-        android:layout_width="match_parent"
+        style="?attr/materialIconButtonFilledStyle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginStart="8dp"
-        android:text="@string/language_info"
-        app:icon="@drawable/ic_baseline_info_24"
-        app:layout_constraintStart_toStartOf="@id/language_selector"
-        app:layout_constraintTop_toBottomOf="@id/language_selector" />
+        android:layout_marginEnd="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/letter_categories"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/convert_to_selector"
+        app:layout_constraintTop_toTopOf="parent"
+        app:icon="@drawable/ic_baseline_info_24" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/letter_categories"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintTop_toBottomOf="@id/language_selector"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/lettersTabInfoButton" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

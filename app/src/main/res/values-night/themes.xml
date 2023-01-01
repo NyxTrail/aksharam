@@ -49,4 +49,14 @@
         <item name="colorSurfaceInverse">@color/md_theme_dark_inverseSurface</item>
         <item name="colorPrimaryInverse">@color/md_theme_dark_inversePrimary</item>
     </style>
+
+    <style name="LetterView" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="LetterViewSmall" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>

@@ -54,4 +54,9 @@
         <item name="android:textSize">30sp</item>
         <item name="android:textStyle">normal</item>
     </style>
+
+    <style name="LetterViewSmall" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">22sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
 </resources>
