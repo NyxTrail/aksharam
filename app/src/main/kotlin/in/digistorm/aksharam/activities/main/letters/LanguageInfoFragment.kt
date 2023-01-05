@@ -20,6 +20,7 @@
 package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.databinding.LanguageInfoBinding
 import `in`.digistorm.aksharam.util.logDebug
 
 import android.view.LayoutInflater
@@ -28,7 +29,12 @@ import android.os.Bundle
 import android.widget.TextView
 import android.text.Html
 import android.view.View
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.text.HtmlCompat
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
 class LanguageInfoFragment : Fragment() {
     private val logTag = javaClass.simpleName
@@ -37,8 +43,25 @@ class LanguageInfoFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        super.onCreate(savedInstanceState)
-        return inflater.inflate(R.layout.language_info, container, false)
+        val binding: LanguageInfoBinding? = DataBindingUtil.inflate<LanguageInfoBinding?>(
+            inflater,
+            R.layout.language_info,
+            container,
+            false
+        ).apply {
+            composeView.apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+                val info: String? = requireArguments().getString("info")
+                if(info != null) {
+                    setContent {
+                        Mdc3Theme {
+                            LanguageInfo(info)
+                        }
+                    }
+                }
+            }
+        }
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -46,7 +69,7 @@ class LanguageInfoFragment : Fragment() {
         var info: String? = null
         if (arguments != null) info = requireArguments().getString("info")
         if (info == null) logDebug(logTag, "Info is null")
-        (view.findViewById<View>(R.id.languageInfoTV) as TextView).text = Html.fromHtml(info)
+        // (view.findViewById<View>(R.id.languageInfoTV) as TextView).text = Html.fromHtml(info)
     }
 
     companion object {
