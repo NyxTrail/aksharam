@@ -19,37 +19,57 @@
  */
 package `in`.digistorm.aksharam.activities.main.letters
 
+import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.util.logDebug
 import android.text.method.LinkMovementMethod
+import android.util.TypedValue
+import android.view.View
 import android.widget.TextView
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.text.HtmlCompat
+import androidx.core.view.marginStart
+import androidx.core.widget.TextViewCompat
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
 @Composable
 fun LanguageInfo(info: String) {
     val htmlInfo = HtmlCompat.fromHtml(info, HtmlCompat.FROM_HTML_MODE_COMPACT)
+    val modifier: Modifier = Modifier
+        .padding(dimensionResource(id = R.dimen.html_margin_horizontal_major))
+        .verticalScroll(rememberScrollState(), true)
 
     Mdc3Theme {
-        Surface {
-            AndroidView(
-                factory = { context ->
-                    TextView(context).apply {
-                        movementMethod = LinkMovementMethod.getInstance()
-                    }
-                },
-                update = { textView ->
-                    textView.text = htmlInfo
+        AndroidView(
+            factory = { context ->
+                AppCompatTextView(context).apply {
+                    TextViewCompat.setTextAppearance(this, R.style.LanguageInfo)
+                    scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY
+                    movementMethod = LinkMovementMethod.getInstance()
                 }
-            )
-        }
+            },
+            modifier = modifier,
+            update = { textView ->
+                textView.text = htmlInfo
+            }
+        )
     }
 }
 
 @Preview
 @Composable
 fun LanguageInfoPreview() {
-    LanguageInfo("This is some text in HTML<br/> used to test compose preview.<br>")
+    Mdc3Theme {
+        LanguageInfo("This is some text in HTML<br/> used to test compose preview.<br>")
+    }
 }

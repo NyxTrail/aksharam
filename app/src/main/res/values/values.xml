@@ -51,6 +51,14 @@
     <!-- this thing is not used yet. should be used in LetterCategoryAdapter.java around line 161 !-->
     <dimen name="letter_grid_text_size">22dp</dimen>
 
+    <dimen name="margin_horizontal_major">8dp</dimen>
+    <dimen name="margin_horizontal_minor">4dp</dimen>
+    <dimen name="margin_vertical_major">8dp</dimen>
+    <dimen name="margin_vertical_minor">4dp</dimen>
+
+    <!-- Horizontal margin for screen that display only HTML -->
+    <dimen name="html_margin_horizontal_major">16dp</dimen>
+
     <array name="dummy_list">
         <item>Item 1</item>
         <item>Item 2</item>
