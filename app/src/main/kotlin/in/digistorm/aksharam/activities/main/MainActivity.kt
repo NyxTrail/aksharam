@@ -20,90 +20,41 @@
 
 package `in`.digistorm.aksharam.activities.main
 
-import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.util.GlobalSettings
-import `in`.digistorm.aksharam.activities.htmlinfo.HTMLInfoActivity
-import `in`.digistorm.aksharam.activities.settings.SettingsActivity
-import `in`.digistorm.aksharam.activities.main.letters.LetterInfoFragment
 import `in`.digistorm.aksharam.activities.initialise.InitialiseAppActivity
-import `in`.digistorm.aksharam.util.getDownloadedLanguages
+import `in`.digistorm.aksharam.activities.main.screens.LettersScreen
+import `in`.digistorm.aksharam.activities.main.screens.PracticeScreen
+import `in`.digistorm.aksharam.activities.main.screens.TransliterateScreen
 import `in`.digistorm.aksharam.util.logDebug
 
-import androidx.appcompat.app.AppCompatActivity
-import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import android.os.Bundle
-import androidx.viewpager2.widget.ViewPager2
-import com.google.android.material.tabs.TabLayout
-import com.google.android.material.tabs.TabLayoutMediator
 import android.content.Intent
-import android.view.Menu
-import android.view.MenuItem
-import androidx.appcompat.app.AppCompatDelegate
-import androidx.fragment.app.Fragment
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
-class MainActivity : AppCompatActivity(), OnTabSelectedListener {
-    private var tabPosition = 0
+class MainActivity : ComponentActivity() {
     private val logTag = javaClass.simpleName
-    private lateinit var tabHeads: Array<String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
-        if (GlobalSettings.instance == null) GlobalSettings.createInstance(this)
-        tabHeads = arrayOf(
-            getText(R.string.letters_tab_header).toString(),
-            getText(R.string.transliterate_tab_header).toString(),
-            getText(R.string.practice_tab_header).toString()
-        )
-        pageCollectionAdapter = PageCollectionAdapter(this)
-        val viewPager = findViewById<ViewPager2>(R.id.pager)
-        viewPager.adapter = pageCollectionAdapter
-        val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
-        tabLayout.addOnTabSelectedListener(this)
-        val tabLayoutMediator = TabLayoutMediator(
-            tabLayout, viewPager
-        ) { tab: TabLayout.Tab, position: Int -> tab.text = tabHeads[position] }
-        tabLayoutMediator.attach()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.action_bar_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        logDebug(logTag, "menuItem clicked: $item , id: $id")
-        if (id == R.id.action_bar_settings) {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        } else if (id == R.id.dark_light_mode) {
-            GlobalSettings.instance?.setDarkMode(!GlobalSettings.instance!!.darkMode, this)
-            val mode = if (GlobalSettings.instance!!.darkMode
-            ) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            for (t in supportFragmentManager.fragments) {
-                /* LetterInfoFragment has to be re-initialised correctly when the uiMode *
-                 * configuration change happens due to switching light/dark modes.       *
-                 * We will simply close LetterInfoFragment if it is open. This should    *
-                 * land us in Letters tab, if we were in LetterInfo when dark/light mode *
-                 * was pressed.
-                 */
-                if (t is LetterInfoFragment) supportFragmentManager.beginTransaction().remove(t)
-                    .commit()
-            }
-            AppCompatDelegate.setDefaultNightMode(mode)
-        } else if (id == R.id.help) {
-            val intent = Intent(this, HTMLInfoActivity::class.java)
-            intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.ExtraValues.HELP)
-            startActivity(intent)
-        } else if (id == R.id.privacy) {
-            val intent = Intent(this, HTMLInfoActivity::class.java)
-            intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.ExtraValues.PRIVACY)
-            startActivity(intent)
+        setContent {
+            Aksharam()
         }
-        return super.onOptionsItemSelected(item)
     }
 
     fun startInitialisationAcitivity() {
@@ -114,32 +65,57 @@ class MainActivity : AppCompatActivity(), OnTabSelectedListener {
         finish()
     }
 
-    override fun onBackPressed() {
-        if (!pageCollectionAdapter!!.restoreFragment(tabPosition)) super.onBackPressed()
-    }
+    @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
+    @Composable
+    private fun Aksharam() {
+        val tabs = listOf("Letters", "Transliterate", "Practice")
+        val viewModel = AksharamViewModel(tabs = tabs)
+        val pagerState = rememberPagerState()
 
-    public override fun onResume() {
-        super.onResume()
-
-        // if there are no downloaded files, switch to Initialisation activity
-        if (getDownloadedLanguages(this).isEmpty()) {
-            logDebug(logTag, "No files found in data directory. Switching to initialisation activity.")
-            startInitialisationAcitivity()
+        Mdc3Theme {
+            Scaffold(
+                topBar = {
+                    AksharamTopBar()
+                }
+            ) { paddingValues ->
+                Column {
+                    AksharamTabRow(
+                        tabs = tabs,
+                        setState = { id -> viewModel.tabState = id },
+                        // Restore selected tab index from viewModel
+                        // View model will initialise this to 0 if a state does not exist
+                        selectedTabIndex = viewModel.tabState,
+                        setPagerIndicator = { tabPositions ->
+                            TabRowDefaults.Indicator(
+                                Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+                            )
+                        },
+                        modifier = Modifier.padding(paddingValues)
+                    )
+                    HorizontalPager(count = tabs.size, state = pagerState) { tabIndex ->
+                        when(tabIndex as Int) {
+                            0 -> LettersScreen(
+                                modifier = Modifier.fillMaxSize()
+                                    .background(Color.Black)
+                            )
+                            1 -> TransliterateScreen(
+                                modifier = Modifier.fillMaxSize()
+                                    .background(Color.Blue)
+                            )
+                            2 -> PracticeScreen(
+                                modifier = Modifier.fillMaxSize()
+                                    .background(Color.Cyan)
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 
-    override fun onTabSelected(tab: TabLayout.Tab) {
-        tabPosition = tab.position
-    }
-
-    override fun onTabUnselected(tab: TabLayout.Tab) {}
-    override fun onTabReselected(tab: TabLayout.Tab) {}
-
-    companion object {
-        private var pageCollectionAdapter: PageCollectionAdapter? = null
-        @JvmStatic
-        fun replaceTabFragment(index: Int, fragment: Fragment?) {
-            pageCollectionAdapter!!.replaceFragment(index, fragment!!)
-        }
+    @Preview
+    @Composable
+    fun AksharamPreview() {
+        Aksharam()
     }
 }

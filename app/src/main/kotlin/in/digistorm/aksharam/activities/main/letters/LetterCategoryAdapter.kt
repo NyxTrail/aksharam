@@ -162,7 +162,7 @@ class LetterCategoryAdapter(
                         targetLanguage,
                         transliterator,
                     )
-                    MainActivity.replaceTabFragment(0, letterInfoFragment)
+                    // MainActivity.replaceTabFragment(0, letterInfoFragment)
                     true
                 }
                 letterView.letters = Pair(letter, transliterator.transliterate(letter, targetLanguage))

@@ -33,6 +33,7 @@ import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.text.HtmlCompat
 import androidx.databinding.DataBindingUtil
+import androidx.databinding.DataBindingUtil.setContentView
 import androidx.fragment.app.Fragment
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
 
@@ -65,7 +66,6 @@ class LanguageInfoFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         var info: String? = null
         if (arguments != null) info = requireArguments().getString("info")
         if (info == null) logDebug(logTag, "Info is null")
