@@ -36,8 +36,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.TabRowDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
@@ -45,6 +47,7 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.rememberPagerState
 import com.google.accompanist.themeadapter.material3.Mdc3Theme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val logTag = javaClass.simpleName
@@ -57,7 +60,7 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    fun startInitialisationAcitivity() {
+    fun startInitialisationActivity() {
         logDebug(logTag, "MainActivity ending. Starting Initialisation Activity.")
         val intent = Intent(this, InitialiseAppActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -71,6 +74,7 @@ class MainActivity : ComponentActivity() {
         val tabs = listOf("Letters", "Transliterate", "Practice")
         val viewModel = AksharamViewModel(tabs = tabs)
         val pagerState = rememberPagerState()
+        val coroutineScope = rememberCoroutineScope()
 
         Mdc3Theme {
             Scaffold(
@@ -79,31 +83,40 @@ class MainActivity : ComponentActivity() {
                 }
             ) { paddingValues ->
                 Column {
-                    AksharamTabRow(
-                        tabs = tabs,
-                        setState = { id -> viewModel.tabState = id },
+                    TabRow(
                         // Restore selected tab index from viewModel
                         // View model will initialise this to 0 if a state does not exist
-                        selectedTabIndex = viewModel.tabState,
-                        setPagerIndicator = { tabPositions ->
+                        selectedTabIndex = pagerState.currentPage,
+                        indicator = { tabPositions ->
                             TabRowDefaults.Indicator(
                                 Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
                             )
                         },
                         modifier = Modifier.padding(paddingValues)
-                    )
+                    ) {
+                        tabs.forEachIndexed { index, tabName -> 
+                            AksharamTab(
+                                tabName = tabName,
+                                onClick = { coroutineScope.launch { pagerState.animateScrollToPage(page = index)} },
+                                selected = pagerState.currentPage == index
+                            )
+                        }
+                    }
                     HorizontalPager(count = tabs.size, state = pagerState) { tabIndex ->
-                        when(tabIndex as Int) {
+                        when(tabIndex) {
                             0 -> LettersScreen(
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier
+                                    .fillMaxSize()
                                     .background(Color.Black)
                             )
                             1 -> TransliterateScreen(
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier
+                                    .fillMaxSize()
                                     .background(Color.Blue)
                             )
                             2 -> PracticeScreen(
-                                modifier = Modifier.fillMaxSize()
+                                modifier = Modifier
+                                    .fillMaxSize()
                                     .background(Color.Cyan)
                             )
                         }
