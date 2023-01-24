@@ -13,10 +13,26 @@
         <action
             android:id="@+id/action_tabbedViewsFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
+        <action
+            android:id="@+id/action_tabbedViewsFragment_to_helpFragment"
+            app:destination="@id/helpFragment" />
+        <action
+            android:id="@+id/action_tabbedViewsFragment_to_privacyPolicyFragment"
+            app:destination="@id/privacyPolicyFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="in.digistorm.aksharam.activities.main.SettingsFragment"
         android:label="@string/settings"
         tools:layout="@layout/fragment_settings"/>
+    <fragment
+        android:id="@+id/helpFragment"
+        android:name="in.digistorm.aksharam.activities.main.HelpFragment"
+        android:label="@string/help"
+        tools:layout="@layout/fragment_help"/>
+    <fragment
+        android:id="@+id/privacyPolicyFragment"
+        android:name="in.digistorm.aksharam.activities.main.PrivacyFragment"
+        android:label="@string/privacy"
+        tools:layout="@layout/fragment_privacy"/>
 </navigation>

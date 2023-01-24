@@ -93,14 +93,10 @@ class MainActivity : AppCompatActivity() {
                 AppCompatDelegate.setDefaultNightMode(mode)
             }
             R.id.help -> {
-                val intent = Intent(this, HTMLInfoActivity::class.java)
-                intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.ExtraValues.HELP)
-                startActivity(intent)
+                navController.navigate(R.id.action_tabbedViewsFragment_to_helpFragment)
             }
             R.id.privacy -> {
-                val intent = Intent(this, HTMLInfoActivity::class.java)
-                intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.ExtraValues.PRIVACY)
-                startActivity(intent)
+                navController.navigate(R.id.action_tabbedViewsFragment_to_privacyPolicyFragment)
             }
         }
         return super.onOptionsItemSelected(item)

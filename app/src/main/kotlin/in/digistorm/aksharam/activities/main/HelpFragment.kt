@@ -20,7 +20,25 @@
 
 package `in`.digistorm.aksharam.activities.main
 
+import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.databinding.FragmentHelpBinding
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 
 class HelpFragment: Fragment() {
+    private lateinit var fragmentHelpBinding: FragmentHelpBinding
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        fragmentHelpBinding = FragmentHelpBinding.inflate(layoutInflater, container, false)
+        fragmentHelpBinding.textView.text = HtmlCompat.fromHtml(getString(R.string.help_text), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        return fragmentHelpBinding.root
+    }
 }
