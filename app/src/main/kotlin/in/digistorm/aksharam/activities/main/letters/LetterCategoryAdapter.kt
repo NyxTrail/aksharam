@@ -20,7 +20,6 @@
 package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.activities.main.MainActivity
 import `in`.digistorm.aksharam.util.ExpandableCardView
 import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.logDebug
@@ -162,7 +161,7 @@ class LetterCategoryAdapter(
                         targetLanguage,
                         transliterator,
                     )
-                    MainActivity.replaceTabFragment(0, letterInfoFragment)
+                    // MainActivity.replaceTabFragment(0, letterInfoFragment)
                     true
                 }
                 letterView.letters = Pair(letter, transliterator.transliterate(letter, targetLanguage))

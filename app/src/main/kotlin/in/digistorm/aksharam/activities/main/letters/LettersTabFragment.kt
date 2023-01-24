@@ -87,7 +87,7 @@ class LettersTabFragment: Fragment() {
             logDebug(logTag, "Data for info: $info")
             val lif = LanguageInfoFragment.newInstance(
                 info["general"]?.get("en") + info[viewModel.targetLanguage.lowercase()]?.get("en"))
-            MainActivity.replaceTabFragment(0, lif)
+            // MainActivity.replaceTabFragment(0, lif)
         }
 
         val categoryListViewAdapter = LetterCategoryAdapter(

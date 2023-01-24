@@ -62,7 +62,7 @@ class SettingsLanguageListAdapter(
                         logDebug(logTag, "Download completed for file: $fileName")
                         v.visibility = View.GONE
                         val deleteIV =
-                            holder.parentConstraintLayout.findViewById<ImageView>(R.id.ManageLanguageDeleteIV)
+                            holder.parentConstraintLayout.findViewById<ImageView>(R.id.none)
                         deleteIV.visibility = View.VISIBLE
                         val deleteClickListener = DeleteClickListener(holder, true, adapter)
                         deleteIV.setOnClickListener(deleteClickListener)
@@ -112,7 +112,7 @@ class SettingsLanguageListAdapter(
                 activity.deleteFile(fileName)
                 v.visibility = View.GONE
                 val downloadIV =
-                    holder.parentConstraintLayout.findViewById<ImageView>(R.id.ManageLanguageDownloadIV)
+                    holder.parentConstraintLayout.findViewById<ImageView>(R.id.none)
                 downloadIV.visibility = View.VISIBLE
                 val downloadClickListener = DownloadClickListener(holder, adapter)
                 downloadIV.setOnClickListener(downloadClickListener)
@@ -135,7 +135,7 @@ class SettingsLanguageListAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val langItemTV = holder.parentConstraintLayout.findViewById<TextView>(R.id.ManageLanguageTV)
+        val langItemTV = holder.parentConstraintLayout.findViewById<TextView>(R.id.none)
         try {
             if (onlineFiles != null) {
                 logDebug(logTag, "Data file list from repo is available.")
@@ -144,14 +144,14 @@ class SettingsLanguageListAdapter(
                 if (fileList!!.contains(fileName)) {
                     logDebug(logTag, "Found file $fileName in the local download directory.")
                     val deleteIV =
-                        holder.parentConstraintLayout.findViewById<ImageView>(R.id.ManageLanguageDeleteIV)
+                        holder.parentConstraintLayout.findViewById<ImageView>(R.id.none)
                     deleteIV.visibility = View.VISIBLE
                     val deleteClickListener = DeleteClickListener(holder, true, this)
                     deleteIV.setOnClickListener(deleteClickListener)
                 } else {
                     logDebug(logTag, "Could not find file $fileName in the local download directory.")
                     val downloadIV =
-                        holder.parentConstraintLayout.findViewById<ImageView>(R.id.ManageLanguageDownloadIV)
+                        holder.parentConstraintLayout.findViewById<ImageView>(R.id.none)
                     downloadIV.visibility = View.VISIBLE
                     val downloadClickListener = DownloadClickListener(holder, this)
                     downloadIV.setOnClickListener(downloadClickListener)
@@ -168,7 +168,7 @@ class SettingsLanguageListAdapter(
                 text = text.substring(0, 1).uppercase() + text.substring(1, text.length - 5)
                 langItemTV.text = text
                 val deleteIV =
-                    holder.parentConstraintLayout.findViewById<ImageView>(R.id.ManageLanguageDeleteIV)
+                    holder.parentConstraintLayout.findViewById<ImageView>(R.id.none)
                 deleteIV.visibility = View.VISIBLE
                 val deleteClickListener = DeleteClickListener(holder, false, this)
                 deleteIV.setOnClickListener(deleteClickListener)

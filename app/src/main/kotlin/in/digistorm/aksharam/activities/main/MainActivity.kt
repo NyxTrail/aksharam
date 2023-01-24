@@ -26,6 +26,7 @@ import `in`.digistorm.aksharam.activities.htmlinfo.HTMLInfoActivity
 import `in`.digistorm.aksharam.activities.settings.SettingsActivity
 import `in`.digistorm.aksharam.activities.main.letters.LetterInfoFragment
 import `in`.digistorm.aksharam.activities.initialise.InitialiseAppActivity
+import `in`.digistorm.aksharam.databinding.ActivityMainBinding
 import `in`.digistorm.aksharam.util.getDownloadedLanguages
 import `in`.digistorm.aksharam.util.logDebug
 
@@ -39,32 +40,27 @@ import android.content.Intent
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.setupActionBarWithNavController
 
-class MainActivity : AppCompatActivity(), OnTabSelectedListener {
-    private var tabPosition = 0
+class MainActivity : AppCompatActivity() {
     private val logTag = javaClass.simpleName
-    private lateinit var tabHeads: Array<String>
+
+    private lateinit var activityMainBinding: ActivityMainBinding
+    private val navController: NavController
+        get() = activityMainBinding.navHostFragmentContainer.getFragment<NavHostFragment>().navController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+
+        activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        setupActionBarWithNavController(navController)
 
         if (GlobalSettings.instance == null) GlobalSettings.createInstance(this)
-        tabHeads = arrayOf(
-            getText(R.string.letters_tab_header).toString(),
-            getText(R.string.transliterate_tab_header).toString(),
-            getText(R.string.practice_tab_header).toString()
-        )
-        pageCollectionAdapter = PageCollectionAdapter(this)
-        val viewPager = findViewById<ViewPager2>(R.id.pager)
-        viewPager.adapter = pageCollectionAdapter
-        val tabLayout = findViewById<TabLayout>(R.id.tab_layout)
-        tabLayout.addOnTabSelectedListener(this)
-        val tabLayoutMediator = TabLayoutMediator(
-            tabLayout, viewPager
-        ) { tab: TabLayout.Tab, position: Int -> tab.text = tabHeads[position] }
-        tabLayoutMediator.attach()
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -76,32 +72,36 @@ class MainActivity : AppCompatActivity(), OnTabSelectedListener {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         val id = item.itemId
         logDebug(logTag, "menuItem clicked: $item , id: $id")
-        if (id == R.id.action_bar_settings) {
-            val intent = Intent(this, SettingsActivity::class.java)
-            startActivity(intent)
-        } else if (id == R.id.dark_light_mode) {
-            GlobalSettings.instance?.setDarkMode(!GlobalSettings.instance!!.darkMode, this)
-            val mode = if (GlobalSettings.instance!!.darkMode
-            ) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-            for (t in supportFragmentManager.fragments) {
-                /* LetterInfoFragment has to be re-initialised correctly when the uiMode *
-                 * configuration change happens due to switching light/dark modes.       *
-                 * We will simply close LetterInfoFragment if it is open. This should    *
-                 * land us in Letters tab, if we were in LetterInfo when dark/light mode *
-                 * was pressed.
-                 */
-                if (t is LetterInfoFragment) supportFragmentManager.beginTransaction().remove(t)
-                    .commit()
+        when (id) {
+            R.id.action_bar_settings -> {
+                navController.navigate(R.id.action_tabbedViewsFragment_to_settingsFragment)
             }
-            AppCompatDelegate.setDefaultNightMode(mode)
-        } else if (id == R.id.help) {
-            val intent = Intent(this, HTMLInfoActivity::class.java)
-            intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.ExtraValues.HELP)
-            startActivity(intent)
-        } else if (id == R.id.privacy) {
-            val intent = Intent(this, HTMLInfoActivity::class.java)
-            intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.ExtraValues.PRIVACY)
-            startActivity(intent)
+            R.id.dark_light_mode -> {
+                GlobalSettings.instance?.setDarkMode(!GlobalSettings.instance!!.darkMode, this)
+                val mode = if (GlobalSettings.instance!!.darkMode
+                ) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+                for (t in supportFragmentManager.fragments) {
+                    /* LetterInfoFragment has to be re-initialised correctly when the uiMode *
+                     * configuration change happens due to switching light/dark modes.       *
+                     * We will simply close LetterInfoFragment if it is open. This should    *
+                     * land us in Letters tab, if we were in LetterInfo when dark/light mode *
+                     * was pressed.
+                     */
+                    if (t is LetterInfoFragment) supportFragmentManager.beginTransaction().remove(t)
+                        .commit()
+                }
+                AppCompatDelegate.setDefaultNightMode(mode)
+            }
+            R.id.help -> {
+                val intent = Intent(this, HTMLInfoActivity::class.java)
+                intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.ExtraValues.HELP)
+                startActivity(intent)
+            }
+            R.id.privacy -> {
+                val intent = Intent(this, HTMLInfoActivity::class.java)
+                intent.putExtra(HTMLInfoActivity.EXTRA_NAME, HTMLInfoActivity.ExtraValues.PRIVACY)
+                startActivity(intent)
+            }
         }
         return super.onOptionsItemSelected(item)
     }
@@ -114,10 +114,6 @@ class MainActivity : AppCompatActivity(), OnTabSelectedListener {
         finish()
     }
 
-    override fun onBackPressed() {
-        if (!pageCollectionAdapter!!.restoreFragment(tabPosition)) super.onBackPressed()
-    }
-
     public override fun onResume() {
         super.onResume()
 
@@ -125,21 +121,6 @@ class MainActivity : AppCompatActivity(), OnTabSelectedListener {
         if (getDownloadedLanguages(this).isEmpty()) {
             logDebug(logTag, "No files found in data directory. Switching to initialisation activity.")
             startInitialisationAcitivity()
-        }
-    }
-
-    override fun onTabSelected(tab: TabLayout.Tab) {
-        tabPosition = tab.position
-    }
-
-    override fun onTabUnselected(tab: TabLayout.Tab) {}
-    override fun onTabReselected(tab: TabLayout.Tab) {}
-
-    companion object {
-        private var pageCollectionAdapter: PageCollectionAdapter? = null
-        @JvmStatic
-        fun replaceTabFragment(index: Int, fragment: Fragment?) {
-            pageCollectionAdapter!!.replaceFragment(index, fragment!!)
         }
     }
 }
