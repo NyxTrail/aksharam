@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    fun startInitialisationAcitivity() {
+    fun startInitialisationActivity() {
         logDebug(logTag, "MainActivity ending. Starting Initialisation Activity.")
         val intent = Intent(this, InitialiseAppActivity::class.java)
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -120,7 +120,7 @@ class MainActivity : AppCompatActivity() {
         // if there are no downloaded files, switch to Initialisation activity
         if (getDownloadedLanguages(this).isEmpty()) {
             logDebug(logTag, "No files found in data directory. Switching to initialisation activity.")
-            startInitialisationAcitivity()
+            startInitialisationActivity()
         }
     }
 }

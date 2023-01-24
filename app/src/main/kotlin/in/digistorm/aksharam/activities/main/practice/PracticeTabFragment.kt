@@ -148,7 +148,7 @@ class PracticeTabFragment : Fragment() {
     private fun getAllDownloadedLanguages(): ArrayList<String> {
         val languages: ArrayList<String> = getDownloadedLanguages(requireContext())
         if (languages.size == 0) {
-            (requireActivity() as MainActivity).startInitialisationAcitivity()
+            (requireActivity() as MainActivity).startInitialisationActivity()
             return ArrayList()
         }
         return languages
