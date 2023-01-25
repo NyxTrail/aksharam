@@ -22,6 +22,8 @@
  ~
  -->
 
+<!-- The menu item id's here must match the id's of the fragments defined in
+  navigation/nav_graph.xml for automatic navigation to work. -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
@@ -30,15 +32,15 @@
         android:icon="@drawable/ic_outline_brightness_medium_24"
         app:showAsAction="ifRoom" />
     <item
-        android:id="@+id/action_bar_settings"
+        android:id="@+id/settingsFragment"
         android:title="@string/settings"
         android:icon="@drawable/ic_baseline_settings_24" />
     <item
-        android:id="@+id/help"
+        android:id="@+id/helpFragment"
         android:title="@string/help"
         android:icon="@drawable/ic_baseline_help_24" />
     <item
-        android:id="@+id/privacy"
+        android:id="@+id/privacyPolicyFragment"
         android:title="@string/privacy"
         android:icon="@drawable/ic_baseline_privacy_24" />
 </menu>

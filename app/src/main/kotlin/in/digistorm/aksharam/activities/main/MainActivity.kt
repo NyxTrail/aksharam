@@ -45,20 +45,22 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.onNavDestinationSelected
 import androidx.navigation.ui.setupActionBarWithNavController
 
 class MainActivity : AppCompatActivity() {
     private val logTag = javaClass.simpleName
 
     private lateinit var activityMainBinding: ActivityMainBinding
-    private val navController: NavController
-        get() = activityMainBinding.navHostFragmentContainer.getFragment<NavHostFragment>().navController
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
-        setupActionBarWithNavController(navController)
+        val navController = activityMainBinding.navHostFragmentContainer.getFragment<NavHostFragment>().navController
+        val appBarConfiguration = AppBarConfiguration(navController.graph)
+        setupActionBarWithNavController(navController, appBarConfiguration)
 
         if (GlobalSettings.instance == null) GlobalSettings.createInstance(this)
     }
@@ -69,37 +71,16 @@ class MainActivity : AppCompatActivity() {
         return super.onCreateOptionsMenu(menu)
     }
 
+    override fun onSupportNavigateUp(): Boolean {
+        logDebug(logTag, "Action bar back button pressed!")
+        val navController = findNavController(R.id.nav_host_fragment_container)
+        return navController.navigateUp() || super.onSupportNavigateUp()
+    }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val id = item.itemId
-        logDebug(logTag, "menuItem clicked: $item , id: $id")
-        when (id) {
-            R.id.action_bar_settings -> {
-                navController.navigate(R.id.action_tabbedViewsFragment_to_settingsFragment)
-            }
-            R.id.dark_light_mode -> {
-                GlobalSettings.instance?.setDarkMode(!GlobalSettings.instance!!.darkMode, this)
-                val mode = if (GlobalSettings.instance!!.darkMode
-                ) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
-                for (t in supportFragmentManager.fragments) {
-                    /* LetterInfoFragment has to be re-initialised correctly when the uiMode *
-                     * configuration change happens due to switching light/dark modes.       *
-                     * We will simply close LetterInfoFragment if it is open. This should    *
-                     * land us in Letters tab, if we were in LetterInfo when dark/light mode *
-                     * was pressed.
-                     */
-                    if (t is LetterInfoFragment) supportFragmentManager.beginTransaction().remove(t)
-                        .commit()
-                }
-                AppCompatDelegate.setDefaultNightMode(mode)
-            }
-            R.id.help -> {
-                navController.navigate(R.id.action_tabbedViewsFragment_to_helpFragment)
-            }
-            R.id.privacy -> {
-                navController.navigate(R.id.action_tabbedViewsFragment_to_privacyPolicyFragment)
-            }
-        }
-        return super.onOptionsItemSelected(item)
+        logDebug(logTag, "Menu item clicked: $item , id: ${item.itemId}")
+        val navController = findNavController(R.id.nav_host_fragment_container)
+        return item.onNavDestinationSelected(navController) || super.onOptionsItemSelected(item)
     }
 
     fun startInitialisationActivity() {
