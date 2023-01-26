@@ -21,6 +21,8 @@ package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.MainActivity
+import `in`.digistorm.aksharam.activities.main.TabbedViewsDirections
+import `in`.digistorm.aksharam.databinding.TabbedViewsBinding
 import `in`.digistorm.aksharam.util.*
 
 import android.os.Bundle
@@ -28,6 +30,7 @@ import android.view.*
 import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import com.google.android.material.textfield.TextInputLayout
@@ -60,7 +63,7 @@ class LettersTabFragment: Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.letters_layout, container, false)
+        return inflater.inflate(R.layout.fragment_letters_tab, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -85,9 +88,10 @@ class LettersTabFragment: Fragment() {
                         "to ${viewModel.targetLanguage}")
             val info: HashMap<String, Map<String, String>> = viewModel.transliterator!!.languageData.info
             logDebug(logTag, "Data for info: $info")
-            val lif = LanguageInfoFragment.newInstance(
-                info["general"]?.get("en") + info[viewModel.targetLanguage.lowercase()]?.get("en"))
-            // MainActivity.replaceTabFragment(0, lif)
+            val action = TabbedViewsDirections.actionTabbedViewsFragmentToLanguageInfoFragment(
+                info = info[viewModel.targetLanguage.lowercase()]?.get("en")!!
+            )
+            findNavController().navigate(action)
         }
 
         val categoryListViewAdapter = LetterCategoryAdapter(

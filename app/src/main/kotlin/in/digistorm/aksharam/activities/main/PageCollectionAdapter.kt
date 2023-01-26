@@ -22,7 +22,6 @@ package `in`.digistorm.aksharam.activities.main
 import `in`.digistorm.aksharam.activities.main.letters.LettersTabFragment
 import `in`.digistorm.aksharam.activities.main.practice.PracticeTabFragment
 import `in`.digistorm.aksharam.activities.main.transliterate.TransliterateTabFragment
-import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.logDebug
 
 import androidx.fragment.app.Fragment
@@ -30,7 +29,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.util.*
 
-class PageCollectionAdapter(fragmentActivity: FragmentActivity?) : FragmentStateAdapter(fragmentActivity!!) {
+class PageCollectionAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
     private val logTag = javaClass.simpleName
     private val fragments = ArrayList<Fragment>()
     private val backStack = ArrayList<Stack<Fragment>>()

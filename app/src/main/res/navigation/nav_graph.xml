@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_tabbedViewsFragment_to_privacyPolicyFragment"
             app:destination="@id/privacyPolicyFragment" />
+        <action
+            android:id="@+id/action_tabbedViewsFragment_to_languageInfoFragment"
+            app:destination="@id/languageInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -35,4 +38,13 @@
         android:name="in.digistorm.aksharam.activities.main.PrivacyFragment"
         android:label="@string/privacy"
         tools:layout="@layout/fragment_privacy"/>
+    <fragment
+        android:id="@+id/languageInfoFragment"
+        android:name="in.digistorm.aksharam.activities.main.letters.LanguageInfoFragment"
+        android:label="LanguageInfoFragment"
+        tools:layout="@layout/language_info" >
+        <argument
+            android:name="info"
+            app:argType="string" />
+    </fragment>
 </navigation>

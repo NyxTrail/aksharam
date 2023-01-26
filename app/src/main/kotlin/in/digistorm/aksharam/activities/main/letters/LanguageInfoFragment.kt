@@ -19,43 +19,36 @@
  */
 package `in`.digistorm.aksharam.activities.main.letters
 
-import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.databinding.LanguageInfoBinding
 import `in`.digistorm.aksharam.util.logDebug
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
-import android.widget.TextView
-import android.text.Html
 import android.view.View
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.navArgs
 
 class LanguageInfoFragment : Fragment() {
     private val logTag = javaClass.simpleName
+
+    private lateinit var binding: LanguageInfoBinding
+    private val args: LanguageInfoFragmentArgs by navArgs()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         super.onCreate(savedInstanceState)
-        return inflater.inflate(R.layout.language_info, container, false)
+        binding = LanguageInfoBinding.inflate(inflater, container, false)
+
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        var info: String? = null
-        if (arguments != null) info = requireArguments().getString("info")
-        if (info == null) logDebug(logTag, "Info is null")
-        (view.findViewById<View>(R.id.languageInfoTV) as TextView).text = Html.fromHtml(info)
-    }
-
-    companion object {
-        fun newInstance(info: String?): LanguageInfoFragment {
-            val lif = LanguageInfoFragment()
-            val args = Bundle()
-            args.putString("info", info)
-            lif.arguments = args
-            return lif
-        }
+        logDebug(logTag, "Displaying info: ${args.info}")
+        binding.languageInfoTV.text = HtmlCompat.fromHtml(args.info, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 }
