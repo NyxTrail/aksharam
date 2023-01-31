@@ -52,7 +52,7 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
                     if (random.nextInt(100) < 21 && prevChar != virama) {
                         // for malayalam, there is also a chance the next character is a chillu
                         nextChar =
-                            if (viewModel.getLanguage().equals("malayalam", ignoreCase = true)) {
+                            if (viewModel.language.equals("malayalam", ignoreCase = true)) {
                                 if (random.nextInt(100) < 31)
                                     chillu[random.nextInt(chillu.size)]
                                 else  // Since it's malayalam, we can just get one of the ligatures at random

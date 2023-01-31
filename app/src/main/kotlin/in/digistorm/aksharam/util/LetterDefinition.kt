@@ -1,4 +1,4 @@
-/*
+/**
  * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
  *
  * This files is part of Aksharam, a script teaching app for Indic
@@ -19,32 +19,43 @@
  */
 package `in`.digistorm.aksharam.util
 
+import android.os.Parcelable
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonAnySetter
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import java.util.ArrayList
 import kotlin.collections.LinkedHashMap
 
-class LetterDefinition {
-    val type: String = ""
+@Parcelize
+class LetterDefinition(
+    val type: String = "",
 
-    val examples: LinkedHashMap<String, Map<String, String>> = LinkedHashMap()
-    val info: LinkedHashMap<String, String> = LinkedHashMap()
+    val examples: LinkedHashMap<String, Map<String, String>> = LinkedHashMap(),
+    val info: LinkedHashMap<String, String> = LinkedHashMap(),
 
-    var isVirama: Boolean = false
+    var isVirama: Boolean = false,
 
-    var base: String = ""
+    var base: String = "",
 
     @JsonProperty("combine_after")
-    var combineAfter: Boolean? = null
+    val combineAfter: Boolean? = null,
 
     @JsonProperty("combine_before")
-    var combineBefore: Boolean? = null
+    val combineBefore: Boolean? = null,
 
     @JsonProperty("exclude_combi_examples")
-    var excludeCombiExamples: Boolean? = null
-    var transliterationHints: MutableMap<String, ArrayList<String>>? = null
-        private set
+    val excludeCombiExamples: Boolean? = null,
 
+    // "ml": ['അ'], "hi":['अ']...
+    var transliterationHints: MutableMap<String, ArrayList<String>>? = null,
+): Parcelable {
+
+    /**
+     * Jackson uses this method to serialise anything that we haven't explicitly defined.
+     * We use this to assign transliteration hints correctly.
+     * "ml": ['അ'], "hi":['अ']...
+     */
     @JsonAnySetter
     fun setLetterDefinitions(key: String, list: ArrayList<String>) {
         if (transliterationHints == null)

@@ -28,11 +28,11 @@
 
     </data>
 
-    <TextView
-        android:id="@+id/letter_view"
-        style="@style/LetterViewSmall"
-        android:layout_width="45dp"
-        android:layout_height="45dp"
+    <in.digistorm.aksharam.activities.main.letters.LetterPairView
+        android:id="@+id/letter_pair_view"
+        style="@style/LetterView"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_margin="4dp"
         android:text="@string/test_text"
         android:gravity="center" />

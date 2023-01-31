@@ -34,10 +34,18 @@ import kotlin.reflect.jvm.internal.impl.util.CheckResult
 class PracticeTabViewModel(application: Application) : AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
 
-    lateinit var transliterator: Transliterator
+    var transliterator: Transliterator? = null
 
     // State variables for Practice Tab
-    var language: MutableLiveData<String> = MutableLiveData()
+    var languageLiveData: MutableLiveData<String> = MutableLiveData()
+    var language: String
+        get() {
+            return languageLiveData.value!!
+        }
+        set(value) {
+            logDebug(logTag, "Language live data set to value: $value")
+            languageLiveData.value = value
+        }
     var practiceIn: MutableLiveData<String> = MutableLiveData()
     var practiceType: MutableLiveData<String> = MutableLiveData()
     var practiceString: MutableLiveData<String> = MutableLiveData()
@@ -45,22 +53,19 @@ class PracticeTabViewModel(application: Application) : AndroidViewModel(applicat
     // Variable is true if user's transliteration is correct
     var practiceSuccessCheck: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    init {
-        viewModelScope.launch {
-            transliterator = Transliterator(application)
-        }
+    fun setTransliterator(context: Context) {
+        transliterator = Transliterator.create(context)
     }
 
+    // Set the transliterator based on a specific language
     fun setTransliterator(language: String, context: Context) {
-        if (transliterator.languageData.language.lowercase() != language.lowercase())
-            transliterator = Transliterator(language, context)
-    }
-
-    fun getLanguage(): String {
-        return transliterator.languageData.language
+        if(transliterator == null)
+            transliterator = Transliterator.create(language, context)
+        else if (transliterator?.getLanguage()?.lowercase() != language.lowercase())
+            transliterator = Transliterator.create(language, context)
     }
 
     fun getLanguageData(): Language {
-        return transliterator.languageData
+        return transliterator!!.languageData
     }
 }

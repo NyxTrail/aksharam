@@ -19,56 +19,41 @@
  */
 package `in`.digistorm.aksharam.util
 
+import android.os.Parcel
+import android.os.Parcelable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import kotlinx.parcelize.Parcelize
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
-class Language {
-    @JsonIgnore
-    private val logTag = javaClass.simpleName
+@Parcelize
+class Language(
+    val comment: String = "",
+    val code: String = "",
 
-    val comment: String = ""
-    val code: String = ""
+    @JsonProperty("trans_langs")
+    val transLanguages: ArrayList<HashMap<String, String>>,
+
+    val info: HashMap<String, Map<String, String>>,
+    val virama: String = "",
+
+    @JsonProperty("ligatures_auto_generatable")
+    private val ligaturesAutoGeneratable: Boolean = false,
+
+    @JsonProperty("data")
+    val letterDefinitions: Map<String, LetterDefinition>,
 
     @JsonIgnore
     var language: String = ""
-        set(lang) {
-            field = lang.lowercase()
-        }
-
-    @JsonProperty("trans_langs")
-    val transLanguages: ArrayList<HashMap<String, String>> = ArrayList()
-        get() {
-            return ArrayList(field)
-        }
-
-    val info: HashMap<String, Map<String, String>> = HashMap()
-        get() {
-            return HashMap(field)
-        }
-
-    val virama: String = ""
-
-    @JsonProperty("ligatures_auto_generatable")
-    private val ligaturesAutoGeneratable: Boolean = false
-
-    @JsonProperty("data")
-    val letterDefinitions: LinkedHashMap<String, LetterDefinition> = LinkedHashMap()
-        get() {
-            return if (field.isNotEmpty()) {
-                LinkedHashMap(field) // return a new LinkedHashMap
-            } else
-                LinkedHashMap()
-        }
+): Parcelable {
 
     // {"vowels": ["a", "e", "i"...], "consonants": ["b", "c", "d"...]...}
     @JsonIgnore
     val lettersCategoryWise: LinkedHashMap<String, ArrayList<String>> = LinkedHashMap()
         get() {
             if (field.isEmpty()) {
-                logDebug(logTag, "Finding letters category wise")
                 for ((key, value) in letterDefinitions) {
                     if (field[value.type] != null) {
                         field[value.type]!!.add(key)
@@ -80,11 +65,6 @@ class Language {
                 }
             }
             return LinkedHashMap(field)
-        }
-
-    val categories: List<String>
-        get() {
-            return lettersCategoryWise.keys.toList()
         }
 
     // Uppercase the first letter
@@ -112,7 +92,6 @@ class Language {
 
     @JsonIgnore
     fun getLettersOfCategory(category: String): ArrayList<String> {
-        logDebug(logTag, lettersCategoryWise.toString())
         val test = lettersCategoryWise[category]
         return if (test == null) ArrayList() else ArrayList(
             test
@@ -155,4 +134,8 @@ class Language {
     @get:JsonIgnore
     val chillu: ArrayList<String>
         get() = getLettersOfCategory("chillu")
+
+    @get:JsonIgnore
+    val signs: ArrayList<String>
+        get() = getLettersOfCategory("signs")
 }

@@ -16,7 +16,7 @@ class TransliterateTabViewModel(application: Application): AndroidViewModel(appl
     var targetLanguage: String = ""
 
     // The Transliterator instance used to perform the transliteration.
-    var transliterator: Transliterator = Transliterator(application)
+    var transliterator: Transliterator = Transliterator.create(application)
 
     fun getLanguageData(): Language {
         return transliterator.languageData

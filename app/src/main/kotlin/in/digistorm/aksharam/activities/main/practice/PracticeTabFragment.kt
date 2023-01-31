@@ -61,10 +61,10 @@ class PracticeTabFragment : Fragment() {
            5. Re initialise Practice Type spinner
            6. Enable input edit text
          */
-        viewModel.language.observe(viewLifecycleOwner) {
-            logDebug(logTag, "viewModel.language changed to ${viewModel.language.value}")
+        viewModel.languageLiveData.observe(viewLifecycleOwner) {
+            logDebug(logTag, "viewModel.language changed to $it")
             // re-initialise the "practice in" spinner
-            viewModel.setTransliterator(viewModel.language.value!!, requireContext())
+            viewModel.setTransliterator(it, requireContext())
             requireActivity().findViewById<View>(R.id.PracticeTabInputTIET).isEnabled = false
             clearInput()
             initialisePracticeTabPracticeInSpinner()
@@ -81,7 +81,7 @@ class PracticeTabFragment : Fragment() {
             (requireActivity().findViewById<View>(R.id.PracticeTabInputTIL) as TextInputLayout).hint =
                 getString(R.string.practice_tab_practice_input_hint, viewModel.practiceIn.value)
             if(viewModel.practiceString.value != null) {
-                viewModel.transliteratedString.value = viewModel.transliterator
+                viewModel.transliteratedString.value = viewModel.transliterator!!
                     .transliterate(viewModel.practiceString.value!!, viewModel.practiceIn.value!!)
                 view.findViewById<ImageView>(R.id.PracticeTabSuccessCheck)
                     .visibility = View.INVISIBLE
@@ -102,7 +102,7 @@ class PracticeTabFragment : Fragment() {
             logDebug(logTag, "viewModel.practiceString changed to ${viewModel.practiceString.value}")
             val practiceTabTextView: TextView = view.findViewById(R.id.PracticeTabPracticeTextTV)
             practiceTabTextView.text = it
-            viewModel.transliteratedString.value = viewModel.transliterator.transliterate(it,
+            viewModel.transliteratedString.value = viewModel.transliterator!!.transliterate(it,
                 viewModel.practiceIn.value!!)
         }
         viewModel.practiceString.observe(viewLifecycleOwner, practiceStringTextViewUpdater)
@@ -196,7 +196,7 @@ class PracticeTabFragment : Fragment() {
                 id: Long
             ) {
                 logDebug(logTag, "onItemSelected invoked by $parent")
-                viewModel.language.value = parent?.getItemAtPosition(position).toString()
+                viewModel.languageLiveData.value = parent?.getItemAtPosition(position).toString()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {}
@@ -224,7 +224,7 @@ class PracticeTabFragment : Fragment() {
             requireContext(),
             R.layout.spinner_item,
             R.id.spinnerItemTV,
-            viewModel.transliterator.languageData.supportedLanguagesForTransliteration,
+            viewModel.transliterator!!.languageData.supportedLanguagesForTransliteration,
             R.id.spinnerLabelTV, getString(R.string.practice_tab_practice_in_hint)
         )
         practiceInAdapter.setDropDownViewResource(R.layout.spinner_drop_down)
@@ -254,7 +254,7 @@ class PracticeTabFragment : Fragment() {
 
         val practiceTypes = ArrayList<String>()
         val categories: Set<String> =
-            viewModel.transliterator.languageData.lettersCategoryWise.keys
+            viewModel.transliterator!!.languageData.lettersCategoryWise.keys
         for (category in categories) {
             practiceTypes.add(
                 category.substring(0, 1).uppercase()
@@ -269,7 +269,7 @@ class PracticeTabFragment : Fragment() {
         // Most of the combinations in these languages do not result in a meaningful ligature, or are
         // easily understood (as in the case of Hindi). So, we will add random ligatures only if the
         // language's data file says we should.
-        if (viewModel.transliterator.languageData.areLigaturesAutoGeneratable()) practiceTypes.add(
+        if (viewModel.transliterator!!.languageData.areLigaturesAutoGeneratable()) practiceTypes.add(
             "Random Ligatures"
         )
         practiceTypes.add("Random Words")

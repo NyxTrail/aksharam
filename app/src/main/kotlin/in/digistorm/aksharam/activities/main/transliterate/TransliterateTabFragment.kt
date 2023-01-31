@@ -92,7 +92,8 @@ class TransliterateTabFragment : Fragment() {
         logDebug(logTag, "Language detected: $inputLanguage")
 
         if (inputLanguage != null && !viewModel.transliterator.isTransliteratingLanguage(inputLanguage)) {
-            viewModel.transliterator.setInputLanguage(inputLanguage, requireContext())
+            // TODO: fix. Commented when Transliterated was modified to be Parcelable
+            // viewModel.transliterator.setInputLanguage(inputLanguage, requireContext())
             // re-initialise the spinner so that only languages that can be transliterated to is listed
             initialiseSpinner()
         }

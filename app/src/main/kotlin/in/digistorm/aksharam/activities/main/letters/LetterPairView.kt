@@ -25,7 +25,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.View
 
-class LetterView: AutoAdjustingTextView, View.OnClickListener {
+class LetterPairView: AutoAdjustingTextView, View.OnClickListener {
     private var logTag: String = javaClass.simpleName
 
     /* Boolean to track if the letter or its transliterated pair is current displayed. */

@@ -20,13 +20,12 @@
 package `in`.digistorm.aksharam.activities.main.letters
 
 import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.databinding.LetterCategoryBinding
 import `in`.digistorm.aksharam.util.ExpandableCardView
-import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.logDebug
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.view.children
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -35,37 +34,17 @@ import androidx.recyclerview.widget.RecyclerView
    Each category is displayed in a separate Material 3 Card View.
  */
 class LetterCategoryAdapter(
-    private var lettersCategoryWise: LinkedHashMap<String, ArrayList<String>>,
-    private var transliterator: Transliterator,
-    private var targetLanguage: String,
-): ListAdapter<String, LetterCategoryAdapter.LetterCategoryCardViewHolder>(
+    private var letterOnLongClickListener: ((String) -> ((View) -> Boolean))
+): ListAdapter<Map<String, ArrayList<Pair<String, String>>>, LetterCategoryAdapter.LetterCategoryCardViewHolder>(
     LetterCategoryDiff()
 ) {
     private val logTag = this.javaClass.simpleName
 
-    private val categories: Array<String>
-        get() {
-            return lettersCategoryWise.keys.toTypedArray()
-        }
-
-    fun setLettersCategoryWise(letters: LinkedHashMap<String, ArrayList<String>>) {
-        lettersCategoryWise = letters
-    }
-
-    private fun findNextCategory(category: String): String? {
-        logDebug(logTag, "Finding next category of $category")
-        val indexOfCategory = categories.indexOf(category)
-        if(indexOfCategory + 1 == categories.size)
-            return null
-        logDebug(logTag, "Next category: ${categories[indexOfCategory + 1]}")
-        return categories[indexOfCategory + 1]
-    }
-
-    private class LetterCategoryDiff: DiffUtil.ItemCallback<String>() {
+    private class LetterCategoryDiff: DiffUtil.ItemCallback<Map<String, ArrayList<Pair<String, String>>>>() {
         private val logTag = this.javaClass.simpleName
         override fun areItemsTheSame(
-            oldItem: String,
-            newItem: String
+            oldItem: Map<String, ArrayList<Pair<String, String>>>,
+            newItem: Map<String, ArrayList<Pair<String, String>>>
         ): Boolean {
             logDebug(logTag, "Are oldItem: $oldItem and newItem: $newItem the same:" +
                     " ${oldItem == newItem}")
@@ -74,8 +53,8 @@ class LetterCategoryAdapter(
 
         // Iff items are same, the system checks whether their contents are also same
         override fun areContentsTheSame(
-            oldItem: String,
-            newItem: String
+            oldItem: Map<String, ArrayList<Pair<String, String>>>,
+            newItem: Map<String, ArrayList<Pair<String, String>>>
         ): Boolean {
             logDebug(logTag, "Are contents of oldItem: $oldItem and " +
                     "newItem: $newItem the same: false")
@@ -84,39 +63,42 @@ class LetterCategoryAdapter(
     }
 
     class LetterCategoryCardViewHolder(
-        val cardView: ExpandableCardView
-    ): RecyclerView.ViewHolder(cardView) {
-        init {
-            cardView.initialize()
-        }
+        private val letterCategoryBinding: LetterCategoryBinding
+    ): RecyclerView.ViewHolder(letterCategoryBinding.root) {
+        val expandableCardView: ExpandableCardView
+            get() = letterCategoryBinding.expandableCardView!!
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LetterCategoryCardViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.letter_category, parent, false)
-        return LetterCategoryCardViewHolder(view as ExpandableCardView)
+//  TODO:      val view = LayoutInflater.from(parent.context).inflate(R.layout.letter_category, parent, false)
+        val letterCategoryBinding = LetterCategoryBinding.inflate(
+            LayoutInflater.from(parent.context), parent, false
+        )
+        return LetterCategoryCardViewHolder(letterCategoryBinding)
     }
 
     override fun onBindViewHolder(holder: LetterCategoryCardViewHolder, position: Int) {
         logDebug(logTag, "Binding view for position: $position")
-        logDebug(logTag, "Items: $currentList")
-        holder.cardView.tag = getItem(position)
+        logDebug(logTag, "Item: ${getItem(position)}")
+        holder.expandableCardView.tag = getItem(position).keys.first()
+        holder.expandableCardView.initialise()
 
-        // Give an ExpandableCardView the ability to find its sibling
-        holder.cardView.findSiblings = fun () : MutableList<ExpandableCardView> {
-            var nextCategory = findNextCategory(getItem(position))
+        // Give an ExpandableCardView the ability to find its sibling, so that they are animated correctly
+        holder.expandableCardView.findSiblings = fun () : MutableList<ExpandableCardView> {
+            var nextCategory = currentList[position + 1]
             val siblingList = mutableListOf<ExpandableCardView>()
             var cardView: ExpandableCardView? = null
             // Collect all Card Views sequentially, until the first un-collapsed one
             while(nextCategory != null) {
                 logDebug(logTag, "In loop")
-                cardView = (holder.cardView.parent as View).findViewWithTag(nextCategory)
+                cardView = (holder.expandableCardView.parent as View).findViewWithTag(nextCategory.keys.first())
                         ?: break // We couldn't find the next category
                 if(cardView.collapsed)
                     siblingList.add(cardView)
                 else
                     break // We break at the first Card View that is not collapsed
                 // Next category
-                nextCategory = findNextCategory(nextCategory)
+                nextCategory = currentList[position + 1]
             }
             if(cardView != null && !cardView.collapsed)
                 siblingList.add(cardView)
@@ -124,7 +106,7 @@ class LetterCategoryAdapter(
             return siblingList
         }
 
-        holder.cardView.letterCategoryHeaderTextView.text = getItem(position).replaceFirstChar {
+        holder.expandableCardView.letterCategoryHeaderTextView.text = getItem(position).keys.first().replaceFirstChar {
             if(it.isLowerCase())
                 it.titlecase()
             else
@@ -135,70 +117,68 @@ class LetterCategoryAdapter(
     }
 
     /* Initialises the LetterGrid for a category of letters (i.e, this is run once for every
-       ViewHolder. */
+       category.) */
     private fun initialiseLetterGrid(
         letterCategoryCardViewHolder: LetterCategoryCardViewHolder,
         position: Int,
     ) {
-        letterCategoryCardViewHolder.cardView.letterGrid.apply {
+        letterCategoryCardViewHolder.expandableCardView.letterGrid.apply {
             removeAllViews()
 
-            logDebug(logTag, "position to get: $position")
-            logDebug(logTag, "Categories are: ")
-            categories.forEach {
-                logDebug(logTag, it)
-            }
-            logDebug(logTag, "categories[position]: ${categories[position]}")
-            for(letter in lettersCategoryWise[categories[position]]!!) {
-                val letterView: LetterView = LayoutInflater
-                    .from(letterCategoryCardViewHolder.cardView.letterGrid.context)
-                    .inflate(R.layout.letter_view,
-                        letterCategoryCardViewHolder.cardView.letterGrid, false) as LetterView
-                letterView.setOnLongClickListener {
-                    logDebug(logTag, "$letter long clicked!")
-                    val letterInfoFragment = LetterInfoFragment(
-                        letter,
-                        targetLanguage,
-                        transliterator,
-                    )
+            logDebug(logTag, "Position to get: $position")
+            val category = getItem(position).keys.first()
+            val letterPairs: ArrayList<Pair<String, String>> = getItem(position)[category] ?: ArrayList()
+            logDebug(logTag, "Current category: $category")
+            logDebug(logTag, "Letter Pairs: $letterPairs")
+            for(letterPair in letterPairs) {
+                val letterView: LetterPairView = LayoutInflater
+                    .from(letterCategoryCardViewHolder.expandableCardView.letterGrid.context)
+                    .inflate(R.layout.letter_pair_view,
+                        letterCategoryCardViewHolder.expandableCardView.letterGrid, false) as LetterPairView
+                letterView.setOnLongClickListener(letterOnLongClickListener(letterPair.first))
+//                    {
+//                    logDebug(logTag, "$letter long clicked!")
+//                    val action = TabbedViewsDirections.actionTabbedViewsFragmentToLetterInfoFragment()
+//                    findNavController().navigate(action)
+//                    val letterInfoFragment = LetterInfoFragment(
+//                        letter,
+//                        targetLanguage,
+//                        transliterator,
+//                    )
                     // MainActivity.replaceTabFragment(0, letterInfoFragment)
-                    true
-                }
-                letterView.letters = Pair(letter, transliterator.transliterate(letter, targetLanguage))
-                letterCategoryCardViewHolder.cardView.letterGrid.addView(letterView)
+                    // true
+                letterView.letters = letterPair
+                // letterView.letters = Pair(letter, transliterator.transliterate(letter, targetLanguage))
+                letterCategoryCardViewHolder.expandableCardView.letterGrid.addView(letterView)
             }
         }
     }
 
-    fun updateTargetLanguage(language: String) {
-        targetLanguage = language
-        logDebug(logTag, "TargetLanguage updated to $targetLanguage")
-    }
-
-    fun updateTransliterator(transliterator: Transliterator) {
-        this.transliterator = transliterator
-        logDebug(logTag, "Transliterator updated")
-    }
-
-    fun updateLetterGrids(categoryView: RecyclerView) {
-        logDebug(logTag, "Updating letter grids...")
-
-        for((i, category) in categories.withIndex()) {
-            logDebug(logTag, "Finding viewHolder for adapter position: $i")
-            (categoryView.findViewHolderForAdapterPosition(i) as? LetterCategoryCardViewHolder?)?.apply {
-                lettersCategoryWise[category]!!.map {
-                    Pair(it, transliterator.transliterate(it, targetLanguage))
-                }.let {
-                        logDebug(logTag, "List contains: $it")
-                        cardView.letterGrid.children.forEachIndexed { i, view ->
-                            (view as LetterView).letters = it[i]
-                        }
-                    }
-                }
-            }
-    }
-
-    override fun getItemCount(): Int {
-        return lettersCategoryWise.size
-    }
+//    fun updateTargetLanguage(language: String) {
+//        targetLanguage = language
+//        logDebug(logTag, "TargetLanguage updated to $targetLanguage")
+//    }
+//
+//    fun updateTransliterator(transliterator: Transliterator) {
+//        this.transliterator = transliterator
+//        logDebug(logTag, "Transliterator updated")
+//    }
+//
+//    fun updateLetterGrids(categoryView: RecyclerView) {
+//        logDebug(logTag, "Updating letter grids...")
+//
+//        for((i, category) in categories.withIndex()) {
+//            logDebug(logTag, "Finding viewHolder for adapter position: $i")
+//            (categoryView.findViewHolderForAdapterPosition(i) as? LetterCategoryCardViewHolder?)?.apply {
+//                lettersCategoryWise[category]!!.map {
+//                    Pair(it, transliterator.transliterate(it, targetLanguage))
+//                }.let {
+//                        logDebug(logTag, "List contains: $it")
+//                        cardView.letterGrid.children.forEachIndexed { i, view ->
+//                            (view as LetterView).letters = it[i]
+//                        }
+//                    }
+//                }
+//            }
+//    }
 }

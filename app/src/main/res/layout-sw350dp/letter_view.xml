@@ -21,11 +21,19 @@
  ~
  -->
 
-<in.digistorm.aksharam.activities.main.letters.LetterView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    style="@style/LetterView"
-    android:layout_width="65dp"
-    android:layout_height="65dp"
-    android:layout_margin="4dp"
-    android:text="@string/test_text"
-    android:gravity="center" />
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <TextView
+        android:id="@+id/letter_view"
+        style="@style/LetterView"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
+        android:layout_margin="4dp"
+        android:text="@string/test_text"
+        android:gravity="center" />
+</layout>

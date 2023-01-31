@@ -23,53 +23,18 @@ import android.content.Context
 import android.content.Intent
 import java.lang.StringBuilder
 import `in`.digistorm.aksharam.activities.initialise.InitialiseAppActivity
+import android.os.Parcel
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 
 // This class is responsible for the actual transliteration
-class Transliterator {
+@Parcelize
+class Transliterator(
+    var languageData: Language,
+): Parcelable {
     // The JSON mapping used to transliterate
-    private val logTag = javaClass.simpleName
-
-    lateinit var languageData: Language
-        private set
-
-    // TODO: Make this private?
-    fun setInputLanguage(inputLang: String, context: Context) {
-        logDebug(logTag, "Initialising transliterator for: $inputLang")
-        val mLanguageData: Language? = getLanguageData(inputLang, context)
-        if (mLanguageData == null) {
-            // TODO: How should we fail?
-            logDebug(logTag, "Failure handling unimplemented.")
-        } else
-            languageData = mLanguageData
-    }
-
-    // Constructor for when we don't know which language to load
-    // load the first one we can find
-    // if we can't, start initialisation activity
-    // TODO: how can we remove this constructor?
-    constructor(context: Context) {
-        // Called the constructor without any input lang, find one.
-        // Files are already downloaded, this constructor is called in MainActivity
-        // to display a default language.
-        val fileList = getDownloadedLanguages(context)
-        if (fileList.size == 0) {
-            // if no files are available, we restart the Initialisation activity
-            // TODO: This is not the right place to do this
-            // TODO: This is VERY VERY BAD. A Transliterator constructor that starts an activity?!
-            logDebug(logTag, "Could not find any language files. Starting Initialisation activity")
-            val intent = Intent(context, InitialiseAppActivity::class.java)
-            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-            context.startActivity(intent)
-        } else {
-            logDebug(logTag, "Found language file: " + fileList[0] + "... Initialising it.")
-            setInputLanguage(fileList[0], context)
-        }
-    }
-
-    // TODO: Handle inputLang being empty
-    constructor(inputLang: String, context: Context) {
-        setInputLanguage(inputLang, context)
-    }
+    private val logTag: String
+        get() = javaClass.simpleName
 
     // Returns whether language is the language we are currently using for transliteration
     fun isTransliteratingLanguage(language: String): Boolean {
@@ -121,5 +86,17 @@ class Transliterator {
         }
         logDebug(logTag, "Constructed string: \"$out\"")
         return out.toString()
+    }
+
+    companion object {
+        fun create(language: String, context: Context): Transliterator {
+            return Transliterator(getLanguageData(language, context)!!)
+        }
+
+        fun create(context: Context): Transliterator {
+            return Transliterator(getLanguageData(
+                getDownloadedFiles(context).first(), context
+            )!!)
+        }
     }
 }

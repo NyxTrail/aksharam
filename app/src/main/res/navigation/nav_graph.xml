@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_tabbedViewsFragment_to_languageInfoFragment"
             app:destination="@id/languageInfoFragment" />
+        <action
+            android:id="@+id/action_tabbedViewsFragment_to_letterInfoFragment"
+            app:destination="@id/letterInfoFragment" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -45,6 +48,18 @@
         tools:layout="@layout/language_info" >
         <argument
             android:name="info"
+            app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/letterInfoFragment"
+        android:name="in.digistorm.aksharam.activities.main.letters.LetterInfoFragment"
+        android:label="LetterInfoFragment"
+        tools:layout="@layout/letter_info" >
+        <argument
+            android:name="letter"
+            app:argType="string" />
+        <argument
+            android:name="targetLanguage"
             app:argType="string" />
     </fragment>
 </navigation>

@@ -43,23 +43,25 @@ class ExpandableCardView: MaterialCardView {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int):
             super(context, attrs, defStyleAttr)
 
-    lateinit var categoryHeader: ConstraintLayout
-    lateinit var letterCategoryHeaderTextView: TextView
-    lateinit var letterGrid: GridLayout
+    val categoryHeader: ConstraintLayout by lazy {
+        findViewById(R.id.letter_category_header)
+    }
+    val letterCategoryHeaderTextView: TextView by lazy {
+        findViewById(R.id.letter_category_header_text)
+    }
+    val letterGrid: GridLayout by lazy {
+        findViewById(R.id.letter_grid)
+    }
     var collapsed: Boolean = false
     var findSiblings: (() -> MutableList<ExpandableCardView>)? = null
-    val transition: Transition
+    private val transition: Transition
         get() {
             return ChangeBounds()
                 .setDuration(300)
                 .setInterpolator(AccelerateDecelerateInterpolator())
         }
 
-    fun initialize() {
-        categoryHeader = findViewById(R.id.letter_category_header)
-        letterCategoryHeaderTextView = findViewById(R.id.letter_category_header_text)
-        letterGrid = findViewById(R.id.letter_grid)
-
+    fun initialise() {
         categoryHeader.setOnClickListener {
             val logTag = "categoryHeaderClickListener"
             val imageView = it.findViewById<ImageView>(R.id.down_arrow)

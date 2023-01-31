@@ -46,7 +46,7 @@ class InputTextChangedListener(
         for((positionInPracticeString: Int, char) in viewModel.practiceString.value!!.withIndex()) {
             if(positionInCopy >= s.length)
                 break
-            val transChar = viewModel.transliterator.transliterate(char.toString(),
+            val transChar = viewModel.transliterator!!.transliterate(char.toString(),
                 viewModel.practiceIn.value!!)
 
             // get transChar.length characters from sCopy

@@ -19,30 +19,52 @@
  */
 package `in`.digistorm.aksharam.activities.main.letters
 
+import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
 import `in`.digistorm.aksharam.util.Transliterator
 import `in`.digistorm.aksharam.util.Language
+import `in`.digistorm.aksharam.util.getLanguageData
 import `in`.digistorm.aksharam.util.logDebug
 import android.app.Application
 
 import android.content.Context
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
 
-class LettersTabViewModel(application: Application): AndroidViewModel(application) {
+class LettersTabViewModel: ViewModel() {
     private val logTag = javaClass.simpleName
 
-    var transliterator: Transliterator? = null
+    // var transliterator: Transliterator? = null
+    // private set
 
-    // The current language displayed in letters tab
-    var languageLiveData: MutableLiveData<String> = MutableLiveData()
-    var language: String
+    var _languageSelected: MutableLiveData<String> = MutableLiveData()
+        private set
+    var languageSelected: String
         get() {
-            return languageLiveData.value!!
+            return _languageSelected.value!!
         }
         set(value) {
             logDebug(logTag, "Language live data set to value: $value")
-            languageLiveData.value = value
+            _languageSelected.value = value
         }
+
+
+    private var _language: MutableLiveData<Language> = MutableLiveData()
+
+    fun getLanguage(): Language {
+        return _language.value!!
+    }
+
+    fun setLanguage(language: Language, aksharamViewModel: AksharamViewModel) {
+        _language.value = language
+        aksharamViewModel.language.value = language
+    }
+
+    fun setLanguage(fileName: String, context: Context, aksharamViewModel: AksharamViewModel) {
+        val language: Language = getLanguageData(fileName, context)!!
+        _language.value = language
+        aksharamViewModel.language.value = language
+    }
 
     // The target language string as displayed by lettersTabTransSpinner
     var targetLanguageLiveData: MutableLiveData<String> = MutableLiveData()
@@ -53,15 +75,4 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
         set(value) {
             targetLanguageLiveData.value = value
         }
-
-    // Set the transliterator based on a specific language
-    fun setTransliterator(language: String, context: Context) {
-        if (transliterator!!.getLanguage().lowercase() != language.lowercase())
-            transliterator = Transliterator(language, context)
-    }
-
-    // A convenience method to obtain language data
-    fun getLanguageData(): Language {
-        return transliterator!!.languageData
-    }
 }
