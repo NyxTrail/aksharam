@@ -102,7 +102,7 @@ class LettersTabFragment: Fragment() {
                 val info: HashMap<String, Map<String, String>> = language.info
                 logDebug(logTag, "Data for info: $info")
                 val action = TabbedViewsDirections.actionTabbedViewsFragmentToLanguageInfoFragment(
-                    info = info[viewModel.targetLanguage.lowercase()]?.get("en")!!
+                    targetLanguage = viewModel.targetLanguage
                 )
                 findNavController().navigate(action)
             }

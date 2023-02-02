@@ -47,7 +47,7 @@
         android:label="LanguageInfoFragment"
         tools:layout="@layout/language_info" >
         <argument
-            android:name="info"
+            android:name="targetLanguage"
             app:argType="string" />
     </fragment>
     <fragment

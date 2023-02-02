@@ -40,6 +40,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
+import kotlin.math.log
 
 class LetterInfoFragment : Fragment() {
     private val logTag = javaClass.simpleName
@@ -110,10 +111,11 @@ class LetterInfoFragment : Fragment() {
              * If current letter is a sign, show all its combinations with consonants.
              */
             "signs" -> {
+                setVisibilityForDiacriticExamplesUI(View.GONE)
                 if(!letterDefinition.shouldExcludeCombiExamples()) {
                     setVisibilityForDiacriticExamplesUI(View.VISIBLE)
                     binding.diacriticSelectorHintTV.text =
-                        getString(R.string.consonants_with_diacritic, letter)
+                        getString(R.string.letter_with_consonants_and_ligatures, letter)
                     languageData.consonants.forEach { consonant ->
                         if (languageData.getLetterDefinition(consonant)
                                 ?.shouldExcludeCombiExamples() != true
@@ -124,7 +126,7 @@ class LetterInfoFragment : Fragment() {
                                     binding.diacriticExamplesGL,
                                     false
                                 )
-                            letterView.letterView!!.text = consonant + letter
+                            letterView.letterView.text = consonant + letter
                             binding.diacriticExamplesGL.addView(letterView.root)
                         }
                     }
@@ -138,7 +140,7 @@ class LetterInfoFragment : Fragment() {
                                     binding.diacriticExamplesGL,
                                     false
                                 )
-                            letterView.letterView!!.text = ligature + letter
+                            letterView.letterView.text = ligature + letter
                             binding.diacriticExamplesGL.addView(letterView.root)
                         }
                     }
@@ -148,7 +150,63 @@ class LetterInfoFragment : Fragment() {
             }
             "consonants" -> {
                 setVisibilityForDiacriticExamplesUI(View.GONE)
+                if(!letterDefinition.shouldExcludeCombiExamples()) {
+                    setVisibilityForDiacriticExamplesUI(View.VISIBLE)
+                    binding.diacriticSelectorHintTV.text =
+                        getString(R.string.letter_with_vowel_signs, letter)
+                    languageData.signs.forEach { sign ->
+                        if(languageData.getLetterDefinition(sign)
+                                ?.shouldExcludeCombiExamples() != true) {
+                            val letterView = LetterViewBinding.inflate(
+                                inflater,
+                                binding.diacriticExamplesGL,
+                                false
+                            )
+                            letterView.letterView.text = letter + sign
+                            binding.diacriticExamplesGL.addView(letterView.root)
+                        }
+                    }
+                    if(languageData.areLigaturesAutoGeneratable()) {
+                        binding.ligaturesWithLetterAsPrefixTv.text =
+                            getString(
+                                R.string.ligatures_with_letter_as_prefix,
+                                letter,
+                                letter,
+                                languageData.virama
+                            )
+                        binding.ligaturesWithLetterAsSuffixTv.text =
+                            getString(
+                                R.string.ligatures_with_letter_as_suffix,
+                                letter,
+                                languageData.virama,
+                                letter
+                            )
+                        languageData.consonants.forEach { consonant ->
+                            if(languageData.getLetterDefinition(consonant)
+                                    ?.shouldExcludeCombiExamples() != true) {
+                                var letterView = LetterViewBinding.inflate(
+                                    inflater,
+                                    binding.ligaturesWithLetterAsPrefixGl,
+                                    false
+                                )
+                                letterView.letterView.text = letter + languageData.virama + consonant
+                                binding.ligaturesWithLetterAsPrefixGl.addView(letterView.root)
 
+                                letterView = LetterViewBinding.inflate(
+                                    inflater,
+                                    binding.ligaturesWithLetterAsSuffixGl,
+                                    false
+                                )
+                                letterView.letterView.text = consonant + languageData.virama + letter
+                                binding.ligaturesWithLetterAsSuffixGl.addView(letterView.root)
+                            }
+                        }
+                        binding.ligaturesWithLetterAsPrefixTv.visibility = View.VISIBLE
+                        binding.ligaturesWithLetterAsPrefixGl.visibility = View.VISIBLE
+                        binding.ligaturesWithLetterAsSuffixTv.visibility = View.VISIBLE
+                        binding.ligaturesWithLetterAsSuffixGl.visibility = View.VISIBLE
+                    }
+                }
             }
             "ligatures" -> {
                 setVisibilityForDiacriticExamplesUI(View.GONE)

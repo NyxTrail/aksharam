@@ -19,6 +19,7 @@
  */
 package `in`.digistorm.aksharam.activities.main.letters
 
+import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
 import `in`.digistorm.aksharam.databinding.LanguageInfoBinding
 import `in`.digistorm.aksharam.util.logDebug
 
@@ -28,6 +29,8 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 
 class LanguageInfoFragment : Fragment() {
@@ -48,7 +51,20 @@ class LanguageInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        logDebug(logTag, "Displaying info: ${args.info}")
-        binding.languageInfoTV.text = HtmlCompat.fromHtml(args.info, HtmlCompat.FROM_HTML_MODE_LEGACY)
+        val activityViewModel: AksharamViewModel by activityViewModels()
+
+        val languageData = activityViewModel.language.value
+        logDebug(logTag, "Info: ${languageData?.info}")
+        logDebug(logTag, "TargetLanguage: ${args.targetLanguage}")
+        val stringToDisplay: String =
+            "" + (languageData?.info?.get("general")?.get("en") ?: "") +
+                    (languageData?.info?.get(args.targetLanguage.lowercase())?.get("en") ?: "")
+        logDebug(logTag, "Info to display: $stringToDisplay")
+        if(stringToDisplay.isEmpty()) {
+            logDebug(logTag, "No info to display. Returning to Letters Tab.")
+            findNavController().popBackStack()
+        }
+        binding.languageInfoTV.text =
+            HtmlCompat.fromHtml(stringToDisplay, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }
 }

@@ -63,14 +63,14 @@
     <string name="transliterate_tab_trans_hint">Convert To</string>
     <string name="letter_info_example_words">Words</string>
     <string name="letter_info_example_meaning">Meaning</string>
-    <string name="letter_info_ligature_consonant_before">
+    <string name="ligatures_with_letter_as_prefix">
         Joint letters (ligatures) of %s before another consonant\n(%s + %s + x):
     </string>
-    <string name="letter_info_ligature_consonant_after">
+    <string name="ligatures_with_letter_as_suffix">
         Joint letters (ligatures) of %s after another consonant\n(x + %s + %s):
     </string>
-    <string name="diacritics_with_consonant">%s with vowel signs:</string>
-    <string name="consonants_with_diacritic">%s with consonants:</string>
+    <string name="letter_with_vowel_signs">%s with vowel signs:</string>
+    <string name="letter_with_consonants_and_ligatures">%s with consonants and ligatures:</string>
     <string name="practice_tab_lang_hint">Language</string>
     <string name="practice_tab_practice_in_hint">Practice In</string>
     <string name="practice_tab_practice_type_hint">Practice Type</string>
