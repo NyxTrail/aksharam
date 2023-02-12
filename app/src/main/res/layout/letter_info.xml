@@ -161,9 +161,11 @@
                     android:minHeight="50dp"
                     android:text="@string/test_text"
                     android:textSize="@dimen/text_normal_size"
+                    android:visibility="gone"
                     app:layout_constraintBottom_toTopOf="@id/diacriticExamplesGL"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@id/letterInfoInfoTV"
+                    tools:visibility="visible"
                     tools:text="@string/letter_with_vowel_signs" />
 
                 <androidx.gridlayout.widget.GridLayout
@@ -171,6 +173,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_margin="8dp"
+                    android:visibility="gone"
                     app:alignmentMode="alignBounds"
                     app:columnCount="5"
                     app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_prefix_tv"

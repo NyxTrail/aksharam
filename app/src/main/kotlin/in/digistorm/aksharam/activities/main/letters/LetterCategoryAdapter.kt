@@ -26,6 +26,9 @@ import `in`.digistorm.aksharam.util.logDebug
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.NavAction
+import androidx.navigation.NavDirections
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -34,27 +37,47 @@ import androidx.recyclerview.widget.RecyclerView
    Each category is displayed in a separate Material 3 Card View.
  */
 class LetterCategoryAdapter(
-    private var letterOnLongClickListener: ((String) -> ((View) -> Boolean))
-): ListAdapter<Map<String, ArrayList<Pair<String, String>>>, LetterCategoryAdapter.LetterCategoryCardViewHolder>(
+    private var letterOnLongClickAction: (String) -> NavDirections
+): ListAdapter<Map<String, List<Pair<String, String>>>, LetterCategoryAdapter.LetterCategoryCardViewHolder>(
     LetterCategoryDiff()
 ) {
     private val logTag = this.javaClass.simpleName
 
-    private class LetterCategoryDiff: DiffUtil.ItemCallback<Map<String, ArrayList<Pair<String, String>>>>() {
+    init {
+        logDebug(logTag, "LetterCategoryAdapter initialised with list: $currentList")
+    }
+
+    private class LetterCategoryDiff: DiffUtil.ItemCallback<Map<String, List<Pair<String, String>>>>() {
         private val logTag = this.javaClass.simpleName
         override fun areItemsTheSame(
-            oldItem: Map<String, ArrayList<Pair<String, String>>>,
-            newItem: Map<String, ArrayList<Pair<String, String>>>
+            oldItem: Map<String, List<Pair<String, String>>>,
+            newItem: Map<String, List<Pair<String, String>>>
         ): Boolean {
             logDebug(logTag, "Are oldItem: $oldItem and newItem: $newItem the same:" +
                     " ${oldItem == newItem}")
-            return oldItem == newItem
+            /**
+             * Items are same if:
+             * 1. their keys are same,
+             * 2. for each value in the Arraylist, first of the pair are the same
+             **/
+            val oldCategory = oldItem.keys.singleOrNull()
+            val newCategory = newItem.keys.singleOrNull()
+            if(oldCategory == newCategory) {
+                val category = newCategory
+                oldItem[category]!!.forEachIndexed { i, letterPair ->
+                    if(letterPair.first != newItem[category]!![i].first)
+                        return false
+                }
+            }
+            else
+                return false
+            return true
         }
 
         // Iff items are same, the system checks whether their contents are also same
         override fun areContentsTheSame(
-            oldItem: Map<String, ArrayList<Pair<String, String>>>,
-            newItem: Map<String, ArrayList<Pair<String, String>>>
+            oldItem: Map<String, List<Pair<String, String>>>,
+            newItem: Map<String, List<Pair<String, String>>>
         ): Boolean {
             logDebug(logTag, "Are contents of oldItem: $oldItem and " +
                     "newItem: $newItem the same: false")
@@ -127,7 +150,7 @@ class LetterCategoryAdapter(
 
             logDebug(logTag, "Position to get: $position")
             val category = getItem(position).keys.first()
-            val letterPairs: ArrayList<Pair<String, String>> = getItem(position)[category] ?: ArrayList()
+            val letterPairs: List<Pair<String, String>> = getItem(position)[category] ?: ArrayList()
             logDebug(logTag, "Current category: $category")
             logDebug(logTag, "Letter Pairs: $letterPairs")
             for(letterPair in letterPairs) {
@@ -135,50 +158,14 @@ class LetterCategoryAdapter(
                     .from(letterCategoryCardViewHolder.expandableCardView.letterGrid.context)
                     .inflate(R.layout.letter_pair_view,
                         letterCategoryCardViewHolder.expandableCardView.letterGrid, false) as LetterPairView
-                letterView.setOnLongClickListener(letterOnLongClickListener(letterPair.first))
-//                    {
-//                    logDebug(logTag, "$letter long clicked!")
-//                    val action = TabbedViewsDirections.actionTabbedViewsFragmentToLetterInfoFragment()
-//                    findNavController().navigate(action)
-//                    val letterInfoFragment = LetterInfoFragment(
-//                        letter,
-//                        targetLanguage,
-//                        transliterator,
-//                    )
-                    // MainActivity.replaceTabFragment(0, letterInfoFragment)
-                    // true
+                // letterView.setOnLongClickListener(letterOnLongClickListener(letterPair.first))
+                letterView.setOnLongClickListener { view ->
+                    view.findNavController().navigate(letterOnLongClickAction(letterPair.first))
+                    true
+                }
                 letterView.letters = letterPair
-                // letterView.letters = Pair(letter, transliterator.transliterate(letter, targetLanguage))
                 letterCategoryCardViewHolder.expandableCardView.letterGrid.addView(letterView)
             }
         }
     }
-
-//    fun updateTargetLanguage(language: String) {
-//        targetLanguage = language
-//        logDebug(logTag, "TargetLanguage updated to $targetLanguage")
-//    }
-//
-//    fun updateTransliterator(transliterator: Transliterator) {
-//        this.transliterator = transliterator
-//        logDebug(logTag, "Transliterator updated")
-//    }
-//
-//    fun updateLetterGrids(categoryView: RecyclerView) {
-//        logDebug(logTag, "Updating letter grids...")
-//
-//        for((i, category) in categories.withIndex()) {
-//            logDebug(logTag, "Finding viewHolder for adapter position: $i")
-//            (categoryView.findViewHolderForAdapterPosition(i) as? LetterCategoryCardViewHolder?)?.apply {
-//                lettersCategoryWise[category]!!.map {
-//                    Pair(it, transliterator.transliterate(it, targetLanguage))
-//                }.let {
-//                        logDebug(logTag, "List contains: $it")
-//                        cardView.letterGrid.children.forEachIndexed { i, view ->
-//                            (view as LetterView).letters = it[i]
-//                        }
-//                    }
-//                }
-//            }
-//    }
 }

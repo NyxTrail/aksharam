@@ -7,25 +7,26 @@ import java.util.*
 fun generatePracticeString(viewModel: PracticeTabViewModel): String {
     val logTag = "generatePracticeString"
     // TODO: Better error handling
-    if (viewModel.practiceType.value?.isEmpty() != false) {
+    if (viewModel.practiceTypeSelected.value?.isEmpty() != false) {
         logDebug(logTag, "Practice type is not known. Cannot generate practice string.")
         return ""
     }
 
     logDebug(logTag, "Generating practice text.")
+    val language = viewModel.language.value!!
     // get all letters of current language, category-wise
-    val vowels = viewModel.getLanguageData().vowels
-    val consonants = viewModel.getLanguageData().consonants
-    val ligatures = viewModel.getLanguageData().ligatures
-    val signs = viewModel.getLanguageData().diacritics
-    val chillu = viewModel.getLanguageData().chillu
+    val vowels = language.vowels
+    val consonants = language.consonants
+    val ligatures = language.ligatures
+    val signs = language.signs
+    val chillu = language.chillu
     val random = Random()
     var practiceString = StringBuilder()
 
     // Special variable to hold the Virama.
     // Useful to detect chillu letters in Malayalam
-    val virama = viewModel.getLanguageData().virama
-    when (viewModel.practiceType.value?.lowercase()) {
+    val virama = language.virama
+    when (viewModel.practiceTypeSelected.value?.lowercase()) {
         // Let's construct a made-up word in current language
         // First letter can be a vowel or consonant (not a sign)
         // Second letter onwards can be a vowel sign or consonant (not a vowel)
@@ -52,7 +53,7 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
                     if (random.nextInt(100) < 21 && prevChar != virama) {
                         // for malayalam, there is also a chance the next character is a chillu
                         nextChar =
-                            if (viewModel.language.equals("malayalam", ignoreCase = true)) {
+                            if (viewModel.languageSelected.value.equals("malayalam", ignoreCase = true)) {
                                 if (random.nextInt(100) < 31)
                                     chillu[random.nextInt(chillu.size)]
                                 else  // Since it's malayalam, we can just get one of the ligatures at random
@@ -103,11 +104,11 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
                         // Following for ligatures that have combining rules.
                         // Certain consonants (right now, only ರ್ in Kannada), form different types of
                         // ligatures before and after a consonant.
-                        val isCombineAfter = viewModel.getLanguageData()
+                        val isCombineAfter = language
                             .getLetterDefinition(letter)?.shouldCombineAfter() ?: false
-                        val isCombineBefore = viewModel.getLanguageData()
+                        val isCombineBefore = language
                             .getLetterDefinition(letter)?.shouldCombineBefore() ?: false
-                        val base = viewModel.getLanguageData().getLetterDefinition(letter)?.base
+                        val base = language.getLetterDefinition(letter)?.base
 
                         // Find the base of this ligature, if any.
                         // "base" of a ligature is the actual consonant used for combining with
@@ -144,15 +145,17 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
                 logDebug(logTag, "Ligature obtained: $ligature")
                 // nextChar is base char if a base exists in the data file.
                 // if there is no base in the data file, nextChar equals ligature (variable above)
-                val nextChar = viewModel.getLanguageData().getLetterDefinition(ligature)?.base ?: ligature
+                val nextChar = language.getLetterDefinition(ligature)?.base ?: ligature
+                logDebug(logTag, "Base ligature of $ligature: $nextChar")
 
                 // get the rules for combining this letter if such rule exists
-                val isCombineAfter = viewModel.getLanguageData()
+                val isCombineAfter = language
                     .getLetterDefinition(ligature)?.shouldCombineAfter() ?: false
-                val isCombineBefore = viewModel.getLanguageData()
+                val isCombineBefore = language
                     .getLetterDefinition(ligature)?.shouldCombineBefore() ?: false
                 if (isCombineAfter && isCombineBefore) {
-                    // randomly select either combineBefore or combineAfter
+                    // This letter can combine either before or after another consonant.
+                    // Randomly select one of either situation.
                     when (random.nextInt(2)) {
                         0 -> practiceString.append(consonants[random.nextInt(consonants.size)])
                             .append(virama).append(nextChar).append(" ")
@@ -161,14 +164,17 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
                         ).append(" ")
                     }
                 } else if (isCombineAfter) {
+                    logDebug(logTag, "Combining after")
                     practiceString.append(consonants[random.nextInt(consonants.size)])
                         .append(virama)
                         .append(nextChar).append(" ")
                 } else if (isCombineBefore) {
-                    practiceString.append(nextChar).append(virama).append(nextChar)
-                        .append(consonants[random.nextInt(consonants.size)])
+                    // This does not happen in any language supported so far
+                    logDebug(logTag, "Combining before")
+                    practiceString.append(nextChar).append(virama).append(
+                        consonants[random.nextInt(consonants.size)])
                 } else {
-                    practiceString.append(nextChar).append(" ")
+                    practiceString.append(ligature).append(" ")
                 }
                 i++
             }

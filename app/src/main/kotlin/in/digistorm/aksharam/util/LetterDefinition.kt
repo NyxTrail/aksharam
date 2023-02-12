@@ -27,7 +27,6 @@ import kotlinx.parcelize.Parcelize
 import java.util.ArrayList
 import kotlin.collections.LinkedHashMap
 
-@Parcelize
 class LetterDefinition(
     val type: String = "",
 
@@ -49,7 +48,7 @@ class LetterDefinition(
 
     // "ml": ['അ'], "hi":['अ']...
     var transliterationHints: MutableMap<String, ArrayList<String>>? = null,
-): Parcelable {
+) {
 
     /**
      * Jackson uses this method to serialise anything that we haven't explicitly defined.

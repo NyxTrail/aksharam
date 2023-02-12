@@ -4,6 +4,7 @@ import java.lang.StringBuilder
 
 private const val logTag: String = "Transliterator2"
 
+// TODO: Rename file to Transliterator (remove suffix '2') after re-implementing all dependencies
 // Transliterate the input string using the mapping and return the transliterated string
 // str is the string that needs to be converted
 // targetLanguage is the language to which the string needs to be converted

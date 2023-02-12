@@ -23,6 +23,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'androidx.navigation.safeargs.kotlin'
     id 'kotlin-parcelize'
+    id 'kotlin-kapt'
 }
 
 android {
@@ -77,6 +78,8 @@ dependencies {
     // https://github.com/FasterXML/jackson-databind/issues/3702
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.13.4'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin:2.13.4'
+
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.5.1")
 
     // Navigation
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'

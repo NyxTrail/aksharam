@@ -25,7 +25,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="in.digistorm.aksharam.activities.main.letters.LettersTabViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,15 +42,16 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="8dp"
-            android:hint="@string/letters_tab_lang_input_hint"
+            android:hint="@string/letters_tab_language_hint"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <AutoCompleteTextView
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
-                app:simpleItems="@array/dummy_list" />
+                list="@{viewModel.downloadedLanguages}"
+                android:text="@={viewModel.languageSelected}"/>
         </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
@@ -62,21 +65,23 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
 
-            <AutoCompleteTextView
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"
-                app:simpleItems="@array/dummy_list" />
+                list="@{viewModel.targetLanguageList}"
+                android:text="@={viewModel.targetLanguageSelected}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button
-            android:id="@+id/lettersTabInfoButton"
+            android:id="@+id/info_button"
             style="@style/Widget.Material3.Button.OutlinedButton"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
             android:layout_marginTop="4dp"
             android:text="@string/language_info"
+            android:onClick="@{viewModel.languageInfoOnClick}"
             app:icon="@drawable/ic_baseline_info_24"
             app:layout_constraintStart_toStartOf="@id/language_selector"
             app:layout_constraintTop_toBottomOf="@id/language_selector" />
@@ -92,7 +97,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/lettersTabInfoButton" />
+            app:layout_constraintTop_toBottomOf="@id/info_button"
+            android:adapter="@{viewModel.categoryListAdapter}"
+            letters_category_wise="@{viewModel.lettersCategoryWise}" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

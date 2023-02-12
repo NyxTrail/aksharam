@@ -10,14 +10,16 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.google.android.material.textfield.TextInputEditText
+import `in`.digistorm.aksharam.util.transliterate
 
 class InputTextChangedListener(
-    private val practiceTabFragment: PracticeTabFragment): TextWatcher {
+    private val practiceTabFragment: PracticeTabFragment,
+    private val viewModel: PracticeTabViewModel
+): TextWatcher {
     private val logTag = javaClass.simpleName
 
-    private val viewModel: PracticeTabViewModel by practiceTabFragment.viewModels()
     private val practiceTextTV: TextView = practiceTabFragment.requireView()
-        .findViewById(R.id.PracticeTabPracticeTextTV)!!
+        .findViewById(R.id.practice_text)!!
 
     override fun afterTextChanged(s: Editable) {}
     override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
@@ -30,7 +32,7 @@ class InputTextChangedListener(
                 "Transliteration of practice string: \"${viewModel.transliteratedString.value}\".")
         if(s.toString() == viewModel.transliteratedString.value) {
             logDebug(logTag, "Entered text matches transliteration correctly.")
-            practiceTabFragment.clearInput()
+            // practiceTabFragment.clearInput()
             practiceTextTV.text = setGreen(viewModel.practiceString.value!!, practiceTabFragment.requireContext())
             viewModel.practiceSuccessCheck.value = true
             return
@@ -46,8 +48,8 @@ class InputTextChangedListener(
         for((positionInPracticeString: Int, char) in viewModel.practiceString.value!!.withIndex()) {
             if(positionInCopy >= s.length)
                 break
-            val transChar = viewModel.transliterator!!.transliterate(char.toString(),
-                viewModel.practiceIn.value!!)
+            val transChar = transliterate(char.toString(),
+                viewModel.practiceInSelected.value!!, viewModel.language.value!!)
 
             // get transChar.length characters from sCopy
             var charsToCheck = ""

@@ -44,7 +44,6 @@
     <fragment
         android:id="@+id/languageInfoFragment"
         android:name="in.digistorm.aksharam.activities.main.letters.LanguageInfoFragment"
-        android:label="LanguageInfoFragment"
         tools:layout="@layout/language_info" >
         <argument
             android:name="targetLanguage"
@@ -53,10 +52,13 @@
     <fragment
         android:id="@+id/letterInfoFragment"
         android:name="in.digistorm.aksharam.activities.main.letters.LetterInfoFragment"
-        android:label="LetterInfoFragment"
+        android:label="{letter} ({category})"
         tools:layout="@layout/letter_info" >
         <argument
             android:name="letter"
+            app:argType="string" />
+        <argument
+            android:name="category"
             app:argType="string" />
         <argument
             android:name="targetLanguage"

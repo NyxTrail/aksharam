@@ -58,7 +58,7 @@
         Select language to convert to
     </string>
 
-    <string name="letters_tab_lang_input_hint">Language</string>
+    <string name="letters_tab_language_hint">Language</string>
     <string name="letters_tab_trans_hint">Convert To</string>
     <string name="transliterate_tab_trans_hint">Convert To</string>
     <string name="letter_info_example_words">Words</string>
@@ -71,7 +71,7 @@
     </string>
     <string name="letter_with_vowel_signs">%s with vowel signs:</string>
     <string name="letter_with_consonants_and_ligatures">%s with consonants and ligatures:</string>
-    <string name="practice_tab_lang_hint">Language</string>
+    <string name="practice_tab_language_hint">Language</string>
     <string name="practice_tab_practice_in_hint">Practice In</string>
     <string name="practice_tab_practice_type_hint">Practice Type</string>
     <string name="practice_tab_practice_input_hint">Practice in %s</string>

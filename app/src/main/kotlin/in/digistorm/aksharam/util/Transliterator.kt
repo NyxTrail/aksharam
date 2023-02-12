@@ -27,11 +27,13 @@ import android.os.Parcel
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
+/**
+ * TODO: Deprecate after moving completely to Transliterator2
+ */
 // This class is responsible for the actual transliteration
-@Parcelize
 class Transliterator(
     var languageData: Language,
-): Parcelable {
+) {
     // The JSON mapping used to transliterate
     private val logTag: String
         get() = javaClass.simpleName

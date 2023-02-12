@@ -19,16 +19,12 @@
  */
 package `in`.digistorm.aksharam.util
 
-import android.os.Parcel
-import android.os.Parcelable
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
-import kotlinx.parcelize.Parcelize
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
-@Parcelize
 class Language(
     val comment: String = "",
     val code: String = "",
@@ -47,7 +43,7 @@ class Language(
 
     @JsonIgnore
     var language: String = ""
-): Parcelable {
+) {
 
     // {"vowels": ["a", "e", "i"...], "consonants": ["b", "c", "d"...]...}
     @JsonIgnore
@@ -120,10 +116,6 @@ class Language(
         get() = getLettersOfCategory("vowels")
 
     @get:JsonIgnore
-    val diacritics: ArrayList<String>
-        get() = getLettersOfCategory("signs")
-
-    @get:JsonIgnore
     val consonants: ArrayList<String>
         get() = getLettersOfCategory("consonants")
 
@@ -138,4 +130,58 @@ class Language(
     @get:JsonIgnore
     val signs: ArrayList<String>
         get() = getLettersOfCategory("signs")
+
+    /**
+     * Returns a list of all possible combinations where a vowel sign can occur after a consonant.
+     */
+    fun generateDiacriticsForSign(sign: String): List<String> {
+        val diacritics = mutableListOf<String>()
+        consonants.forEach { consonant ->
+            if(getLetterDefinition(consonant)?.shouldExcludeCombiExamples() != true) {
+                diacritics.add(consonant + sign)
+            }
+        }
+        ligatures.forEach { ligature ->
+            if(getLetterDefinition(ligature)?.shouldExcludeCombiExamples() != true) {
+                diacritics.add(ligature + sign)
+            }
+        }
+        return diacritics
+    }
+
+    /**
+     * Returns a list of all possible combinations of letter with vowel signs.
+     * Assumption: letter is a consonant or a ligature that can be combined with vowel signs.
+     * If they cannot be combined, excludeCombiExamples must be set true in data file.
+     */
+    fun generateDiacriticsForLetter(letter: String): List<String> {
+        val diacritics = mutableListOf<String>()
+        signs.forEach { sign ->
+            if(getLetterDefinition(sign)?.shouldExcludeCombiExamples() != true) {
+                diacritics.add(letter + sign)
+            }
+        }
+        return diacritics
+    }
+
+    /**
+     * Generate a list of all possible ligatures formed by combining letter with consonants.
+     * A consonant is not used and included in this process if excludeCombiExamples is set true in its
+     * definition. The virama character is used for combining the letters.
+     * The return value is a Pair of Lists, where the first value is a list of ligatures with letter
+     * as a prefix, and the second value is a list of ligatures with letter as a suffix.
+     */
+    fun generateLigatures(letter: String): Pair<List<String>, List<String>> {
+        val ligaturesWithLetterAsPrefix = mutableListOf<String>()
+        val ligaturesWithLetterAsSuffix = mutableListOf<String>()
+        if(ligaturesAutoGeneratable) {
+            consonants.forEach { consonant ->
+                if (getLetterDefinition(consonant)?.shouldExcludeCombiExamples() != true) {
+                    ligaturesWithLetterAsPrefix.add(letter + virama + consonant)
+                    ligaturesWithLetterAsSuffix.add(consonant + virama + letter)
+                }
+            }
+        }
+        return Pair(ligaturesWithLetterAsPrefix, ligaturesWithLetterAsSuffix)
+    }
 }

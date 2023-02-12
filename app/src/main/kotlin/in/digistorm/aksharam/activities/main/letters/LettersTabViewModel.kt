@@ -19,60 +19,140 @@
  */
 package `in`.digistorm.aksharam.activities.main.letters
 
-import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
-import `in`.digistorm.aksharam.util.Transliterator
-import `in`.digistorm.aksharam.util.Language
-import `in`.digistorm.aksharam.util.getLanguageData
-import `in`.digistorm.aksharam.util.logDebug
 import android.app.Application
+import android.view.View.OnClickListener
+import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
 
-import android.content.Context
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.*
+import androidx.navigation.NavDirections
+import `in`.digistorm.aksharam.activities.main.TabbedViewsDirections
+import `in`.digistorm.aksharam.util.*
 
-class LettersTabViewModel: ViewModel() {
+class LettersTabViewModel(application: Application): AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
 
-    // var transliterator: Transliterator? = null
-    // private set
+    private lateinit var aksharamViewModel: AksharamViewModel
 
-    var _languageSelected: MutableLiveData<String> = MutableLiveData()
+    // The actual list of languages currently available to the app
+    var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData()
+        get() {
+            if(field.value == null) {
+                field.value  = getAllDownloadedLanguages()
+            }
+            return field
+        }
+
+    // A function to initialise the Convert To drop down.
+    // This function can access the view which we can't do here in the view model.
+    private lateinit var navigateToLanguageInfo: (NavDirections) -> Unit
+
+    // The currently selected language in the UI
+    var languageSelected: MutableLiveData<String> = MutableLiveData()
+        get() {
+            if(field.value == null) {
+                if((downloadedLanguages.value?.size ?: 0) > 0)
+                    field.value = downloadedLanguages.value?.first()
+            }
+            return field
+        }
         private set
-    var languageSelected: String
-        get() {
-            return _languageSelected.value!!
-        }
-        set(value) {
-            logDebug(logTag, "Language live data set to value: $value")
-            _languageSelected.value = value
-        }
 
-
-    private var _language: MutableLiveData<Language> = MutableLiveData()
-
-    fun getLanguage(): Language {
-        return _language.value!!
-    }
-
-    fun setLanguage(language: Language, aksharamViewModel: AksharamViewModel) {
-        _language.value = language
+    // The actual language data.
+    var language: LiveData<Language> = languageSelected.map { newLanguage ->
+        logDebug(logTag, "Fetching data for $newLanguage")
+        val language: Language = getLanguage(newLanguage)
         aksharamViewModel.language.value = language
+        language
     }
 
-    fun setLanguage(fileName: String, context: Context, aksharamViewModel: AksharamViewModel) {
-        val language: Language = getLanguageData(fileName, context)!!
-        _language.value = language
-        aksharamViewModel.language.value = language
+    // The list of languages shown in the Convert To drop down.
+    var targetLanguageList: LiveData<ArrayList<String>> = language.map { language ->
+        logDebug(logTag, "Transforming \"${language.language}\" to a live data of target languages")
+        val targetLanguages = language.supportedLanguagesForTransliteration
+        targetLanguageSelected.value = targetLanguages.first()
+        targetLanguages
     }
-
-    // The target language string as displayed by lettersTabTransSpinner
-    var targetLanguageLiveData: MutableLiveData<String> = MutableLiveData()
-    var targetLanguage: String
+    var targetLanguageSelected: MutableLiveData<String> = MutableLiveData()
         get() {
-            return targetLanguageLiveData.value!!
+            if(field.value == null) {
+                logDebug(logTag, "targetLanguageSelected backing field is null")
+                field.value = targetLanguageList.value?.first() ?: "Oops!"
+                if(field.value == null)
+                    logDebug(logTag, "targetLanguageSelected is still null!")
+            }
+            return field
         }
-        set(value) {
-            targetLanguageLiveData.value = value
+
+    val lettersCategoryWise: LiveData<List<Map<String, ArrayList<Pair<String, String>>>>> = targetLanguageSelected.map { newLanguage ->
+        logDebug(logTag, "Generating letters category wise for language: ${language.value?.language}")
+        logDebug(logTag, "Conversion language is: $newLanguage")
+        val categories = mutableListOf<Map<String, ArrayList<Pair<String, String>>>>()
+        // [{"vowels": ["a", "e",...]}, {"consonants":: ["b", "c", "d",...]}, ...]
+        language.value?.lettersCategoryWise?.forEach { (category, letters) ->
+            val transliteratedLetterPairs: ArrayList<Pair<String, String>> = ArrayList()
+            letters.forEach { letter ->
+                transliteratedLetterPairs.add(letter to transliterate(letter, newLanguage, language.value!!))
+            }
+            categories.add(mapOf(category to transliteratedLetterPairs))
         }
+        logDebug(logTag, "Category list created: $categories")
+        categories
+    }
+
+    var categoryListAdapter: LetterCategoryAdapter = LetterCategoryAdapter(::letterOnLongClickAction)
+
+    private fun letterOnLongClickAction(letter: String): NavDirections {
+        val category = language.value?.getLetterDefinition(letter)?.type!!.replaceFirstChar {
+            if(it.isLowerCase())
+                it.titlecase()
+            else
+                it.toString()
+        }
+        return TabbedViewsDirections.actionTabbedViewsFragmentToLetterInfoFragment(
+            letter = letter,
+            category = category,
+            targetLanguage = targetLanguageSelected.value!!,
+        )
+    }
+
+    val languageInfoOnClick: OnClickListener = OnClickListener {
+        if(targetLanguageSelected.value != null) {
+            val directions = TabbedViewsDirections.actionTabbedViewsFragmentToLanguageInfoFragment(
+                targetLanguageSelected.value!!
+            )
+            navigateToLanguageInfo(directions)
+        }
+    }
+
+    fun initialise(
+        activityViewModel: AksharamViewModel,
+        navigateToLanguageInfo: (NavDirections) -> Unit,
+    ) {
+        logDebug(logTag, "Initialising...")
+        this.aksharamViewModel = activityViewModel
+        this.navigateToLanguageInfo = navigateToLanguageInfo
+        logDebug(logTag, "Done initialising.")
+    }
+
+    private fun getLanguage(file: String): Language {
+        val languageData: Language? = getLanguageData(file, getApplication())
+        if(languageData != null)
+            return languageData
+        else {
+            // TODO: How to handle this?
+            logDebug(logTag, "Null encounter while trying to load language: \"$file\"")
+            return languageData!!  // Dummy return which should just throw a NullPointer Exception
+        }
+    }
+
+    // TODO: This exists in PracticeTabViewModel as well. Move to a common utility collection.
+    // Start Initialisation activity if we could not find any downloaded languages.
+    private fun getAllDownloadedLanguages(): java.util.ArrayList<String> {
+        val languages: java.util.ArrayList<String> = getDownloadedLanguages(getApplication())
+        if (languages.size == 0) {
+            // (requireActivity() as MainActivity).startInitialisationActivity()
+            return java.util.ArrayList()
+        }
+        return languages
+    }
 }

@@ -19,53 +19,125 @@
  */
 package `in`.digistorm.aksharam.activities.main.practice
 
-import `in`.digistorm.aksharam.util.Language
-import `in`.digistorm.aksharam.util.Transliterator
-import `in`.digistorm.aksharam.util.logDebug
 import android.app.Application
-import android.content.Context
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.launch
-import kotlin.reflect.jvm.internal.impl.util.CheckResult
+import android.widget.ArrayAdapter
+import androidx.lifecycle.*
+import `in`.digistorm.aksharam.util.*
+import java.util.*
+import kotlin.collections.ArrayList
 
-class PracticeTabViewModel(application: Application) : AndroidViewModel(application) {
+class PracticeTabViewModel(application: Application): AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
 
-    var transliterator: Transliterator? = null
-
-    // State variables for Practice Tab
-    var languageLiveData: MutableLiveData<String> = MutableLiveData()
-    var language: String
+    // The actual list of languages currently available to the app
+    var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData()
         get() {
-            return languageLiveData.value!!
+            if(field.value == null) {
+                field.value = getAllDownloadedLanguages()
+            }
+            return field
         }
-        set(value) {
-            logDebug(logTag, "Language live data set to value: $value")
-            languageLiveData.value = value
+    // Adapter containing the list of languages displayed in the UI
+    lateinit var languageAdapter: ArrayAdapter<String>
+    // The currently selected language in the UI
+    var languageSelected: MutableLiveData<String> = MutableLiveData()
+        get() {
+            if(field.value == null) {
+                if((downloadedLanguages.value?.size ?: 0) > 0)
+                    field.value = downloadedLanguages.value?.first()
+            }
+            return field
         }
-    var practiceIn: MutableLiveData<String> = MutableLiveData()
-    var practiceType: MutableLiveData<String> = MutableLiveData()
-    var practiceString: MutableLiveData<String> = MutableLiveData()
+        private set
+
+    // The actual language data
+    var language: LiveData<Language> = languageSelected.map { newLanguage ->
+        logDebug(logTag, "Fetching data for $newLanguage")
+        val language: Language = getLanguage(newLanguage)
+        language
+    }
+
+    var practiceInLanguages: LiveData<ArrayList<String>> = language.map { language ->
+        logDebug(logTag, "Transforming \"${language.language}\" to a live data of target languages")
+        val targetList = language.supportedLanguagesForTransliteration
+        practiceInSelected.value = targetList.first()
+        targetList
+    }
+    lateinit var practiceInAdapter: ArrayAdapter<String>
+    var practiceInSelected: MutableLiveData<String> = MutableLiveData()
+
+    var practiceTypes: LiveData<ArrayList<String>> = language.map { language ->
+        val types = arrayListOf<String>()
+        val lettersCategoryWise = language.lettersCategoryWise
+        for(category in lettersCategoryWise.keys) {
+            types.add(category.replaceFirstChar { char ->
+                if(char.isLowerCase())
+                    char.titlecase(Locale.getDefault())
+                else
+                    char.toString()
+            })
+        }
+
+        // Additional practice types
+        // Random ligatures work best in some languages like Kannada where each consonant can form
+        // a unique conjunct with another consonant. Other languages like Malayalam or Hindi
+        // have a few ligatures, yet this is true only for commonly occurring consonant combinations
+        // Most of the combinations in these languages do not result in a meaningful ligature, or are
+        // easily understood (as in the case of Hindi). So, we will add random ligatures only if the
+        // language's data file says we should.
+        if(language.areLigaturesAutoGeneratable())
+            types.add("Random Ligatures")
+        types.add("Random Words")
+
+        practiceTypeSelected.value = types.first()
+
+        types
+    }
+    lateinit var practiceTypesAdapter: ArrayAdapter<String>
+    var practiceTypeSelected: MutableLiveData<String> = MutableLiveData()
+    get() {
+        if(field.value == null) {
+            if((practiceTypes.value?.size ?: 0) > 0)
+                field.value = practiceTypes.value?.first()
+        }
+        return field
+    }
+
+    var practiceString: LiveData<String> = practiceTypeSelected.map { practiceType ->
+        logDebug(logTag, "Practice string changes...")
+        val _practiceString = generatePracticeString(this)
+        transliteratedString.value = transliterate(_practiceString, practiceInSelected.value!!, language.value!!)
+        practiceSuccessCheck.value = false
+        _practiceString
+    }
     var transliteratedString: MutableLiveData<String> = MutableLiveData()
+
+    fun generateNewPracticeString() {
+        practiceTypeSelected.postValue(practiceTypeSelected.value)
+    }
+
     // Variable is true if user's transliteration is correct
     var practiceSuccessCheck: MutableLiveData<Boolean> = MutableLiveData(false)
 
-    fun setTransliterator(context: Context) {
-        transliterator = Transliterator.create(context)
+    private fun getLanguage(file: String): Language {
+        val languageData: Language? = getLanguageData(file, getApplication())
+        return if(languageData != null)
+            languageData
+        else {
+            // TODO: How to handle this?
+            logDebug(logTag, "Null encounter while trying to load language: \"$file\"")
+            languageData!!  // Dummy return which should just throw a NullPointer Exception
+        }
     }
 
-    // Set the transliterator based on a specific language
-    fun setTransliterator(language: String, context: Context) {
-        if(transliterator == null)
-            transliterator = Transliterator.create(language, context)
-        else if (transliterator?.getLanguage()?.lowercase() != language.lowercase())
-            transliterator = Transliterator.create(language, context)
-    }
-
-    fun getLanguageData(): Language {
-        return transliterator!!.languageData
+    // TODO: This exists in LettersTabViewModel as well. Move to a common utility collection.
+    // Start Initialisation activity if we could not find any downloaded languages.
+    private fun getAllDownloadedLanguages(): java.util.ArrayList<String> {
+        val languages: java.util.ArrayList<String> = getDownloadedLanguages(getApplication())
+        if (languages.size == 0) {
+            // (requireActivity() as MainActivity).startInitialisationActivity()
+            return java.util.ArrayList()
+        }
+        return languages
     }
 }
