@@ -25,7 +25,7 @@ import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
 
 import androidx.lifecycle.*
 import androidx.navigation.NavDirections
-import `in`.digistorm.aksharam.activities.main.TabbedViewsDirections
+import `in`.digistorm.aksharam.activities.main.TabbedViewsFragmentDirections
 import `in`.digistorm.aksharam.util.*
 
 class LettersTabViewModel(application: Application): AndroidViewModel(application) {
@@ -37,7 +37,7 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
     var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData()
         get() {
             if(field.value == null) {
-                field.value  = getAllDownloadedLanguages()
+                field.value  = getDownloadedLanguages(getApplication())
             }
             return field
         }
@@ -108,7 +108,7 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
             else
                 it.toString()
         }
-        return TabbedViewsDirections.actionTabbedViewsFragmentToLetterInfoFragment(
+        return TabbedViewsFragmentDirections.actionTabbedViewsFragmentToLetterInfoFragment(
             letter = letter,
             category = category,
             targetLanguage = targetLanguageSelected.value!!,
@@ -117,7 +117,7 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
 
     val languageInfoOnClick: OnClickListener = OnClickListener {
         if(targetLanguageSelected.value != null) {
-            val directions = TabbedViewsDirections.actionTabbedViewsFragmentToLanguageInfoFragment(
+            val directions = TabbedViewsFragmentDirections.actionTabbedViewsFragmentToLanguageInfoFragment(
                 targetLanguageSelected.value!!
             )
             navigateToLanguageInfo(directions)
@@ -143,16 +143,5 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
             logDebug(logTag, "Null encounter while trying to load language: \"$file\"")
             return languageData!!  // Dummy return which should just throw a NullPointer Exception
         }
-    }
-
-    // TODO: This exists in PracticeTabViewModel as well. Move to a common utility collection.
-    // Start Initialisation activity if we could not find any downloaded languages.
-    private fun getAllDownloadedLanguages(): java.util.ArrayList<String> {
-        val languages: java.util.ArrayList<String> = getDownloadedLanguages(getApplication())
-        if (languages.size == 0) {
-            // (requireActivity() as MainActivity).startInitialisationActivity()
-            return java.util.ArrayList()
-        }
-        return languages
     }
 }

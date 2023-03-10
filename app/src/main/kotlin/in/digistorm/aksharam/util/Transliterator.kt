@@ -22,7 +22,6 @@ package `in`.digistorm.aksharam.util
 import android.content.Context
 import android.content.Intent
 import java.lang.StringBuilder
-import `in`.digistorm.aksharam.activities.initialise.InitialiseAppActivity
 import android.os.Parcel
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize

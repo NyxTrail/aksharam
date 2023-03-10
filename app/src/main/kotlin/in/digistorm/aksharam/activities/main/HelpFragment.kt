@@ -28,17 +28,28 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 
 class HelpFragment: Fragment() {
-    private lateinit var fragmentHelpBinding: FragmentHelpBinding
+    private lateinit var binding: FragmentHelpBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        fragmentHelpBinding = FragmentHelpBinding.inflate(layoutInflater, container, false)
-        fragmentHelpBinding.textView.text = HtmlCompat.fromHtml(getString(R.string.help_text), HtmlCompat.FROM_HTML_MODE_LEGACY)
-        return fragmentHelpBinding.root
+        binding = FragmentHelpBinding.inflate(layoutInflater, container, false)
+        binding.textView.text = HtmlCompat.fromHtml(getString(R.string.help_text), HtmlCompat.FROM_HTML_MODE_LEGACY)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val navController = findNavController()
+        binding.toolbar.setupWithNavController(
+            navController,
+            AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
+        )
     }
 }

@@ -33,7 +33,7 @@
     <string name="back">Back</string>
 
     <!-- Stuff for the InitialiseAppActivity -->
-    <string name="initialisation_check_data">Checking available data files online…</string>
+    <string name="initialisation_checking_data">Checking available data files online…</string>
     <string name="initialisation_choice_hint">
         Please choose language data you wish to download:
     </string>
@@ -146,4 +146,5 @@
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="language_info">Language Info</string>
+    <string name="vertical_ellipsis">&#8942;</string>
 </resources>

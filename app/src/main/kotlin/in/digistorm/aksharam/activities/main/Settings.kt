@@ -31,6 +31,10 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
+import `in`.digistorm.aksharam.R
 import kotlinx.coroutines.*
 
 class SettingsFragment: Fragment() {
@@ -64,6 +68,12 @@ class SettingsFragment: Fragment() {
                 submitList(it)
             }
         }
+
+        val navController = findNavController()
+        binding.toolbar.setupWithNavController(
+            navController,
+            AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
+        )
     }
 
     private fun updateViewsAfterFileListChanged(): CompletionHandler {

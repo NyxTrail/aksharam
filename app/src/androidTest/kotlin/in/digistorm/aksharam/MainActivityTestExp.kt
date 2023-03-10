@@ -1,6 +1,6 @@
 package `in`.digistorm.aksharam
 
-import `in`.digistorm.aksharam.activities.initialise.InitialiseAppActivity
+import `in`.digistorm.aksharam.activities.main.initialise.InitialiseAppActivity
 import `in`.digistorm.aksharam.activities.main.MainActivity
 import `in`.digistorm.aksharam.util.Language
 import `in`.digistorm.aksharam.util.getAllLanguages

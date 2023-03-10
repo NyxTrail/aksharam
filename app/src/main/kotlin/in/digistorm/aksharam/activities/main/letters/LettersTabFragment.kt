@@ -19,22 +19,17 @@
  */
 package `in`.digistorm.aksharam.activities.main.letters
 
-import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.activities.main.MainActivity
 import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
 import `in`.digistorm.aksharam.databinding.FragmentLettersTabBinding
 import `in`.digistorm.aksharam.util.*
 
 import android.os.Bundle
 import android.view.*
-import android.widget.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import `in`.digistorm.aksharam.activities.main.TabbedViewsDirections
-import kotlin.collections.ArrayList
 
 class LettersTabFragment: Fragment() {
     private val logTag = javaClass.simpleName
@@ -56,6 +51,10 @@ class LettersTabFragment: Fragment() {
         super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
 
+        if(activityViewModel.availableLanguages.value?.isEmpty() == true) {
+            logDebug(logTag, "No downloaded files found!")
+        }
+
         viewModel.initialise(
             activityViewModel = activityViewModel,
             navigateToLanguageInfo = { action ->
@@ -64,22 +63,5 @@ class LettersTabFragment: Fragment() {
         )
 
         binding.viewModel = viewModel
-
-        // Initialise the fragment
-        (binding.languageSelector.editText as MaterialAutoCompleteTextView)
-            .setText(viewModel.languageSelected.value, false)
-    }
-
-    // TODO: This exists in PracticeTabFragment as well. Move to a common utility collection.
-    // Return an empty array list if we could not find any
-    // downloaded files. Should not be a problem since we
-    // are anyways exiting this activity.
-    private fun getAllDownloadedLanguages(): ArrayList<String> {
-        val languages: ArrayList<String> = getDownloadedLanguages(requireContext())
-        if (languages.size == 0) {
-            (requireActivity() as MainActivity).startInitialisationActivity()
-            return ArrayList()
-        }
-        return languages
     }
 }

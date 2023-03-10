@@ -1,6 +1,5 @@
 package `in`.digistorm.aksharam.util
 
-import android.widget.AdapterView.OnItemClickListener
 import android.widget.ArrayAdapter
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -32,12 +31,6 @@ fun MaterialAutoCompleteTextView.writeSimpleItems(
     if(text.toString() != newText) {
         setText(newText, false)
     }
-}
-
-@BindingAdapter("itemClicked")
-fun MaterialAutoCompleteTextView.setItemClicked(listener: OnItemClickListener) {
-    logDebug(logTag, "Item clicked!")
-    onItemClickListener = listener
 }
 
 @BindingAdapter("letters_category_wise")

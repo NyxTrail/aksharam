@@ -22,27 +22,33 @@
  ~
  -->
 
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_gravity="center"
-    android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <CheckedTextView
-        android:id="@+id/LanguageDataFileListCTV"
-        android:layout_width="0dp"
-        android:layout_height="30dp"
-        android:checkMark="?android:attr/textCheckMark"
-        android:checkMarkTintMode="multiply"
-        android:checked="false"
-        android:gravity="center"
-        android:textSize="@dimen/text_clickable_size"
-        android:text="@string/test_text"
-        android:layout_marginTop="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <data>
+    </data>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <CheckedTextView
+            android:id="@+id/checkbox"
+            android:layout_width="0dp"
+            android:layout_height="30dp"
+            android:checkMark="?android:attr/textCheckMark"
+            android:checkMarkTintMode="multiply"
+            android:checked="false"
+            android:gravity="center"
+            android:textSize="@dimen/text_clickable_size"
+            android:text="@string/test_text"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</layout>

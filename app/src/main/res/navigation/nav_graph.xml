@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/tabbedViewsFragment"
-        android:name="in.digistorm.aksharam.activities.main.TabbedViews"
+        android:name="in.digistorm.aksharam.activities.main.TabbedViewsFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/tabbed_views">
+        tools:layout="@layout/fragment_tabbed_views">
         <action
             android:id="@+id/action_tabbedViewsFragment_to_settingsFragment"
             app:destination="@id/settingsFragment" />
@@ -25,6 +25,9 @@
         <action
             android:id="@+id/action_tabbedViewsFragment_to_letterInfoFragment"
             app:destination="@id/letterInfoFragment" />
+        <action
+            android:id="@+id/action_tabbedViewsFragment_to_initialisationScreen"
+            app:destination="@id/initialisationScreen" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
@@ -63,5 +66,13 @@
         <argument
             android:name="targetLanguage"
             app:argType="string" />
+    </fragment>
+    <fragment
+        android:id="@+id/initialisationScreen"
+        android:name="in.digistorm.aksharam.activities.main.initialise.InitialisationScreen"
+        android:label="@string/app_name" >
+        <action
+            android:id="@+id/action_initialisationScreen_to_tabbedViewsFragment"
+            app:destination="@id/tabbedViewsFragment" />
     </fragment>
 </navigation>

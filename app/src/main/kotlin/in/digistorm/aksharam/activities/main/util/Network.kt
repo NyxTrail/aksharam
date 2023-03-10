@@ -57,7 +57,17 @@ private val okHttpClient = OkHttpClient.Builder()
 data class LanguageFile(
     val name: String,
     val download_url: String,
-)
+) {
+    val displayName: String
+        get() {
+            return name.removeSuffix(".json").replaceFirstChar {  firstChar ->
+                if(firstChar.isLowerCase())
+                    firstChar.titlecase()
+                else
+                    firstChar.toString()
+            }
+        }
+}
 
 interface GitHubApi {
     @GET("contents?ref=1.0")

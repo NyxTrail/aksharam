@@ -41,6 +41,12 @@ suspend fun writeTofile(
     }
 }
 
+suspend fun downloadFile(file: LanguageFile, context: Context) {
+    logDebug(logTag, "Downloading file: ${file.name} from: ${file.download_url}")
+    val fileContents = downloadFile(file.download_url)
+    writeTofile(file.name, fileContents!!, context)
+}
+
 suspend fun getLocalFiles(context: Context): MutableList<String> {
     val files = mutableListOf<String>()
     return withContext(Dispatchers.IO) {
