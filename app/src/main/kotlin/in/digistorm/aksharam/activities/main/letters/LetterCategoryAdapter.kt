@@ -108,10 +108,14 @@ class LetterCategoryAdapter(
 
         // Give an ExpandableCardView the ability to find its sibling, so that they are animated correctly
         holder.expandableCardView.findSiblings = fun () : MutableList<ExpandableCardView> {
-            var nextCategory = currentList[position + 1]
+            var nextCategory = if(position + 1 < currentList.size)
+                currentList[position + 1]
+            else
+                null
             val siblingList = mutableListOf<ExpandableCardView>()
             var cardView: ExpandableCardView? = null
             // Collect all Card Views sequentially, until the first un-collapsed one
+            var i = 0
             while(nextCategory != null) {
                 logDebug(logTag, "In loop")
                 cardView = (holder.expandableCardView.parent as View).findViewWithTag(nextCategory.keys.first())
@@ -121,7 +125,7 @@ class LetterCategoryAdapter(
                 else
                     break // We break at the first Card View that is not collapsed
                 // Next category
-                nextCategory = currentList[position + 1]
+                nextCategory = currentList[position + i++]
             }
             if(cardView != null && !cardView.collapsed)
                 siblingList.add(cardView)
