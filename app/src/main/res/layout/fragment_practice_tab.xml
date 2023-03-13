@@ -29,7 +29,7 @@
     <data>
         <variable
             name="viewModel"
-            type="in.digistorm.aksharam.activities.main.practice.PracticeTabViewModel" />
+            type="in.digistorm.aksharam.activities.main.fragments.practice.PracticeTabViewModel" />
     </data>
 
     <androidx.core.widget.NestedScrollView

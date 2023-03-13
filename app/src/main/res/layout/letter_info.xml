@@ -50,7 +50,7 @@
                 android:elevation="10dp"/>
         </com.google.android.material.appbar.AppBarLayout>
 
-        <in.digistorm.aksharam.util.AutoAdjustingTextView
+        <in.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
             android:id="@+id/letterInfoHeadingTV"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

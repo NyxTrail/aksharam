@@ -19,9 +19,9 @@
  */
 package `in`.digistorm.aksharam.activities.main
 
-import `in`.digistorm.aksharam.activities.main.letters.LettersTabFragment
-import `in`.digistorm.aksharam.activities.main.practice.PracticeTabFragment
-import `in`.digistorm.aksharam.activities.main.transliterate.TransliterateTabFragment
+import `in`.digistorm.aksharam.activities.main.fragments.letters.LettersTabFragment
+import `in`.digistorm.aksharam.activities.main.fragments.practice.PracticeTabFragment
+import `in`.digistorm.aksharam.activities.main.fragments.transliterate.TransliterateTabFragment
 import `in`.digistorm.aksharam.util.logDebug
 
 import androidx.fragment.app.Fragment

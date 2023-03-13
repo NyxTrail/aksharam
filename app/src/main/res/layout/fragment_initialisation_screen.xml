@@ -29,7 +29,7 @@
         <import type="android.view.View" />
         <variable
             name="viewModel"
-            type="in.digistorm.aksharam.activities.main.initialise.InitialisationScreenViewModel" />
+            type="in.digistorm.aksharam.activities.main.fragments.initialise.InitialisationScreenViewModel" />
 
     </data>
 

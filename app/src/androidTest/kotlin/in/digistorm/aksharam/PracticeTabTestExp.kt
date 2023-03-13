@@ -1,7 +1,6 @@
 package `in`.digistorm.aksharam
 
-import `in`.digistorm.aksharam.util.Language
-import `in`.digistorm.aksharam.util.Transliterator
+import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.util.logDebug
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onData

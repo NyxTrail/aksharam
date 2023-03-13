@@ -26,22 +26,15 @@ import `in`.digistorm.aksharam.util.logDebug
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.onNavDestinationSelected
-import androidx.navigation.ui.setupActionBarWithNavController
-import `in`.digistorm.aksharam.activities.main.initialise.InitialisationScreenDirections
-import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
+import `in`.digistorm.aksharam.activities.main.fragments.initialise.InitialisationScreenDirections
 
 class MainActivity : AppCompatActivity() {
     private val logTag = javaClass.simpleName
 
-    private val aksharamViewModel: AksharamViewModel by viewModels()
+    private val activityViewModel: ActivityViewModel by viewModels()
     private lateinit var activityMainBinding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -50,7 +43,7 @@ class MainActivity : AppCompatActivity() {
 
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
-        aksharamViewModel.availableLanguages.observe(this) { languageFiles ->
+        activityViewModel.availableLanguages.observe(this) { languageFiles ->
             val navController = findNavController(R.id.nav_host_fragment_container)
             if(languageFiles.size > 0 && navController.currentDestination?.id == R.id.initialisationScreen) {
                 findNavController(R.id.nav_host_fragment_container)

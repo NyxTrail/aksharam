@@ -28,7 +28,7 @@
 
     </data>
 
-    <in.digistorm.aksharam.util.AutoAdjustingTextView
+    <in.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
         android:id="@+id/letter_view"
         style="@style/LetterView"
         android:layout_width="65dp"

@@ -24,6 +24,7 @@ import `in`.digistorm.aksharam.util.logDebug
 import android.content.Context
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.BufferedReader
 import java.nio.charset.StandardCharsets
 
 private const val logTag = "Files"
@@ -63,3 +64,8 @@ suspend fun deleteFile(fileName: String, context: Context) {
         context.deleteFile(fileName)
     }
 }
+
+fun getBufferedReader(file: String, context: Context): BufferedReader {
+    return context.openFileInput(file).bufferedReader()
+}
+

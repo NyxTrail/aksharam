@@ -5,7 +5,7 @@ import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.activities.main.letters.LetterCategoryAdapter
+import `in`.digistorm.aksharam.activities.main.fragments.letters.LetterCategoryAdapter
 
 private val logTag: String = "AutoCompleteBindingAdapter"
 

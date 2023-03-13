@@ -2,11 +2,10 @@ package `in`.digistorm.aksharam
 
 import `in`.digistorm.aksharam.activities.main.initialise.InitialiseAppActivity
 import `in`.digistorm.aksharam.activities.main.MainActivity
-import `in`.digistorm.aksharam.util.Language
+import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.util.getAllLanguages
 import `in`.digistorm.aksharam.util.logDebug
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions
 import androidx.test.espresso.matcher.ViewMatchers

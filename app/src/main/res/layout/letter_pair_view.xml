@@ -28,7 +28,7 @@
 
     </data>
 
-    <in.digistorm.aksharam.activities.main.letters.LetterPairView
+    <in.digistorm.aksharam.activities.main.fragments.letters.LetterPairView
         android:id="@+id/letter_pair_view"
         style="@style/LetterViewSmall"
         android:layout_width="45dp"

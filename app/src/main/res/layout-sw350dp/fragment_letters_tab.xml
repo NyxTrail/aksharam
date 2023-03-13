@@ -27,7 +27,7 @@
     <data>
         <variable
             name="viewModel"
-            type="in.digistorm.aksharam.activities.main.letters.LettersTabViewModel" />
+            type="in.digistorm.aksharam.activities.main.fragments.letters.LettersTabViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
