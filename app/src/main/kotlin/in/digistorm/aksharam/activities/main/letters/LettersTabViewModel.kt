@@ -28,19 +28,15 @@ import androidx.navigation.NavDirections
 import `in`.digistorm.aksharam.activities.main.TabbedViewsFragmentDirections
 import `in`.digistorm.aksharam.util.*
 
-class LettersTabViewModel(application: Application): AndroidViewModel(application) {
+class LettersTabViewModel(
+    application: Application,
+    // We persist some state information in the activityViewModel for Fragments reachable from LettersTabFragment
+    val activityViewModel: AksharamViewModel
+): AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
 
-    private lateinit var aksharamViewModel: AksharamViewModel
-
     // The actual list of languages currently available to the app
-    var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData()
-        get() {
-            if(field.value == null) {
-                field.value  = getDownloadedLanguages(getApplication())
-            }
-            return field
-        }
+    var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData(arrayListOf())
 
     // A function to initialise the Convert To drop down.
     // This function can access the view which we can't do here in the view model.
@@ -49,6 +45,7 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
     // The currently selected language in the UI
     var languageSelected: MutableLiveData<String> = MutableLiveData()
         get() {
+            logDebug(logTag, "languageSelected")
             if(field.value == null) {
                 if((downloadedLanguages.value?.size ?: 0) > 0)
                     field.value = downloadedLanguages.value?.first()
@@ -61,7 +58,7 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
     var language: LiveData<Language> = languageSelected.map { newLanguage ->
         logDebug(logTag, "Fetching data for $newLanguage")
         val language: Language = getLanguage(newLanguage)
-        aksharamViewModel.language.value = language
+        activityViewModel.language.value = language
         language
     }
 
@@ -72,11 +69,12 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
         targetLanguageSelected.value = targetLanguages.first()
         targetLanguages
     }
+
     var targetLanguageSelected: MutableLiveData<String> = MutableLiveData()
         get() {
             if(field.value == null) {
                 logDebug(logTag, "targetLanguageSelected backing field is null")
-                field.value = targetLanguageList.value?.first() ?: "Oops!"
+                field.value = targetLanguageList.value?.first()
                 if(field.value == null)
                     logDebug(logTag, "targetLanguageSelected is still null!")
             }
@@ -102,6 +100,7 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
     var categoryListAdapter: LetterCategoryAdapter = LetterCategoryAdapter(::letterOnLongClickAction)
 
     private fun letterOnLongClickAction(letter: String): NavDirections {
+        logDebug(logTag, "$letter long clicked.")
         val category = language.value?.getLetterDefinition(letter)?.type!!.replaceFirstChar {
             if(it.isLowerCase())
                 it.titlecase()
@@ -125,13 +124,16 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
     }
 
     fun initialise(
-        activityViewModel: AksharamViewModel,
         navigateToLanguageInfo: (NavDirections) -> Unit,
     ) {
-        logDebug(logTag, "Initialising...")
-        this.aksharamViewModel = activityViewModel
+        logDebug(logTag, "Initialising.")
         this.navigateToLanguageInfo = navigateToLanguageInfo
-        logDebug(logTag, "Done initialising.")
+        downloadedLanguages.value = getDownloadedLanguages(getApplication())
+        if(downloadedLanguages.value?.contains(languageSelected.value) != true) {
+            if(downloadedLanguages.value?.isNotEmpty() == true) {
+                languageSelected.value = downloadedLanguages.value?.first()
+            }
+        }
     }
 
     private fun getLanguage(file: String): Language {
@@ -143,5 +145,10 @@ class LettersTabViewModel(application: Application): AndroidViewModel(applicatio
             logDebug(logTag, "Null encounter while trying to load language: \"$file\"")
             return languageData!!  // Dummy return which should just throw a NullPointer Exception
         }
+    }
+
+    init {
+        logDebug(logTag, "aksharamViewModel available languages: ${downloadedLanguages.value}")
+        logDebug(logTag, "downloaded languages: ${downloadedLanguages.value}")
     }
 }

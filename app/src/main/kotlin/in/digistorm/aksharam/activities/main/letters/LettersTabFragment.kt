@@ -19,6 +19,7 @@
  */
 package `in`.digistorm.aksharam.activities.main.letters
 
+import android.content.Context
 import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
 import `in`.digistorm.aksharam.databinding.FragmentLettersTabBinding
 import `in`.digistorm.aksharam.util.*
@@ -28,6 +29,10 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
+import androidx.lifecycle.viewmodel.ViewModelInitializer
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 
@@ -35,8 +40,18 @@ class LettersTabFragment: Fragment() {
     private val logTag = javaClass.simpleName
 
     private lateinit var binding: FragmentLettersTabBinding
-    private val viewModel: LettersTabViewModel by viewModels()
     private val activityViewModel: AksharamViewModel by activityViewModels()
+    private val viewModel: LettersTabViewModel by viewModels {
+        object: ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                return (LettersTabViewModel(
+                    application = requireActivity().application,
+                    activityViewModel = activityViewModel
+                ) as? T) ?: throw Exception("ViewModelProvider.Factory: LettersTabViewModel could not be created.")
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -48,15 +63,9 @@ class LettersTabFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
 
-        if(activityViewModel.availableLanguages.value?.isEmpty() == true) {
-            logDebug(logTag, "No downloaded files found!")
-        }
-
         viewModel.initialise(
-            activityViewModel = activityViewModel,
             navigateToLanguageInfo = { action ->
                 findNavController().navigate(action)
             }

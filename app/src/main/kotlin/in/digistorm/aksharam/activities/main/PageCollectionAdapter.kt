@@ -29,7 +29,7 @@ import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import java.util.*
 
-class PageCollectionAdapter(fragmentActivity: FragmentActivity) : FragmentStateAdapter(fragmentActivity) {
+class PageCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment) {
     private val logTag = javaClass.simpleName
     private val fragments = ArrayList<Fragment>()
     private val backStack = ArrayList<Stack<Fragment>>()
@@ -59,7 +59,6 @@ class PageCollectionAdapter(fragmentActivity: FragmentActivity) : FragmentStateA
         backStack[index].push(fragments[index])
         fragments[index] = fragment
         notifyItemChanged(index)
-        // mainActivity.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
     /* Returns true if something is actually replaced

@@ -51,6 +51,8 @@ class PracticeTabFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
 
+        viewModel.initialise()
+
         // Assign the data binding's version of the view model
         binding.viewModel = viewModel
 

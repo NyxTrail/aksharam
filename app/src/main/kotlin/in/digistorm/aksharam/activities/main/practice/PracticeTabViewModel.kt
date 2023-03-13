@@ -22,21 +22,19 @@ package `in`.digistorm.aksharam.activities.main.practice
 import android.app.Application
 import android.widget.ArrayAdapter
 import androidx.lifecycle.*
+import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
 import `in`.digistorm.aksharam.util.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class PracticeTabViewModel(application: Application): AndroidViewModel(application) {
+class PracticeTabViewModel(
+    application: Application,
+): AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
 
     // The actual list of languages currently available to the app
-    var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData()
-        get() {
-            if(field.value == null) {
-                field.value = getAllDownloadedLanguages()
-            }
-            return field
-        }
+    var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData(arrayListOf())
+
     // Adapter containing the list of languages displayed in the UI
     lateinit var languageAdapter: ArrayAdapter<String>
     // The currently selected language in the UI
@@ -130,14 +128,13 @@ class PracticeTabViewModel(application: Application): AndroidViewModel(applicati
         }
     }
 
-    // TODO: This exists in LettersTabViewModel as well. Move to a common utility collection.
-    // Start Initialisation activity if we could not find any downloaded languages.
-    private fun getAllDownloadedLanguages(): java.util.ArrayList<String> {
-        val languages: java.util.ArrayList<String> = getDownloadedLanguages(getApplication())
-        if (languages.size == 0) {
-            // (requireActivity() as MainActivity).startInitialisationActivity()
-            return java.util.ArrayList()
+    fun initialise() {
+        logDebug(logTag, "Initialising.")
+        downloadedLanguages.value = getDownloadedLanguages(getApplication())
+        if(downloadedLanguages.value?.contains(languageSelected.value) != true) {
+            if(downloadedLanguages.value?.isNotEmpty() == true) {
+                languageSelected.value = downloadedLanguages.value?.first()
+            }
         }
-        return languages
     }
 }

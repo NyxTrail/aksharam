@@ -12,6 +12,8 @@ import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayout.OnTabSelectedListener
 import com.google.android.material.tabs.TabLayoutMediator
 import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.activities.main.letters.LettersTabFragment
+import `in`.digistorm.aksharam.activities.main.practice.PracticeTabFragment
 import `in`.digistorm.aksharam.databinding.FragmentTabbedViewsBinding
 import `in`.digistorm.aksharam.util.getDownloadedLanguages
 import `in`.digistorm.aksharam.util.logDebug
@@ -48,7 +50,7 @@ class TabbedViewsFragment: Fragment() {
         logDebug(logTag, "onViewCreated")
         goToInitialisationScreenIfNoDownloadedFiles()
 
-        pageCollectionAdapter = PageCollectionAdapter(this.requireActivity())
+        pageCollectionAdapter = PageCollectionAdapter(this)
         binding.pager.adapter = pageCollectionAdapter
         binding.tabLayout.addOnTabSelectedListener(TabSelectedListener())
         TabLayoutMediator(
