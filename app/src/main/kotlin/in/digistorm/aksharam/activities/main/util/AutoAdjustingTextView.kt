@@ -24,7 +24,6 @@ import android.graphics.Canvas
 import android.util.AttributeSet
 import android.util.TypedValue
 import androidx.appcompat.widget.AppCompatTextView
-import `in`.digistorm.aksharam.util.logDebug
 
 open class AutoAdjustingTextView : AppCompatTextView {
     private val logTag = javaClass.simpleName

@@ -22,7 +22,7 @@ package `in`.digistorm.aksharam.activities.main
 
 import `in`.digistorm.aksharam.activities.main.fragments.settings.SettingsViewModel
 import `in`.digistorm.aksharam.databinding.FragmentSettingsBinding
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View

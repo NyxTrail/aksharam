@@ -20,7 +20,7 @@
 package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import `in`.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View

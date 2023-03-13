@@ -1,15 +1,12 @@
 package `in`.digistorm.aksharam
 
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.content.Context
 import android.text.Html
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.ViewAssertion
 import androidx.test.espresso.action.ViewActions
-import androidx.test.espresso.assertion.ViewAssertions
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
@@ -18,12 +15,9 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
-import org.junit.Assert
 import java.io.BufferedReader
 import java.io.IOException
-import java.util.*
 
 class TransliterateTabTestExp: AksharamTestBaseExp() {
     fun getData(context: Context): Map<String, List<Map<String, String>>> {

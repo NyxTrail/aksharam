@@ -23,6 +23,9 @@ import android.app.Application
 import android.widget.ArrayAdapter
 import androidx.lifecycle.*
 import `in`.digistorm.aksharam.activities.main.language.Language
+import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
+import `in`.digistorm.aksharam.activities.main.language.getLanguageData
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.util.*
 import java.util.*
 import kotlin.collections.ArrayList
@@ -51,7 +54,7 @@ class PracticeTabViewModel(
     // The actual language data
     var language: LiveData<Language> = languageSelected.map { newLanguage ->
         logDebug(logTag, "Fetching data for $newLanguage")
-        val language: Language = getLanguage(newLanguage)
+        val language: Language = getLanguageData(newLanguage, getApplication())
         language
     }
 
@@ -116,17 +119,6 @@ class PracticeTabViewModel(
 
     // Variable is true if user's transliteration is correct
     var practiceSuccessCheck: MutableLiveData<Boolean> = MutableLiveData(false)
-
-    private fun getLanguage(file: String): Language {
-        val languageData: Language? = getLanguageData(file, getApplication())
-        return if(languageData != null)
-            languageData
-        else {
-            // TODO: How to handle this?
-            logDebug(logTag, "Null encounter while trying to load language: \"$file\"")
-            languageData!!  // Dummy return which should just throw a NullPointer Exception
-        }
-    }
 
     fun initialise() {
         logDebug(logTag, "Initialising.")

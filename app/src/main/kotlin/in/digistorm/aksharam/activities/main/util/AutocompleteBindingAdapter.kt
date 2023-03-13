@@ -1,4 +1,4 @@
-package `in`.digistorm.aksharam.util
+package `in`.digistorm.aksharam.activities.main.util
 
 import android.widget.ArrayAdapter
 import androidx.databinding.BindingAdapter

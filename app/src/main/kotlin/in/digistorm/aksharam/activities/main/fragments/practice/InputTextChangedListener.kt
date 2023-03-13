@@ -1,15 +1,12 @@
 package `in`.digistorm.aksharam.activities.main.fragments.practice
 
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.util.logDebug
-import `in`.digistorm.aksharam.util.setGreen
-import `in`.digistorm.aksharam.util.setRedGreen
+import `in`.digistorm.aksharam.activities.main.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.setGreen
+import `in`.digistorm.aksharam.activities.main.util.setRedGreen
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.TextView
-import android.widget.Toast
-import androidx.fragment.app.viewModels
-import com.google.android.material.textfield.TextInputEditText
 import `in`.digistorm.aksharam.util.transliterate
 
 class InputTextChangedListener(

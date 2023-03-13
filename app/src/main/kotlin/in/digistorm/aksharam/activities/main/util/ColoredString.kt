@@ -1,4 +1,4 @@
-package `in`.digistorm.aksharam.util
+package `in`.digistorm.aksharam.activities.main.util
 
 import `in`.digistorm.aksharam.R
 import android.content.Context

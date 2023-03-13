@@ -21,7 +21,7 @@ package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import `in`.digistorm.aksharam.activities.main.ActivityViewModel
 import `in`.digistorm.aksharam.databinding.LanguageInfoBinding
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 import android.view.LayoutInflater
 import android.view.ViewGroup

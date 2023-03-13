@@ -20,8 +20,6 @@
 
 package `in`.digistorm.aksharam.activities.main.fragments.initialise
 
-import `in`.digistorm.aksharam.util.*
-
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -35,7 +33,9 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.ActivityViewModel
+import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
 import `in`.digistorm.aksharam.activities.main.util.downloadFile
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.databinding.FragmentInitialisationScreenBinding
 import kotlinx.coroutines.launch
 

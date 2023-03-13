@@ -20,8 +20,7 @@
 package `in`.digistorm.aksharam.activities.main.language
 
 import android.content.Context
-import `in`.digistorm.aksharam.util.getAllLanguages
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.util.HashMap
 import java.util.LinkedHashMap
 

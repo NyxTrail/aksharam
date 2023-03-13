@@ -31,6 +31,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 class LettersTabFragment: Fragment() {
     private val logTag = javaClass.simpleName

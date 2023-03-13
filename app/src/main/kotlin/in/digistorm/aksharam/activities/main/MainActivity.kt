@@ -22,7 +22,7 @@ package `in`.digistorm.aksharam.activities.main
 
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.databinding.ActivityMainBinding
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle

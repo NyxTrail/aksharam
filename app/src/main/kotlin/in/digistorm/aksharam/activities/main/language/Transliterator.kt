@@ -1,6 +1,7 @@
 package `in`.digistorm.aksharam.util
 
 import `in`.digistorm.aksharam.activities.main.language.Language
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.lang.StringBuilder
 
 private const val logTag: String = "Transliterator"

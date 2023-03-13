@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import `in`.digistorm.aksharam.activities.main.language.Language
 import androidx.lifecycle.MutableLiveData
-import `in`.digistorm.aksharam.util.getDownloadedLanguages
+import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
 
 /**
  * Activity scoped ViewModel

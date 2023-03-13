@@ -24,7 +24,7 @@ import `in`.digistorm.aksharam.activities.main.ActivityViewModel
 import `in`.digistorm.aksharam.databinding.LetterInfoBinding
 import `in`.digistorm.aksharam.databinding.LetterViewBinding
 import `in`.digistorm.aksharam.databinding.WordAndMeaningBinding
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.util.transliterate
 
 import android.annotation.SuppressLint
@@ -49,15 +49,15 @@ class LetterInfoFragment : Fragment() {
 
     private val letter by lazy { args.letter }
     private val targetLanguage by lazy { args.targetLanguage }
-    private val languageData by lazy { activityViewModel.language.value }
-    private val targetLanguageCode by lazy { languageData?.getLanguageCode(targetLanguage) }
-    private val letterDefinition by lazy { languageData?.getLetterDefinition(letter) }
+    private val languageData by lazy { activityViewModel.language.value!! }
+    private val targetLanguageCode by lazy { languageData.getLanguageCode(targetLanguage) }
+    private val letterDefinition by lazy { languageData.getLetterDefinition(letter) }
     private val letterType by lazy { letterDefinition?.type }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = LetterInfoBinding.inflate(inflater, container, false)
         return binding.root
@@ -84,68 +84,62 @@ class LetterInfoFragment : Fragment() {
     private fun setUp(inflater: LayoutInflater) {
         logDebug(logTag, "Showing info dialog for: ${args.letter}")
 
-        if(languageData == null) {
-            // Return to previous fragment
-            // TODO: Display a snack bar with a suitable error message
-            findNavController().popBackStack()
+        binding.letterInfoHeadingTV.text = args.letter
+        binding.letterInfoTransliteratedHeadingTV.text =
+            transliterate(args.letter, args.targetLanguage, languageData)
+
+        /**
+         * Example words and their meanings.
+         */
+        // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
+        val letterExamples = languageData.getLetterDefinition(args.letter)!!.examples
+
+        // If there are no examples, hide this section
+        if (letterExamples.isEmpty()) {
+            logDebug(logTag, "No examples found for letter: $letter")
+            binding.letterInfoWordsTV.visibility = View.GONE
+            binding.letterInfoMeaningTV.visibility = View.GONE
         } else {
-            binding.letterInfoHeadingTV.text = args.letter
-            binding.letterInfoTransliteratedHeadingTV.text =
-                transliterate(args.letter, args.targetLanguage, languageData!!)
+            showExamplesWordsAndMeanings(letterExamples, inflater)
+        }
 
-            /**
-             * Example words and their meanings.
-             */
-            // We pack the examples into the WordAndMeaning Layout in letter_info.xml layout file
-            val letterExamples = languageData?.getLetterDefinition(args.letter)!!.examples
+        /**
+         * Display additional info for the current letter.
+         */
+        // Check if extra info exists for this letter
+        if (letterDefinition?.info?.get("en") == null) {
+            logDebug(logTag, "No additional info for $letter was found. Hiding UI element.")
+            binding.letterInfoInfoTV.visibility = View.GONE
+        } else {
+            logDebug(logTag, "Info found for letter $letter: ${letterDefinition?.info}")
+            binding.letterInfoInfoTV.text = HtmlCompat.fromHtml(
+                letterDefinition?.info?.get("en")!!, HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+        }
 
-            // If there are no examples, hide this section
-            if (letterExamples.isEmpty()) {
-                logDebug(logTag, "No examples found for letter: $letter")
-                binding.letterInfoWordsTV.visibility = View.GONE
-                binding.letterInfoMeaningTV.visibility = View.GONE
-            } else {
-                showExamplesWordsAndMeanings(letterExamples, inflater)
+        when (letterType) {
+            "vowels" -> {
             }
-
-            /**
-             * Display additional info for the current letter.
-             */
-            // Check if extra info exists for this letter
-            if (letterDefinition?.info?.get("en") == null) {
-                logDebug(logTag, "No additional info for $letter was found. Hiding UI element.")
-                binding.letterInfoInfoTV.visibility = View.GONE
-            } else {
-                logDebug(logTag, "Info found for letter $letter: ${letterDefinition?.info}")
-                binding.letterInfoInfoTV.text = HtmlCompat.fromHtml(
-                    letterDefinition?.info?.get("en")!!, HtmlCompat.FROM_HTML_MODE_LEGACY
-                )
+            "signs" -> {
+                if (letterDefinition?.shouldExcludeCombiExamples() != true) {
+                    showDiacriticsForSign(inflater)
+                }
             }
-
-            when (letterType) {
-                "vowels" -> {
+            "consonants" -> {
+                if (letterDefinition?.shouldExcludeCombiExamples() != true) {
+                    showDiacriticsForLetter(inflater)
+                    showLigatures(inflater)
                 }
-                "signs" -> {
-                    if (letterDefinition?.shouldExcludeCombiExamples() != true) {
-                        showDiacriticsForSign(inflater)
-                    }
+            }
+            "ligatures" -> {
+                if (letterDefinition?.shouldExcludeCombiExamples() != true) {
+                    showDiacriticsForLetter(inflater)
                 }
-                "consonants" -> {
-                    if (letterDefinition?.shouldExcludeCombiExamples() != true) {
-                        showDiacriticsForLetter(inflater)
-                        showLigatures(inflater)
-                    }
-                }
-                "ligatures" -> {
-                    if (letterDefinition?.shouldExcludeCombiExamples() != true) {
-                        showDiacriticsForLetter(inflater)
-                    }
-                }
-                "chillu" -> {
-                }
-                else -> {
-                    logDebug(logTag, "Unknown category: $letterType for letter: $letter")
-                }
+            }
+            "chillu" -> {
+            }
+            else -> {
+                logDebug(logTag, "Unknown category: $letterType for letter: $letter")
             }
         }
     }
@@ -162,7 +156,7 @@ class LetterInfoFragment : Fragment() {
             wordsAndMeaningBinding.wordAndMeaningWordTV.text = word
             wordsAndMeaningBinding.wordAndMeaningMeaningTV.text = meanings[targetLanguageCode]!!
             wordsAndMeaningBinding.wordAndMeaningTransliterationTV.text =
-                transliterate(word, targetLanguage, languageData!!)
+                transliterate(word, targetLanguage, languageData)
             binding.letterInfoWordAndMeaningLL.addView(wordsAndMeaningBinding.root)
         }
     }
@@ -176,7 +170,7 @@ class LetterInfoFragment : Fragment() {
         showDiacriticExamplesUI(View.VISIBLE)
         binding.diacriticSelectorHintTV.text =
             getString(R.string.letter_with_consonants_and_ligatures, letter)
-        languageData?.generateDiacriticsForSign(letter)?.forEach { diacritic ->
+        languageData.generateDiacriticsForSign(letter)?.forEach { diacritic ->
             val letterView =
                 LetterViewBinding.inflate(
                     inflater,
@@ -197,7 +191,7 @@ class LetterInfoFragment : Fragment() {
         showDiacriticExamplesUI(View.VISIBLE)
         binding.diacriticSelectorHintTV.text =
             getString(R.string.letter_with_vowel_signs, letter)
-        languageData?.generateDiacriticsForLetter(letter)?.forEach { diacritic ->
+        languageData.generateDiacriticsForLetter(letter).forEach { diacritic ->
             val letterView = LetterViewBinding.inflate(
                 inflater,
                 binding.diacriticExamplesGL,
@@ -217,7 +211,7 @@ class LetterInfoFragment : Fragment() {
     private fun showLigatures(
         inflater: LayoutInflater
     ) {
-        val (ligaturesWithLetterAsPrefix, ligaturesWithLetterAsSuffix) = languageData!!.generateLigatures(letter)
+        val (ligaturesWithLetterAsPrefix, ligaturesWithLetterAsSuffix) = languageData.generateLigatures(letter)
         ligaturesWithLetterAsPrefix.apply {
             if(isNotEmpty()) {
                 binding.ligaturesWithLetterAsPrefixTv.text =
@@ -225,7 +219,7 @@ class LetterInfoFragment : Fragment() {
                         R.string.ligatures_with_letter_as_prefix,
                         letter,
                         letter,
-                        languageData?.virama
+                        languageData.virama
                     )
                 forEach { ligature ->
                     val letterView = LetterViewBinding.inflate(
@@ -247,7 +241,7 @@ class LetterInfoFragment : Fragment() {
                     getString(
                         R.string.ligatures_with_letter_as_suffix,
                         letter,
-                        languageData?.virama,
+                        languageData.virama,
                         letter
                     )
                 forEach { ligature ->

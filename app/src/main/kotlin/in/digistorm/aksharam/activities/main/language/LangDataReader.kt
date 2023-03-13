@@ -17,15 +17,15 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-package `in`.digistorm.aksharam.util
+package `in`.digistorm.aksharam.activities.main.language
 
 import `in`.digistorm.aksharam.BuildConfig
 import android.content.Context
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.readValue
-import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.util.getBufferedReader
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.io.IOException
 import java.util.*
 
@@ -35,10 +35,10 @@ inline fun <reified T> readValue(file: String, context: Context): T  {
     return mapper.readValue(bufferedReader)
 }
 
-fun getLanguageData(file: String?, context: Context): Language? {
+fun getLanguageData(file: String, context: Context): Language {
     val logTag = "LangDataReader::getLanguageData"
     logDebug(logTag, "Initialising lang data file: $file")
-    var fileLC = file?.lowercase() ?: return null
+    var fileLC = file.lowercase()
 
     if (!fileLC.endsWith(".json")) fileLC = "$fileLC.json"
     val mapper = jacksonObjectMapper()
@@ -59,7 +59,7 @@ fun getLanguageData(file: String?, context: Context): Language? {
     } catch (e: IOException) {
         logDebug(logTag, "Read operation failed on file: $fileLC")
         e.printStackTrace()
-        null
+        throw e
     }
 }
 

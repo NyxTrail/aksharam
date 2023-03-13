@@ -22,7 +22,7 @@ package `in`.digistorm.aksharam.activities.main.fragments.settings
 
 import `in`.digistorm.aksharam.activities.main.util.Network
 import `in`.digistorm.aksharam.activities.main.util.getLocalFiles
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

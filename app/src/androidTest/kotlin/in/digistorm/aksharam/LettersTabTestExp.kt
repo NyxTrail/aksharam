@@ -10,6 +10,9 @@ import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.pressBack
 import androidx.test.espresso.matcher.ViewMatchers.*
 import `in`.digistorm.aksharam.activities.main.language.Language
+import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
+import `in`.digistorm.aksharam.activities.main.language.getLanguageData
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matchers.*
 import org.junit.Assert

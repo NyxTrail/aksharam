@@ -2,15 +2,12 @@ package `in`.digistorm.aksharam.activities.main.fragments.initialise
 
 import android.app.Application
 import android.view.View
-import androidx.databinding.ObservableArrayList
-import androidx.databinding.ObservableList
 import androidx.lifecycle.*
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.util.LanguageFile
 import `in`.digistorm.aksharam.activities.main.util.Network
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

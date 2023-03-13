@@ -14,8 +14,8 @@ import com.google.android.material.tabs.TabLayoutMediator
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.PageCollectionAdapter
 import `in`.digistorm.aksharam.databinding.FragmentTabbedViewsBinding
-import `in`.digistorm.aksharam.util.getDownloadedLanguages
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 class TabbedViewsFragment: Fragment() {
     private val logTag = javaClass.simpleName

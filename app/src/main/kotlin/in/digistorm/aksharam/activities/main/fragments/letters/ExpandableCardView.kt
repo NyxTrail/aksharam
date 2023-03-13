@@ -34,7 +34,7 @@ import androidx.transition.ChangeBounds
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.google.android.material.card.MaterialCardView
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 class ExpandableCardView: MaterialCardView {
     private val logTag = this.javaClass.simpleName

@@ -19,7 +19,7 @@
  */
 package `in`.digistorm.aksharam.activities.main.fragments.initialise
 
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 import androidx.recyclerview.widget.RecyclerView
 import android.view.ViewGroup

@@ -39,6 +39,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import `in`.digistorm.aksharam.activities.main.ActivityViewModel
 import `in`.digistorm.aksharam.activities.main.language.LanguageDetector
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 class TransliterateTabFragment : Fragment() {
     private val logTag = javaClass.simpleName

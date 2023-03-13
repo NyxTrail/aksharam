@@ -24,7 +24,7 @@ import `in`.digistorm.aksharam.activities.main.util.deleteFile
 import `in`.digistorm.aksharam.activities.main.util.downloadFile
 import `in`.digistorm.aksharam.activities.main.util.writeTofile
 import `in`.digistorm.aksharam.databinding.SettingsLanguageListItemBinding
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup

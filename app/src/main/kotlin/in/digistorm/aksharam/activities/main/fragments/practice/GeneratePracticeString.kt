@@ -1,16 +1,11 @@
 package `in`.digistorm.aksharam.activities.main.fragments.practice
 
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.lang.StringBuilder
 import java.util.*
 
 fun generatePracticeString(viewModel: PracticeTabViewModel): String {
     val logTag = "generatePracticeString"
-    // TODO: Better error handling
-    if (viewModel.practiceTypeSelected.value?.isEmpty() != false) {
-        logDebug(logTag, "Practice type is not known. Cannot generate practice string.")
-        return ""
-    }
 
     logDebug(logTag, "Generating practice text.")
     val language = viewModel.language.value!!
@@ -26,7 +21,7 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
     // Special variable to hold the Virama.
     // Useful to detect chillu letters in Malayalam
     val virama = language.virama
-    when (viewModel.practiceTypeSelected.value?.lowercase()) {
+    when (viewModel.practiceTypeSelected.value!!.lowercase()) {
         // Let's construct a made-up word in current language
         // First letter can be a vowel or consonant (not a sign)
         // Second letter onwards can be a vowel sign or consonant (not a vowel)

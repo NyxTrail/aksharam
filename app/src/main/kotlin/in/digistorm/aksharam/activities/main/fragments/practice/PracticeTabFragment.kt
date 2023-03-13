@@ -20,7 +20,6 @@
 package `in`.digistorm.aksharam.activities.main.fragments.practice
 
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.util.*
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -30,6 +29,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.databinding.FragmentPracticeTabBinding
 
 class PracticeTabFragment : Fragment() {

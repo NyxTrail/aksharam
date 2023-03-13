@@ -27,11 +27,15 @@ import androidx.lifecycle.*
 import androidx.navigation.NavDirections
 import `in`.digistorm.aksharam.activities.main.fragments.TabbedViewsFragmentDirections
 import `in`.digistorm.aksharam.activities.main.language.Language
+import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
+import `in`.digistorm.aksharam.activities.main.language.getLanguageData
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.util.*
 
 class LettersTabViewModel(
     application: Application,
-    // We persist some state information in the activityViewModel for Fragments reachable from LettersTabFragment
+    // We persist some state information in the activityViewModel for Fragments reachable
+    // from LettersTabFragment
     val activityViewModel: ActivityViewModel
 ): AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
@@ -58,7 +62,7 @@ class LettersTabViewModel(
     // The actual language data.
     var language: LiveData<Language> = languageSelected.map { newLanguage ->
         logDebug(logTag, "Fetching data for $newLanguage")
-        val language: Language = getLanguage(newLanguage)
+        val language: Language = getLanguageData(newLanguage, getApplication())
         activityViewModel.language.value = language
         language
     }
@@ -76,8 +80,6 @@ class LettersTabViewModel(
             if(field.value == null) {
                 logDebug(logTag, "targetLanguageSelected backing field is null")
                 field.value = targetLanguageList.value?.first()
-                if(field.value == null)
-                    logDebug(logTag, "targetLanguageSelected is still null!")
             }
             return field
         }
@@ -136,21 +138,5 @@ class LettersTabViewModel(
                 languageSelected.value = downloadedLanguages.value?.first()
             }
         }
-    }
-
-    private fun getLanguage(file: String): Language {
-        val languageData: Language? = getLanguageData(file, getApplication())
-        if(languageData != null)
-            return languageData
-        else {
-            // TODO: How to handle this?
-            logDebug(logTag, "Null encounter while trying to load language: \"$file\"")
-            return languageData!!  // Dummy return which should just throw a NullPointer Exception
-        }
-    }
-
-    init {
-        logDebug(logTag, "aksharamViewModel available languages: ${downloadedLanguages.value}")
-        logDebug(logTag, "downloaded languages: ${downloadedLanguages.value}")
     }
 }

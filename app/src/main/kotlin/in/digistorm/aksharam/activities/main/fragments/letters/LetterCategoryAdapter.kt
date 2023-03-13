@@ -21,7 +21,7 @@ package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.databinding.LetterCategoryBinding
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,9 +61,8 @@ class LetterCategoryAdapter(
             val oldCategory = oldItem.keys.singleOrNull()
             val newCategory = newItem.keys.singleOrNull()
             if(oldCategory == newCategory) {
-                val category = newCategory
-                oldItem[category]!!.forEachIndexed { i, letterPair ->
-                    if(letterPair.first != newItem[category]!![i].first)
+                oldItem[newCategory]!!.forEachIndexed { i, letterPair ->
+                    if(letterPair.first != newItem[newCategory]!![i].first)
                         return false
                 }
             }
@@ -87,11 +86,10 @@ class LetterCategoryAdapter(
         private val letterCategoryBinding: LetterCategoryBinding
     ): RecyclerView.ViewHolder(letterCategoryBinding.root) {
         val expandableCardView: ExpandableCardView
-            get() = letterCategoryBinding.expandableCardView!!
+            get() = letterCategoryBinding.expandableCardView
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LetterCategoryCardViewHolder {
-//  TODO:      val view = LayoutInflater.from(parent.context).inflate(R.layout.letter_category, parent, false)
         val letterCategoryBinding = LetterCategoryBinding.inflate(
             LayoutInflater.from(parent.context), parent, false
         )

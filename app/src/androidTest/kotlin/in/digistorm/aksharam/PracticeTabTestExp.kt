@@ -1,7 +1,7 @@
 package `in`.digistorm.aksharam
 
 import `in`.digistorm.aksharam.activities.main.language.Language
-import `in`.digistorm.aksharam.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logDebug
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
