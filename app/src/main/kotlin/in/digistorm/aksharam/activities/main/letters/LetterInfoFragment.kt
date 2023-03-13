@@ -24,7 +24,6 @@ import `in`.digistorm.aksharam.activities.main.models.AksharamViewModel
 import `in`.digistorm.aksharam.databinding.LetterInfoBinding
 import `in`.digistorm.aksharam.databinding.LetterViewBinding
 import `in`.digistorm.aksharam.databinding.WordAndMeaningBinding
-import `in`.digistorm.aksharam.util.Language
 import `in`.digistorm.aksharam.util.logDebug
 import `in`.digistorm.aksharam.util.transliterate
 
@@ -38,6 +37,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
 
 class LetterInfoFragment : Fragment() {
     private val logTag = javaClass.simpleName
@@ -64,6 +65,12 @@ class LetterInfoFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.toolbar.setupWithNavController(
+            findNavController(),
+            AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
+        )
+
         setUp(layoutInflater)
     }
 

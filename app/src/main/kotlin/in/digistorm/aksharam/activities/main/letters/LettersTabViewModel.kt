@@ -117,6 +117,7 @@ class LettersTabViewModel(
     val languageInfoOnClick: OnClickListener = OnClickListener {
         if(targetLanguageSelected.value != null) {
             val directions = TabbedViewsFragmentDirections.actionTabbedViewsFragmentToLanguageInfoFragment(
+                languageSelected.value!!,
                 targetLanguageSelected.value!!
             )
             navigateToLanguageInfo(directions)

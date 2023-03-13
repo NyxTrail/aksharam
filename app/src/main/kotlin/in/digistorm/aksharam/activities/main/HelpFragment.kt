@@ -46,9 +46,8 @@ class HelpFragment: Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val navController = findNavController()
         binding.toolbar.setupWithNavController(
-            navController,
+            findNavController(),
             AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
         )
     }

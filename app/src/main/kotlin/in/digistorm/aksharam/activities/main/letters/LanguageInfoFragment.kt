@@ -32,6 +32,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.setupWithNavController
+import `in`.digistorm.aksharam.R
 
 class LanguageInfoFragment : Fragment() {
     private val logTag = javaClass.simpleName
@@ -53,6 +56,11 @@ class LanguageInfoFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         val activityViewModel: AksharamViewModel by activityViewModels()
 
+        binding.toolbar.setupWithNavController(
+            findNavController(),
+            AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
+        )
+
         val languageData = activityViewModel.language.value
         logDebug(logTag, "Info: ${languageData?.info}")
         logDebug(logTag, "TargetLanguage: ${args.targetLanguage}")
@@ -64,6 +72,7 @@ class LanguageInfoFragment : Fragment() {
             logDebug(logTag, "No info to display. Returning to Letters Tab.")
             findNavController().popBackStack()
         }
+
         binding.languageInfoTV.text =
             HtmlCompat.fromHtml(stringToDisplay, HtmlCompat.FROM_HTML_MODE_LEGACY)
     }

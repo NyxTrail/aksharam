@@ -47,7 +47,11 @@
     <fragment
         android:id="@+id/languageInfoFragment"
         android:name="in.digistorm.aksharam.activities.main.letters.LanguageInfoFragment"
+        android:label="{language} ➤ {targetLanguage}"
         tools:layout="@layout/language_info" >
+        <argument
+            android:name="language"
+            app:argType="string" />
         <argument
             android:name="targetLanguage"
             app:argType="string" />
