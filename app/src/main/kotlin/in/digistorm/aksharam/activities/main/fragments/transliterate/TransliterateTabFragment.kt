@@ -28,52 +28,49 @@ import android.view.ViewGroup
 import android.os.Bundle
 import android.text.TextWatcher
 import android.text.Editable
-import android.app.Activity
-import android.text.Html
 import android.view.View
 import android.widget.*
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import `in`.digistorm.aksharam.activities.main.ActivityViewModel
 import `in`.digistorm.aksharam.activities.main.language.LanguageDetector
 import `in`.digistorm.aksharam.activities.main.util.logDebug
+import `in`.digistorm.aksharam.databinding.FragmentTransliterationBinding
 
 class TransliterateTabFragment : Fragment() {
     private val logTag = javaClass.simpleName
 
-    private val activityViewModel: ActivityViewModel by activityViewModels()
+    private lateinit var binding: FragmentTransliterationBinding
+
     private val viewModel: TransliterateTabViewModel by viewModels {
         object: ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return (TransliterateTabViewModel(
                     application = requireActivity().application,
-                    activityViewModel = activityViewModel
                 ) as? T) ?: throw Exception("ViewModelProvider.Factory: TransliterateTabViewModel could not be created.")
             }
         }
     }
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        return inflater.inflate(R.layout.transliteration_layout, container, false)
+    ): View {
+        binding = FragmentTransliterationBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = viewLifecycleOwner
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
 
-
-        initialiseSpinner()
-
         // Live transliteration as each new character is entered into the input text box
-        (view.findViewById<View>(R.id.TransliterateTabInputTextField) as EditText)
-            .addTextChangedListener(object : TextWatcher {
+        (binding.inputTextField).addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence,
                     start: Int,
@@ -84,124 +81,36 @@ class TransliterateTabFragment : Fragment() {
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
-                    transliterate(s.toString(), view, viewModel)
+                    detectLanguage(s.toString())
+                    setTransliteration(s.toString())
                 }
             })
     }
 
-    private fun transliterate(input: String, view: View?, viewModel: TransliterateTabViewModel) {
-        logDebug(logTag, "Transliterating $input to ${viewModel.targetLanguage}")
-        if (input.isEmpty() || view == null) return
-
-        val inputLanguage = detectLanguage(input)
-        logDebug(logTag, "Language detected: $inputLanguage")
-
-        //if (inputLanguage != null && !viewModel.transliterator.isTransliteratingLanguage(inputLanguage)) {
-            // TODO: fix. Commented when Transliterated was modified to be Parcelable
-            // viewModel.transliterator.setInputLanguage(inputLanguage, requireContext())
-            // re-initialise the spinner so that only languages that can be transliterated to is listed
-            //initialiseSpinner()
-        //}
-
-        // Now we are ready to transliterate
-        logDebug(logTag, "Transliterating to $viewModel.targetLanguage.")
-        // val outputString = viewModel.transliterator.transliterate(input, viewModel.targetLanguage)
-        // setText(view, R.id.TransliterateTabOutputTextView, outputString)
+    private fun setTransliteration(inputString: String) {
+        binding.outputTextView.text = transliterate(
+            inputString,
+            viewModel.targetLanguageSelected.value!!,
+            viewModel.language.value!!
+        )
     }
 
-    // v: view to run findViewById on
-    // id: id of TextView to find
-    // text: text to set
-    private fun setText(v: View?, id: Int, text: CharSequence) {
-        if (v == null) return
-        val tv = v.findViewById<TextView>(id) ?: return
-        tv.text = text
-    }
-
-    // v: view to run findViewById on
-    // id: id of TextView to find
-    // text: text to set
-    private fun setText(activity: Activity?, id: Int, text: CharSequence) {
-        if (activity == null) return
-        val tv = activity.findViewById<TextView>(id) ?: return
-        tv.text = text
-    }
-
-    private fun detectLanguage(inputString: String): String? {
+    private fun detectLanguage(inputString: String) {
         val lang: String? = LanguageDetector(context).detectLanguage(inputString, context)
         logDebug(logTag, "Detected language: $lang")
         if (lang == null) {
-            logDebug(logTag, getString(R.string.lang_could_not_detect))
-            if (activity == null) return null
-            setText(
-                activity, R.id.TransliterateTabInfoTV,
-                Html.fromHtml(getText(R.string.lang_could_not_detect).toString())
+            logDebug(logTag, "Could not detect language.")
+            binding.infoTextView.text = HtmlCompat.fromHtml(
+                getString(R.string.lang_could_not_detect),
+                HtmlCompat.FROM_HTML_MODE_LEGACY
             )
-            return null
         }
-        setText(
-            activity,
-            R.id.TransliterateTabInfoTV,
-            getText(R.string.transliterate_tab_info_default)
-        )
-        return lang
-    }
-
-    private fun setTargetLanguage(viewModel: TransliterateTabViewModel,
-                                  languageSelectionSpinner: Spinner,
-                                  adapter: ArrayAdapter<String>
-    ) {
-        if(viewModel.targetLanguage.isEmpty()) {
-            logDebug(logTag, "Target language not set in view model. Selecting item 0...")
-            languageSelectionSpinner.setSelection(0)
-            viewModel.targetLanguage = languageSelectionSpinner.selectedItem.toString()
-            logDebug(logTag, "Item 0 selected was ${viewModel.targetLanguage}")
-        } else { // TODO: When will this branch be entered
-            if (adapter.getPosition(viewModel.targetLanguage) == -1) {
-                logDebug(logTag, "Target language not found in adapter. Selecting item 0...")
-                languageSelectionSpinner.setSelection(0)
-                viewModel.targetLanguage = languageSelectionSpinner.selectedItem.toString()
-                logDebug(logTag, "Item 0 selected was ${viewModel.targetLanguage}")
-            }
-            else
-                languageSelectionSpinner.setSelection(adapter.getPosition(viewModel.targetLanguage))
+        else {
+            binding.infoTextView.text = HtmlCompat.fromHtml(
+                getString(R.string.transliterate_tab_info_default),
+                HtmlCompat.FROM_HTML_MODE_LEGACY
+            )
+            viewModel.detectedLanguage.value = lang
         }
-    }
-
-    fun initialiseSpinner() {
-        logDebug(logTag, "Transliterate tab spinner initialising...")
-        val languageSelectionSpinner: Spinner = requireView().findViewById(R.id.LanguageSelectionSpinner)
-
-        val adapter: ArrayAdapter<String> = ArrayAdapter(
-            requireContext(),
-            R.layout.spinner_item,
-            R.id.spinnerItemTV,
-            viewModel.getLanguageData().supportedLanguagesForTransliteration,
-        )
-        adapter.setDropDownViewResource(R.layout.spinner_drop_down)
-        languageSelectionSpinner.adapter = adapter
-
-        setTargetLanguage(viewModel, languageSelectionSpinner, adapter)
-
-        languageSelectionSpinner.onItemSelectedListener =
-            object: AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    viewModel.targetLanguage = parent?.getItemAtPosition(position).toString()
-                    val editText =
-                        requireActivity().findViewById<EditText>(R.id.TransliterateTabInputTextField)
-                            ?: return
-                    transliterate(
-                        editText.text.toString(),
-                        requireActivity().findViewById(R.id.TransliterateTabOutputTextView),
-                        viewModel)
-                }
-
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
-            }
     }
 }

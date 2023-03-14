@@ -41,7 +41,7 @@ class PracticeTabFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPracticeTabBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
@@ -56,12 +56,9 @@ class PracticeTabFragment : Fragment() {
         // Assign the data binding's version of the view model
         binding.viewModel = viewModel
 
-        // Initialise the Fragment
-        (binding.languageSelector.editText as MaterialAutoCompleteTextView)
-            .setText(viewModel.languageSelected.value)
-
         // When refresh button is clicked, generate a new practice string
         binding.refreshButton.setOnClickListener {
+            logDebug(logTag, "Refresh button clicked!")
             binding.practiceInputEditText.setText("")
             binding.practiceInputEditText.isEnabled = true
             binding.practiceSuccess.visibility = View.GONE
@@ -70,8 +67,8 @@ class PracticeTabFragment : Fragment() {
 
         // Display a success message and a check mark when user input matches transliterated string
         viewModel.practiceSuccessCheck.observe(viewLifecycleOwner) {
-            val successCheck: Boolean = viewModel.practiceSuccessCheck.value ?: false
-            if(successCheck) {
+            val successCheck: Boolean? = viewModel.practiceSuccessCheck.value
+            if(successCheck == true) {
                 logDebug(logTag, "Showing results and disabling text input.")
                 binding.practiceInputEditText.isEnabled = false
                 binding.practiceSuccess.visibility = View.VISIBLE

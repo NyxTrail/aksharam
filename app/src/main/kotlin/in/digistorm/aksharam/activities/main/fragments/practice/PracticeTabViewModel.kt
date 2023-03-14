@@ -25,6 +25,7 @@ import androidx.lifecycle.*
 import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
 import `in`.digistorm.aksharam.activities.main.language.getLanguageData
+import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.util.*
 import java.util.*
@@ -36,20 +37,10 @@ class PracticeTabViewModel(
     private val logTag = javaClass.simpleName
 
     // The actual list of languages currently available to the app
-    var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData(arrayListOf())
+    var downloadedLanguages: CheckedMutableLiveData<ArrayList<String>> = CheckedMutableLiveData(arrayListOf())
 
-    // Adapter containing the list of languages displayed in the UI
-    lateinit var languageAdapter: ArrayAdapter<String>
     // The currently selected language in the UI
-    var languageSelected: MutableLiveData<String> = MutableLiveData()
-        get() {
-            if(field.value == null) {
-                if((downloadedLanguages.value?.size ?: 0) > 0)
-                    field.value = downloadedLanguages.value?.first()
-            }
-            return field
-        }
-        private set
+    var languageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
     // The actual language data
     var language: LiveData<Language> = languageSelected.map { newLanguage ->
@@ -61,11 +52,11 @@ class PracticeTabViewModel(
     var practiceInLanguages: LiveData<ArrayList<String>> = language.map { language ->
         logDebug(logTag, "Transforming \"${language.language}\" to a live data of target languages")
         val targetList = language.supportedLanguagesForTransliteration
-        practiceInSelected.value = targetList.first()
+        practiceInSelected.setValue(targetList.first())
+        logDebug(logTag, "Practice In language selected: ${practiceInSelected.value}")
         targetList
     }
-    lateinit var practiceInAdapter: ArrayAdapter<String>
-    var practiceInSelected: MutableLiveData<String> = MutableLiveData()
+    var practiceInSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
     var practiceTypes: LiveData<ArrayList<String>> = language.map { language ->
         val types = arrayListOf<String>()
@@ -90,31 +81,25 @@ class PracticeTabViewModel(
             types.add("Random Ligatures")
         types.add("Random Words")
 
-        practiceTypeSelected.value = types.first()
-
+        practiceTypeSelected.setValue(types.first())
+        logDebug(logTag, "Generated practice types for ${languageSelected.value}: $types")
+        logDebug(logTag, "Practice Type selected: ${practiceTypeSelected.value}")
         types
     }
-    lateinit var practiceTypesAdapter: ArrayAdapter<String>
-    var practiceTypeSelected: MutableLiveData<String> = MutableLiveData()
-    get() {
-        if(field.value == null) {
-            if((practiceTypes.value?.size ?: 0) > 0)
-                field.value = practiceTypes.value?.first()
-        }
-        return field
-    }
+    var practiceTypeSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
-    var practiceString: LiveData<String> = practiceTypeSelected.map { practiceType ->
-        logDebug(logTag, "Practice string changes...")
+    var practiceString: LiveData<String> = practiceTypeSelected.map {
         val _practiceString = generatePracticeString(this)
         transliteratedString.value = transliterate(_practiceString, practiceInSelected.value!!, language.value!!)
         practiceSuccessCheck.value = false
+        logDebug(logTag, "Practice string changed to: $_practiceString")
+        logDebug(logTag, "Transliterated string: ${transliteratedString.value}")
         _practiceString
     }
     var transliteratedString: MutableLiveData<String> = MutableLiveData()
 
     fun generateNewPracticeString() {
-        practiceTypeSelected.postValue(practiceTypeSelected.value)
+        practiceTypeSelected.trigger()
     }
 
     // Variable is true if user's transliteration is correct
@@ -122,10 +107,18 @@ class PracticeTabViewModel(
 
     fun initialise() {
         logDebug(logTag, "Initialising.")
-        downloadedLanguages.value = getDownloadedLanguages(getApplication())
-        if(downloadedLanguages.value?.contains(languageSelected.value) != true) {
-            if(downloadedLanguages.value?.isNotEmpty() == true) {
-                languageSelected.value = downloadedLanguages.value?.first()
+
+        val mDownloadedLanguages = getDownloadedLanguages(getApplication())
+
+        if(mDownloadedLanguages != downloadedLanguages.value) {
+            downloadedLanguages.setValue(mDownloadedLanguages)
+            logDebug(logTag, "Downloaded languages set to: ${downloadedLanguages.value}")
+
+            // If currently selected language is no longer available, update the view model with
+            // the first available language
+            if (downloadedLanguages.value?.contains(languageSelected.value) != true) {
+                if(downloadedLanguages.value?.isNotEmpty() == true)
+                    languageSelected.setValue(downloadedLanguages.value!!.first())
             }
         }
     }

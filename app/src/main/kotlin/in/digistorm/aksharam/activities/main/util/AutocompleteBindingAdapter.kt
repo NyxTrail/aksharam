@@ -2,6 +2,7 @@ package `in`.digistorm.aksharam.activities.main.util
 
 import android.widget.ArrayAdapter
 import androidx.databinding.BindingAdapter
+import androidx.databinding.InverseBindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import `in`.digistorm.aksharam.R
@@ -13,11 +14,14 @@ private val logTag: String = "AutoCompleteBindingAdapter"
 fun MaterialAutoCompleteTextView.writeSimpleItems(
     oldItems: ArrayList<String>?,
     oldText: String?,
-    newItems: ArrayList<String>,
-    newText: String,
+    newItems: ArrayList<String>?, // TODO: null issues in practice tab
+    newText: String?,
 ) {
     logDebug(logTag, "writeSimpleItems")
-    if(newItems.isNotEmpty()) {
+    logDebug(logTag, "oldItems: $oldItems, oldText: $oldText")
+    logDebug(logTag, "newItems: $newItems, newText: $newText")
+
+    if(newItems?.isNotEmpty() == true) {
         if(newItems != oldItems)
             setAdapter(
                 ArrayAdapter(

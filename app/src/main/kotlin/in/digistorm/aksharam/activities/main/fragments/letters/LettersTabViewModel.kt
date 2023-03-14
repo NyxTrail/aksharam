@@ -29,8 +29,11 @@ import `in`.digistorm.aksharam.activities.main.fragments.TabbedViewsFragmentDire
 import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
 import `in`.digistorm.aksharam.activities.main.language.getLanguageData
+import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.util.*
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class LettersTabViewModel(
     application: Application,
@@ -41,22 +44,14 @@ class LettersTabViewModel(
     private val logTag = javaClass.simpleName
 
     // The actual list of languages currently available to the app
-    var downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData(arrayListOf())
+    var downloadedLanguages: CheckedMutableLiveData<ArrayList<String>> = CheckedMutableLiveData(arrayListOf())
 
     // A function to initialise the Convert To drop down.
     // This function can access the view which we can't do here in the view model.
     private lateinit var navigateToLanguageInfo: (NavDirections) -> Unit
 
     // The currently selected language in the UI
-    var languageSelected: MutableLiveData<String> = MutableLiveData()
-        get() {
-            logDebug(logTag, "languageSelected")
-            if(field.value == null) {
-                if((downloadedLanguages.value?.size ?: 0) > 0)
-                    field.value = downloadedLanguages.value?.first()
-            }
-            return field
-        }
+    var languageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
         private set
 
     // The actual language data.
@@ -71,18 +66,11 @@ class LettersTabViewModel(
     var targetLanguageList: LiveData<ArrayList<String>> = language.map { language ->
         logDebug(logTag, "Transforming \"${language.language}\" to a live data of target languages")
         val targetLanguages = language.supportedLanguagesForTransliteration
-        targetLanguageSelected.value = targetLanguages.first()
+        targetLanguageSelected.setValue(targetLanguages.first())
+        logDebug(logTag, "Selected target language: ${targetLanguageSelected.value}")
         targetLanguages
     }
-
-    var targetLanguageSelected: MutableLiveData<String> = MutableLiveData()
-        get() {
-            if(field.value == null) {
-                logDebug(logTag, "targetLanguageSelected backing field is null")
-                field.value = targetLanguageList.value?.first()
-            }
-            return field
-        }
+    var targetLanguageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
     val lettersCategoryWise: LiveData<List<Map<String, ArrayList<Pair<String, String>>>>> = targetLanguageSelected.map { newLanguage ->
         logDebug(logTag, "Generating letters category wise for language: ${language.value?.language}")
@@ -132,10 +120,20 @@ class LettersTabViewModel(
     ) {
         logDebug(logTag, "Initialising.")
         this.navigateToLanguageInfo = navigateToLanguageInfo
-        downloadedLanguages.value = getDownloadedLanguages(getApplication())
-        if(downloadedLanguages.value?.contains(languageSelected.value) != true) {
-            if(downloadedLanguages.value?.isNotEmpty() == true) {
-                languageSelected.value = downloadedLanguages.value?.first()
+
+        val mDownloadedLanguages = getDownloadedLanguages(getApplication())
+
+        // If there is a change in downloaded languages...
+        if(mDownloadedLanguages != downloadedLanguages.value) {
+            downloadedLanguages.setValue(mDownloadedLanguages)
+            logDebug(logTag, "Downloaded languages set to: ${downloadedLanguages.value}")
+
+            // If currently selected language is no longer available, update the view model with
+            // the first available language
+            if (downloadedLanguages.value?.contains(languageSelected.value) != true) {
+                if (downloadedLanguages.value?.isNotEmpty() == true) {
+                    languageSelected.setValue(downloadedLanguages.value!!.first())
+                }
             }
         }
     }
