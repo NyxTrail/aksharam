@@ -100,7 +100,7 @@
                     android:layout_height="wrap_content"
                     android:inputType="none"
                     list="@{viewModel.selectableLanguages}"
-                    android:text="@{viewModel.targetLanguageSelected}"
+                    android:text="@={viewModel.targetLanguageSelected}"
                     tools:text="Kannada" />
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -112,6 +112,7 @@
                 android:hint="@string/output_text_field"
                 android:textColorHint="#78909C"
                 android:textSize="@dimen/text_normal_size"
+                android:text="@{viewModel.transliteratedString}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHeight_percent="0.40"

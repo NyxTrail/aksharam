@@ -17,10 +17,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 package `in`.digistorm.aksharam.activities.main.fragments.transliterate
 
-import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.util.*
 
 import android.view.LayoutInflater
@@ -30,12 +28,10 @@ import android.text.TextWatcher
 import android.text.Editable
 import android.view.View
 import android.widget.*
-import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import `in`.digistorm.aksharam.activities.main.language.LanguageDetector
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.databinding.FragmentTransliterationBinding
 
@@ -60,6 +56,7 @@ class TransliterateTabFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        logDebug(logTag, "onCreateView")
         binding = FragmentTransliterationBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
@@ -68,6 +65,9 @@ class TransliterateTabFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
+
+        viewModel.initialise()
+        binding.viewModel = viewModel
 
         // Live transliteration as each new character is entered into the input text box
         (binding.inputTextField).addTextChangedListener(object : TextWatcher {
@@ -81,36 +81,8 @@ class TransliterateTabFragment : Fragment() {
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
-                    detectLanguage(s.toString())
-                    setTransliteration(s.toString())
+                    viewModel.currentInput.value = s.toString()
                 }
-            })
-    }
-
-    private fun setTransliteration(inputString: String) {
-        binding.outputTextView.text = transliterate(
-            inputString,
-            viewModel.targetLanguageSelected.value!!,
-            viewModel.language.value!!
-        )
-    }
-
-    private fun detectLanguage(inputString: String) {
-        val lang: String? = LanguageDetector(context).detectLanguage(inputString, context)
-        logDebug(logTag, "Detected language: $lang")
-        if (lang == null) {
-            logDebug(logTag, "Could not detect language.")
-            binding.infoTextView.text = HtmlCompat.fromHtml(
-                getString(R.string.lang_could_not_detect),
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-            )
-        }
-        else {
-            binding.infoTextView.text = HtmlCompat.fromHtml(
-                getString(R.string.transliterate_tab_info_default),
-                HtmlCompat.FROM_HTML_MODE_LEGACY
-            )
-            viewModel.detectedLanguage.value = lang
-        }
+        })
     }
 }

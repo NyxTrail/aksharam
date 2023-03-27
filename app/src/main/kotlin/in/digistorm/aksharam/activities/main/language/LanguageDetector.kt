@@ -20,6 +20,7 @@
 package `in`.digistorm.aksharam.activities.main.language
 
 import android.content.Context
+import `in`.digistorm.aksharam.activities.main.helpers.upperCaseFirstLetter
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.util.HashMap
 import java.util.LinkedHashMap
@@ -27,39 +28,40 @@ import java.util.LinkedHashMap
 class LanguageDetector(context: Context?) {
     private val logTag = javaClass.simpleName
     private val languages: LinkedHashMap<String, Language>
-    fun detectLanguage(input: String, context: Context?): String? {
+
+    // Assumption: characters in a language are unique and each character exists only once
+    // in all language definitions combined. That is we detect a language by its script. If two
+    // languages use the same script, we cannot distinguish between them. Such a scenario is not
+    // supported in this app, since we are primarily an app for script learning (not language learning).
+    fun detectLanguage(input: String): String? {
         logDebug(logTag, "Detecting language for $input")
         logDebug(logTag, "languages loaded: " + languages.keys)
 
-        // now, we attempt to detect the input language
-        val langs = languages.keys.toTypedArray()
+        // Now, we attempt to detect the input language
         val score = HashMap<String, Int>()
         for (ch in input.toCharArray()) {
-            for ((key, value) in languages) {
+            for ((languageName, value) in languages) {
                 val letterDefinition = value.getLetterDefinition(ch.toString() + "")
+                // If a definition exists for letter `ch` in language...
                 if (letterDefinition != null) {
-                    logDebug(logTag, " $ch matches a character in the $key set.")
-                    if (score.containsKey(key)) {
-                        score[key] = score[key]!! + 1
-                    } else score[key] = 1
+                    // If we are already tracking `languageName`, increment it. Else, initialise it to 1.
+                    score[languageName] = score[languageName]?.inc() ?: 1
+                    // We have found the letter, no point checking other languages.
+                    // Proceed with next character.
+                    break
                 }
             }
+            logDebug(logTag, "Character $ch is unknown to us. Ignoring.")
         }
-        var langDetected: String? = null
-        var maxScore = 0
+        var langDetected: String? = score.keys.first()
+        var maxScore = score[langDetected] ?: 0
         for ((key, value) in score) {
-            if (langDetected == null) {
-                langDetected = key
-                maxScore = value
-                continue
-            }
             if (value > maxScore) {
                 langDetected = key
                 maxScore = value
             }
         }
-        logDebug(logTag, "Detected $langDetected in input string with score $maxScore")
-        return langDetected
+        return langDetected?.upperCaseFirstLetter()
     }
 
     init {

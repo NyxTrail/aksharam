@@ -77,7 +77,7 @@ fun getAllLanguages(context: Context): LinkedHashMap<String, Language> {
         try {
             val language: Language = readValue(file, context)
             language.language = file.lowercase().replace(".json", "")
-            languageList[file.lowercase().replace(".json", "")] = language
+            languageList[language.language] = language
         } catch (e: IOException) {
             logDebug(logTag, "Read operation failed on file: $logTag")
             e.printStackTrace()
@@ -102,7 +102,12 @@ fun getDownloadedLanguages(context: Context): ArrayList<String> {
         // if file is not json, ignore it
         if (!file.lowercase().contains(".json")) continue
         val languageName = file.replace(".json", "")
-        sourceLanguages.add(languageName.substring(0, 1).uppercase() + languageName.substring(1))
+        sourceLanguages.add(languageName.replaceFirstChar { letter ->
+            if(letter.isLowerCase())
+                letter.titlecase()
+            else
+                letter.toString()
+        })
     }
     logDebug(logTag, "source languages found: $sourceLanguages")
     return sourceLanguages
