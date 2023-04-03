@@ -53,7 +53,7 @@ class LanguageDetector(context: Context?) {
             }
             logDebug(logTag, "Character $ch is unknown to us. Ignoring.")
         }
-        var langDetected: String? = score.keys.first()
+        var langDetected: String? = score.keys.firstOrNull()
         var maxScore = score[langDetected] ?: 0
         for ((key, value) in score) {
             if (value > maxScore) {
@@ -61,6 +61,7 @@ class LanguageDetector(context: Context?) {
                 maxScore = value
             }
         }
+        logDebug(logTag, "Detected language $langDetected in string $input.")
         return langDetected?.upperCaseFirstLetter()
     }
 

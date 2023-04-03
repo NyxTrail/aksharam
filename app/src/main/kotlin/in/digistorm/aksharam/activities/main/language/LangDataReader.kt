@@ -63,18 +63,25 @@ fun getLanguageData(file: String, context: Context): Language {
     }
 }
 
+/*
+ * Return a map of language name to its actual data.
+ */
 fun getAllLanguages(context: Context): LinkedHashMap<String, Language> {
     val logTag = "LangDataReader::getAllLanguages"
     val files = ArrayList<String>()
     Collections.addAll(files, *context.fileList())
     val languageList = LinkedHashMap<String, Language>()
     if (files.size == 0) {
+        logDebug(logTag, "Could not find any downloaded files.")
         return languageList
     }
     val mapper = jacksonObjectMapper()
     mapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
     for (file in files) {
         try {
+            logDebug(logTag, "Found file: $file")
+            if(!file.endsWith(".json"))
+                continue
             val language: Language = readValue(file, context)
             language.language = file.lowercase().replace(".json", "")
             languageList[language.language] = language

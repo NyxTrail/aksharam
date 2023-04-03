@@ -13,44 +13,24 @@ class TransliterateTabViewModel(
 ): AndroidViewModel(application) {
     private val logTag = javaClass.simpleName
 
-    private val downloadedLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData(arrayListOf())
+    private val downloadedLanguages: MutableLiveData<List<String>> = MutableLiveData(arrayListOf())
 
     val currentInput: MutableLiveData<String> = MutableLiveData()
 
-    val detectedLanguage: MutableLiveData<String?> = MutableLiveData()
-
-    var language: Language? = null
-    get() {
-        if(field == null || field?.language?.firstCharCapitalised() != detectedLanguage.value) {
-            field = detectedLanguage.value?.let {
-                getLanguageData(it, getApplication())
-            }
-        }
-        return field
+    val detectedLanguage: LiveData<String?> = currentInput.map { input ->
+        LanguageDetector(application).detectLanguage(input)
     }
 
-    val selectableLanguages: MutableLiveData<ArrayList<String>> = MutableLiveData()
-
-    private fun String.firstCharCapitalised(): String {
-        return replaceFirstChar {
-            if(it.isLowerCase())
-                it.uppercase()
-            else
-                it.toString()
-        }
+    var language: LiveData<Language?> = detectedLanguage.map { languageName ->
+        if(languageName != null)
+            getLanguageData(languageName, application)
+        else
+            null
     }
 
-    private fun setSelectableLanguages() {
-        val tempList = arrayListOf<String>()
-        if(selectableLanguages.value?.contains(detectedLanguage.value) != false) {
-            downloadedLanguages.value?.forEach { language ->
-                if (language != detectedLanguage.value)
-                    tempList.add(language)
-            } ?: logDebug(logTag, "Downloaded languages was not populated. How did this happen?")
-            targetLanguageSelected.value = tempList.getOrNull(0)
-            logDebug(logTag, "Languages enabled for transliteration: $tempList")
-            logDebug(logTag, "Target Language selected: ${targetLanguageSelected.value}")
-            selectableLanguages.value = tempList
+    var selectableLanguages: LiveData<List<String>> = detectedLanguage.map { languageName ->
+        (downloadedLanguages.value as? Collection<String> ?: listOf()).filter { currentString ->
+            return@filter currentString != languageName
         }
     }
 
@@ -62,23 +42,21 @@ class TransliterateTabViewModel(
 
     var transliteratedString: MutableLiveData<String?> = MediatorLiveData<String>().apply {
         addSource(currentInput) { currentInput ->
-            detectedLanguage.value = LanguageDetector(application).detectLanguage(currentInput)
-            logDebug(logTag, "Detected ${detectedLanguage.value} in $currentInput.")
             if(detectedLanguage.value == null) {
-                value = this@TransliterateTabViewModel.getApplication<Application>().getString(R.string.lang_could_not_detect)
+                value = this@TransliterateTabViewModel.getApplication<Application>()
+                    .getString(R.string.lang_could_not_detect)
             }
-            setSelectableLanguages()
             targetLanguageSelected.value?.let { targetLanguage ->
-                language?.let { language ->
-                    value = transliterate(currentInput, targetLanguage, language)
+                language.value?.let { languageValue ->
+                    value = transliterate(currentInput, targetLanguage, languageValue)
                 }
             }
         }
 
         addSource(targetLanguageSelected) { newLanguageSelected ->
             currentInput.value?.let { currentInput ->
-                language?.let { language ->
-                    value = transliterate(currentInput, newLanguageSelected, language)
+                language.value?.let { languageValue ->
+                    value = transliterate(currentInput, newLanguageSelected, languageValue)
                 }
             }
         }
@@ -87,6 +65,5 @@ class TransliterateTabViewModel(
     fun initialise() {
         logDebug(logTag, "Initialising.")
         downloadedLanguages.value = getDownloadedLanguages(getApplication())
-        setSelectableLanguages()
     }
 }

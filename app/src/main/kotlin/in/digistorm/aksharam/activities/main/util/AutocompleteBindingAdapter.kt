@@ -12,9 +12,9 @@ private val logTag: String = "AutoCompleteBindingAdapter"
 
 @BindingAdapter(value = ["list", "android:text"], requireAll = false)
 fun MaterialAutoCompleteTextView.writeSimpleItems(
-    oldItems: ArrayList<String>?,
+    oldItems: List<String>?,
     oldText: String?,
-    newItems: ArrayList<String>?, // TODO: null issues in practice tab
+    newItems: List<String>?, // TODO: null issues in practice tab
     newText: String?,
 ) {
     logDebug(logTag, "writeSimpleItems")
