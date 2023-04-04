@@ -21,13 +21,13 @@
 package `in`.digistorm.aksharam.activities.main.fragments.settings
 
 import `in`.digistorm.aksharam.activities.main.util.Network
-import `in`.digistorm.aksharam.activities.main.util.getLocalFiles
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import `in`.digistorm.aksharam.activities.main.util.getLocalFiles
 import kotlinx.coroutines.*
 
 class SettingsViewModel: ViewModel() {
@@ -44,19 +44,30 @@ class SettingsViewModel: ViewModel() {
             withContext(Dispatchers.IO) {
                 val onlineFiles = Network.onlineFiles.getContents()
                 logDebug(logTag, "Files available online: $onlineFiles")
-                val localFiles = getLocalFiles(context)
+                val localFiles = arrayListOf<String>().apply { addAll( getLocalFiles(context)) }
                 logDebug(logTag, "File available locally: $localFiles")
                 val files = mutableListOf<AksharamFile>()
-                for (file in onlineFiles) {
-                    if (localFiles.contains(file.name)) {
-                        files.add(AksharamFile(onlineLanguageFile = file, localFileName = file.name, isDownloaded = true))
+                for(file in onlineFiles) {
+                    if(localFiles.contains(file.name)) {
+                        files.add(AksharamFile(
+                            onlineLanguageFile = file,
+                            localFileName = file.name,
+                            isDownloaded = true
+                        ))
                         localFiles.remove(file.name)
                     } else
-                        files.add(AksharamFile(onlineLanguageFile = file, localFileName = null, isDownloaded = false))
+                        files.add(AksharamFile(
+                            onlineLanguageFile = file,
+                            localFileName = null,
+                            isDownloaded = false
+                        ))
                 }
                 // Local files that are not available online
                 for (file in localFiles) {
-                    files.add(AksharamFile(localFileName = file, isDownloaded = true))
+                    files.add(AksharamFile(
+                        localFileName = file,
+                        isDownloaded = true
+                    ))
                 }
                 _languageFiles.postValue(files)
             }

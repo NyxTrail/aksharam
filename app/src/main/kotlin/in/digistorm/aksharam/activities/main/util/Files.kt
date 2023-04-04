@@ -47,14 +47,13 @@ suspend fun downloadFile(file: LanguageFile, context: Context) {
     writeTofile(file.name, fileContents!!, context)
 }
 
-suspend fun getLocalFiles(context: Context): MutableList<String> {
-    val files = mutableListOf<String>()
+suspend fun getLocalFiles(context: Context): List<String> {
     return withContext(Dispatchers.IO) {
         logDebug(logTag, "Finding all available lang data files")
         // If filesDir is null, add an empty array
-        files.addAll(context.filesDir.list() ?: arrayOf())
-        logDebug(logTag, "Local files found: $files")
-        return@withContext files
+        val list = context.filesDir.list()?.filter { it.endsWith(".json") } ?: listOf<String>()
+        logDebug(logTag, "Local files found: $list")
+        return@withContext list
     }
 }
 

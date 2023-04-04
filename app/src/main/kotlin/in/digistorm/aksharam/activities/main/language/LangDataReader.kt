@@ -21,11 +21,15 @@ package `in`.digistorm.aksharam.activities.main.language
 
 import `in`.digistorm.aksharam.BuildConfig
 import android.content.Context
+import com.fasterxml.jackson.core.JacksonException
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.module.kotlin.readValue
+import `in`.digistorm.aksharam.activities.main.helpers.upperCaseFirstLetter
 import `in`.digistorm.aksharam.activities.main.util.getBufferedReader
 import `in`.digistorm.aksharam.activities.main.util.logDebug
+import `in`.digistorm.aksharam.activities.main.util.logError
+import java.io.FileNotFoundException
 import java.io.IOException
 import java.util.*
 
@@ -35,7 +39,14 @@ inline fun <reified T> readValue(file: String, context: Context): T  {
     return mapper.readValue(bufferedReader)
 }
 
-fun getLanguageData(file: String, context: Context): Language {
+/**
+ * file: Name of file. If file does not end with ".json", we add ".json" to the end
+ * and then look for the file.
+ * context: Application/activity context.
+ *
+ * We set the `language` field in the Language class to the name of the current language
+ */
+fun getLanguageData(file: String, context: Context): Language? {
     val logTag = "LangDataReader::getLanguageData"
     logDebug(logTag, "Initialising lang data file: $file")
     var fileLC = file.lowercase()
@@ -50,12 +61,19 @@ fun getLanguageData(file: String, context: Context): Language {
         }
 
         val language = readValue<Language>(fileLC, context)
-        language.language = fileLC.lowercase().replace(".json", "")
+        language.language = fileLC
+            .lowercase()
+            .replace(".json", "")
+            .upperCaseFirstLetter()
         if (BuildConfig.DEBUG) {
             logDebug(logTag, "File read and deserialized: $fileLC")
             logDebug(logTag, "Deserialized language: " + mapper.writeValueAsString(language))
         }
         language
+    } catch (e: FileNotFoundException) {
+        logDebug(logTag, "File not found: $file\n" +
+                "Generated file name: $fileLC")
+        return null
     } catch (e: IOException) {
         logDebug(logTag, "Read operation failed on file: $fileLC")
         e.printStackTrace()
@@ -63,8 +81,9 @@ fun getLanguageData(file: String, context: Context): Language {
     }
 }
 
-/*
- * Return a map of language name to its actual data.
+/**
+ * Return a map of all download languages with key set to the name of the language and
+ * value set set to its deserialized data.
  */
 fun getAllLanguages(context: Context): LinkedHashMap<String, Language> {
     val logTag = "LangDataReader::getAllLanguages"
@@ -80,52 +99,32 @@ fun getAllLanguages(context: Context): LinkedHashMap<String, Language> {
     for (file in files) {
         try {
             logDebug(logTag, "Found file: $file")
-            if(!file.endsWith(".json"))
+            if (!file.endsWith(".json"))
                 continue
             val language: Language = readValue(file, context)
-            language.language = file.lowercase().replace(".json", "")
+            language.language = file
+                .lowercase()
+                .replace(".json", "")
+                .upperCaseFirstLetter()
             languageList[language.language] = language
+        } catch (e: JacksonException) {
+            logError(logTag, "Invalid json file detected: $file")
+            logError(logTag, "Trying next file")
         } catch (e: IOException) {
-            logDebug(logTag, "Read operation failed on file: $logTag")
+            logError(logTag, "Read operation failed on file: $file")
             e.printStackTrace()
-            return languageList
         }
     }
     return languageList
 }
 
-/* Find downloaded languages. Return list of such languages with
-   ".json" extension removed and first letter capitalised. Returns empty
-    array list if no files found.
+/**
+ * Find downloaded languages. Return list of such languages with
+ * ".json" extension removed and first letter capitalised. Returns empty
+ *  array list if no files found.
  */
 fun getDownloadedLanguages(context: Context): ArrayList<String> {
     val logTag = "LangDataReader::getDownloadedLanguages"
-    logDebug(logTag, "finding all available lang data files")
-    val files = context.filesDir.list()
-    if (files == null || files.isEmpty()) return ArrayList() // return an empty array list
-    val sourceLanguages = ArrayList<String>()
-    for (file in files) {
-        logDebug(logTag, "found file $file")
-        // if file is not json, ignore it
-        if (!file.lowercase().contains(".json")) continue
-        val languageName = file.replace(".json", "")
-        sourceLanguages.add(languageName.replaceFirstChar { letter ->
-            if(letter.isLowerCase())
-                letter.titlecase()
-            else
-                letter.toString()
-        })
-    }
-    logDebug(logTag, "source languages found: $sourceLanguages")
-    return sourceLanguages
-}
-
-fun getDownloadedFiles(context: Context): ArrayList<String> {
-    val logTag = "LangDataReader::getDownloadedFiles"
     logDebug(logTag, "Finding all available lang data files")
-    val files = context.filesDir.list()
-    if (files == null || files.isEmpty()) return ArrayList() // return an empty array list
-    val fileList = ArrayList<String>()
-    Collections.addAll(fileList, *files)
-    return fileList
+    return arrayListOf<String>().apply { addAll(getAllLanguages(context).keys) }
 }

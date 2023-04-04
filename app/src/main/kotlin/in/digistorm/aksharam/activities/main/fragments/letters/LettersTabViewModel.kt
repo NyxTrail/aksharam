@@ -32,8 +32,6 @@ import `in`.digistorm.aksharam.activities.main.language.getLanguageData
 import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.util.*
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 class LettersTabViewModel(
     application: Application,
@@ -57,7 +55,7 @@ class LettersTabViewModel(
     // The actual language data.
     var language: LiveData<Language> = languageSelected.map { newLanguage ->
         logDebug(logTag, "Fetching data for $newLanguage")
-        val language: Language = getLanguageData(newLanguage, getApplication())
+        val language: Language = getLanguageData(newLanguage, getApplication())!!
         activityViewModel.language.value = language
         language
     }

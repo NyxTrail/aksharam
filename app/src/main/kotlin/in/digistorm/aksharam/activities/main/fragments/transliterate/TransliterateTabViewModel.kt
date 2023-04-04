@@ -23,7 +23,7 @@ class TransliterateTabViewModel(
 
     var language: LiveData<Language?> = detectedLanguage.map { languageName ->
         if(languageName != null)
-            getLanguageData(languageName, application)
+            getLanguageData(languageName, application)!!
         else
             null
     }

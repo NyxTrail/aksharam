@@ -45,7 +45,7 @@ class PracticeTabViewModel(
     // The actual language data
     var language: LiveData<Language> = languageSelected.map { newLanguage ->
         logDebug(logTag, "Fetching data for $newLanguage")
-        val language: Language = getLanguageData(newLanguage, getApplication())
+        val language: Language = getLanguageData(newLanguage, getApplication())!!
         language
     }
 

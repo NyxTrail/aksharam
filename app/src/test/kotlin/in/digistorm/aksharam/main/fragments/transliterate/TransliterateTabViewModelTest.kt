@@ -1,53 +1,28 @@
 package `in`.digistorm.aksharam.main.fragments.transliterate
 
 import `in`.digistorm.aksharam.activities.main.fragments.transliterate.TransliterateTabViewModel
-import `in`.digistorm.aksharam.activities.main.helpers.upperCaseFirstLetter
 import `in`.digistorm.aksharam.util.waitAndGetValue
 import android.content.Context
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import `in`.digistorm.aksharam.util.AksharamTestBase
 import kotlinx.coroutines.*
 import org.junit.AfterClass
 import org.junit.Assert.*
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import java.nio.file.Files
 import java.nio.file.Path
 import java.util.stream.Stream
-import kotlin.io.path.Path
-import kotlin.io.path.name
 
 @RunWith(AndroidJUnit4::class)
-class TransliterateTabViewModelTest {
-
-    var files = arrayListOf<String>()
+class TransliterateTabViewModelTest: AksharamTestBase() {
 
     // This rule is useful if we need to postValue from tests.
     @get:Rule
     val rule = InstantTaskExecutorRule()
-
-    @Before
-    fun copyDataFiles() {
-        val sourcePath = Path(
-            System.getProperty("user.dir")!!
-                    + "/../../aksharam-data/"
-        )
-        val destinationFolder = ApplicationProvider.getApplicationContext<Context>().filesDir.toPath()
-        val fileList: Stream<Path> = Files.list(sourcePath).filter { file ->
-            file.name.endsWith(".json")
-        }
-        for (file in fileList) {
-            files.add(file.name.replace(".json", "").upperCaseFirstLetter())
-            val destinationFilePath = Path(destinationFolder.toString(), file.name)
-            if (Files.notExists(destinationFilePath)) {
-                Files.copy(file, destinationFilePath)
-            }
-        }
-        // throw Exception("Temporary End!")
-    }
 
     companion object {
         /* Clean up files after test completion. */
