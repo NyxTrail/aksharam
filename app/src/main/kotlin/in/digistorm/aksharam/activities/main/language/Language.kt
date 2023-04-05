@@ -21,6 +21,7 @@ package `in`.digistorm.aksharam.activities.main.language
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonProperty
+import `in`.digistorm.aksharam.activities.main.helpers.upperCaseFirstLetter
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
@@ -63,17 +64,15 @@ class Language(
             return LinkedHashMap(field)
         }
 
-    // Uppercase the first letter
     val supportedLanguagesForTransliteration: ArrayList<String>
         get() {
-            val languagesForTransliteration = ArrayList<String>()
-            for (language in transLanguages) {
-                var lang = language.keys.toTypedArray()[0].lowercase()
-                // Uppercase the first letter
-                lang = lang.substring(0, 1).uppercase() + lang.substring(1)
-                languagesForTransliteration.add(lang)
+            return arrayListOf<String>().apply {
+                addAll(
+                    transLanguages.map { item ->
+                        item.keys.first().lowercase().upperCaseFirstLetter()
+                    }
+                )
             }
-            return languagesForTransliteration
         }
 
     fun areLigaturesAutoGeneratable(): Boolean {

@@ -64,7 +64,7 @@ class LettersTabViewModel(
     var targetLanguageList: LiveData<ArrayList<String>> = language.map { language ->
         logDebug(logTag, "Transforming \"${language.language}\" to a live data of target languages")
         val targetLanguages = language.supportedLanguagesForTransliteration
-        targetLanguageSelected.setValue(targetLanguages.first())
+        targetLanguageSelected.value = targetLanguages.first()
         logDebug(logTag, "Selected target language: ${targetLanguageSelected.value}")
         targetLanguages
     }
@@ -123,14 +123,14 @@ class LettersTabViewModel(
 
         // If there is a change in downloaded languages...
         if(mDownloadedLanguages != downloadedLanguages.value) {
-            downloadedLanguages.setValue(mDownloadedLanguages)
+            downloadedLanguages.value = mDownloadedLanguages
             logDebug(logTag, "Downloaded languages set to: ${downloadedLanguages.value}")
 
             // If currently selected language is no longer available, update the view model with
             // the first available language
             if (downloadedLanguages.value?.contains(languageSelected.value) != true) {
                 if (downloadedLanguages.value?.isNotEmpty() == true) {
-                    languageSelected.setValue(downloadedLanguages.value!!.first())
+                    languageSelected.setValueIfDifferent(downloadedLanguages.value!!.first())
                 }
             }
         }

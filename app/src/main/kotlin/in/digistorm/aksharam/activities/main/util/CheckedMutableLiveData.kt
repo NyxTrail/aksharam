@@ -22,7 +22,7 @@ class CheckedMutableLiveData<T>: MutableLiveData<T> {
             super.postValue(value)
     }
 
-    override fun setValue(value: T) {
+    fun setValueIfDifferent(value: T) {
         if(this.value != value)
             super.setValue(value)
     }
