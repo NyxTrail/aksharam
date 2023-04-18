@@ -39,19 +39,20 @@ class LanguageDetector(context: Context?) {
 
         // Now, we attempt to detect the input language
         val score = HashMap<String, Int>()
-        for (ch in input.toCharArray()) {
+        outer@for (ch in input.toCharArray()) {
             for ((languageName, value) in languages) {
-                val letterDefinition = value.getLetterDefinition(ch.toString() + "")
+                val letterDefinition = value.getLetterDefinition(ch.toString())
                 // If a definition exists for letter `ch` in language...
                 if (letterDefinition != null) {
                     // If we are already tracking `languageName`, increment it. Else, initialise it to 1.
                     score[languageName] = score[languageName]?.inc() ?: 1
                     // We have found the letter, no point checking other languages.
                     // Proceed with next character.
-                    break
+                    continue@outer
                 }
             }
-            logDebug(logTag, "Character $ch is unknown to us. Ignoring.")
+            // We checked all languages and did not find this character.
+            logDebug(logTag, "Character $ch in $input is unknown to us. Ignoring.")
         }
         var langDetected: String? = score.keys.firstOrNull()
         var maxScore = score[langDetected] ?: 0
