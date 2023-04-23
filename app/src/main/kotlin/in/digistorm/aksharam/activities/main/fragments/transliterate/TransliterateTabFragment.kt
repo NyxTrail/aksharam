@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.databinding.FragmentTransliterationBinding
 
@@ -68,6 +69,17 @@ class TransliterateTabFragment : Fragment() {
 
         viewModel.initialise()
         binding.viewModel = viewModel
+
+        viewModel.selectableLanguages.observe(viewLifecycleOwner) { value ->
+            if (value.isNotEmpty()) {
+                binding.languageSpinner.isEnabled = true
+                binding.languageSpinner.setHint(R.string.transliterate_tab_trans_hint)
+            } else {
+                binding.languageSpinner.setHint(R.string.transliterate_tab_info_default)
+                binding.languageSpinner.editText?.text = null
+                binding.languageSpinner.isEnabled = false
+            }
+        }
 
         // Live transliteration as each new character is entered into the input text box
         (binding.inputTextField).addTextChangedListener(object : TextWatcher {

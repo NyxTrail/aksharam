@@ -49,6 +49,7 @@
     <string name="lang_could_not_detect">
         Could not detect language. Have you downloaded its data?
     </string>
+    <string name="transliteration">Transliteration</string>
     <string name="output_text_field">Output</string>
     <string name="letters_tab_header">Letters</string>
     <string name="transliterate_tab_header">Transliterate</string>

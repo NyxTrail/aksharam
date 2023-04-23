@@ -1,6 +1,7 @@
 package `in`.digistorm.aksharam.activities.main.fragments.transliterate
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.*
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.language.*
@@ -11,26 +12,29 @@ import `in`.digistorm.aksharam.util.transliterate
 class TransliterateTabViewModel(
     application: Application,
 ): AndroidViewModel(application) {
+    /* TODO: show error messages in the language selection spinner */
     private val logTag = javaClass.simpleName
 
     private val downloadedLanguages: MutableLiveData<List<String>> = MutableLiveData(arrayListOf())
 
     val currentInput: MutableLiveData<String> = MutableLiveData()
 
-    val detectedLanguage: LiveData<String?> = currentInput.map { input ->
-        LanguageDetector(application).detectLanguage(input)
+    val detectedLanguage: LiveData<String> = currentInput.map { input ->
+        LanguageDetector(application).detectLanguage(input) ?: ""
     }
 
-    var language: LiveData<Language?> = detectedLanguage.map { languageName ->
-        if(languageName != null)
-            getLanguageData(languageName, application)!!
-        else
-            null
+    var language: LiveData<Language?> = detectedLanguage.distinctUntilChanged().map { languageName ->
+        logDebug(logTag, "Fetching language data")
+        getLanguageData(languageName, application)
     }
 
     var selectableLanguages: LiveData<List<String>> = detectedLanguage.map { languageName ->
-        (downloadedLanguages.value as? Collection<String> ?: listOf()).filter { currentString ->
-            return@filter currentString != languageName
+        if(languageName.isEmpty())
+            listOf()
+        else {
+            (downloadedLanguages.value ?: listOf()).filter { currentString ->
+                return@filter currentString != languageName
+            }
         }
     }
 
@@ -51,6 +55,11 @@ class TransliterateTabViewModel(
                     value = transliterate(currentInput, targetLanguage, languageValue)
                 }
             }
+        }
+
+        addSource(language) { language ->
+            if(language != null && targetLanguageSelected.value != null)
+                value = transliterate(currentInput.value!!, targetLanguageSelected.value!!, language)
         }
 
         addSource(targetLanguageSelected) { newLanguageSelected ->

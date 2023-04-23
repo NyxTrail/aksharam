@@ -32,92 +32,65 @@
             type="in.digistorm.aksharam.activities.main.fragments.transliterate.TransliterateTabViewModel" />
     </data>
 
-    <ScrollView
-        android:id="@+id/scroll_view"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:fillViewport="true"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:orientation="vertical">
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/language_spinner"
+            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_margin="8dp"
+            android:hint="@string/transliterate_tab_info_default"
+            android:orientation="vertical"
+            android:enabled="false"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
 
-            <EditText
-                android:id="@+id/input_text_field"
+            <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:ems="10"
-                android:hint="@string/input_text_field"
-                android:inputType="text|textMultiLine"
-                android:textColorHint="#78909C"
-                android:textSize="@dimen/text_normal_size"
-                app:layout_constraintBottom_toTopOf="@id/info_text_view"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:importantForAutofill="no" />
-
-            <TextView
-                android:id="@+id/info_text_view"
-                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="2dp"
-                android:ems="10"
-                android:text="@string/transliterate_tab_info_default"
-                android:lines="3"
-                android:gravity="center"
-                app:layout_constraintHorizontal_chainStyle="spread_inside"
-                app:layout_constraintBottom_toBottomOf="@id/language_spinner"
-                app:layout_constraintEnd_toStartOf="@id/language_spinner"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_text_field"
-                app:layout_constraintWidth_default="percent"
-                app:layout_constraintWidth_percent="0.60" />
+                android:inputType="none"
+                list="@{viewModel.selectableLanguages}"
+                android:text="@={viewModel.targetLanguageSelected}" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/language_spinner"
-                style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:hint="@string/transliterate_tab_trans_hint"
-                app:layout_constraintStart_toEndOf="@id/info_text_view"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/input_text_field" >
-                <com.google.android.material.textfield.MaterialAutoCompleteTextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="none"
-                    list="@{viewModel.selectableLanguages}"
-                    android:text="@={viewModel.targetLanguageSelected}"
-                    tools:text="Kannada" />
-            </com.google.android.material.textfield.TextInputLayout>
+        <EditText
+            android:id="@+id/input_text_field"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:ems="10"
+            android:hint="@string/input_text_field"
+            android:inputType="text|textMultiLine"
+            android:textColorHint="#78909C"
+            android:textSize="@dimen/text_normal_size"
+            android:layout_margin="10dp"
+            android:lines="3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/language_spinner"
+            app:layout_constraintVertical_chainStyle="packed"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:importantForAutofill="no"
+            tools:hint="@string/input_text_field"/>
 
-
-            <TextView
-                android:id="@+id/output_text_view"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:hint="@string/output_text_field"
-                android:textColorHint="#78909C"
-                android:textSize="@dimen/text_normal_size"
-                android:text="@{viewModel.transliteratedString}"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHeight_percent="0.40"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/language_spinner" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-    </ScrollView>
+        <TextView
+            android:id="@+id/output_text_view"
+            style="@style/Widget.MaterialComponents.TextView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:hint="@string/transliteration"
+            android:textColorHint="#78909C"
+            android:textSize="@dimen/text_normal_size"
+            android:text="@{viewModel.transliteratedString}"
+            android:layout_marginTop="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHeight_percent="0.40"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/input_text_field" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

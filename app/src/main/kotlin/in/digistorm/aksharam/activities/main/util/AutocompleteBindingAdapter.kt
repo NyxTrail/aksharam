@@ -21,7 +21,7 @@ fun MaterialAutoCompleteTextView.writeSimpleItems(
     logDebug(logTag, "oldItems: $oldItems, oldText: $oldText")
     logDebug(logTag, "newItems: $newItems, newText: $newText")
 
-    if(newItems?.isNotEmpty() == true) {
+    if(newItems != null) {
         if(newItems != oldItems)
             setAdapter(
                 ArrayAdapter(
