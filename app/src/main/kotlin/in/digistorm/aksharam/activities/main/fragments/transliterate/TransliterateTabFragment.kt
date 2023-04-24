@@ -34,12 +34,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.util.logDebug
-import `in`.digistorm.aksharam.databinding.FragmentTransliterationBinding
+import `in`.digistorm.aksharam.databinding.FragmentTransliterateBinding
 
 class TransliterateTabFragment : Fragment() {
     private val logTag = javaClass.simpleName
 
-    private lateinit var binding: FragmentTransliterationBinding
+    private lateinit var binding: FragmentTransliterateBinding
 
     private val viewModel: TransliterateTabViewModel by viewModels {
         object: ViewModelProvider.Factory {
@@ -58,7 +58,7 @@ class TransliterateTabFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         logDebug(logTag, "onCreateView")
-        binding = FragmentTransliterationBinding.inflate(inflater, container, false)
+        binding = FragmentTransliterateBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root
     }
@@ -75,7 +75,10 @@ class TransliterateTabFragment : Fragment() {
                 binding.languageSpinner.isEnabled = true
                 binding.languageSpinner.setHint(R.string.transliterate_tab_trans_hint)
             } else {
-                binding.languageSpinner.setHint(R.string.transliterate_tab_info_default)
+                if((viewModel.currentInput.value?.length ?: 0) > 0)
+                    binding.languageSpinner.setHint(R.string.could_not_detect_language)
+                else
+                    binding.languageSpinner.setHint(R.string.transliterate_tab_info_default)
                 binding.languageSpinner.editText?.text = null
                 binding.languageSpinner.isEnabled = false
             }

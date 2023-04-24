@@ -1,9 +1,7 @@
 package `in`.digistorm.aksharam.activities.main.fragments.transliterate
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.*
-import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.language.*
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.util.transliterate
@@ -12,7 +10,6 @@ import `in`.digistorm.aksharam.util.transliterate
 class TransliterateTabViewModel(
     application: Application,
 ): AndroidViewModel(application) {
-    /* TODO: show error messages in the language selection spinner */
     private val logTag = javaClass.simpleName
 
     private val downloadedLanguages: MutableLiveData<List<String>> = MutableLiveData(arrayListOf())
@@ -46,10 +43,6 @@ class TransliterateTabViewModel(
 
     var transliteratedString: MutableLiveData<String?> = MediatorLiveData<String>().apply {
         addSource(currentInput) { currentInput ->
-            if(detectedLanguage.value == null) {
-                value = this@TransliterateTabViewModel.getApplication<Application>()
-                    .getString(R.string.lang_could_not_detect)
-            }
             targetLanguageSelected.value?.let { targetLanguage ->
                 language.value?.let { languageValue ->
                     value = transliterate(currentInput, targetLanguage, languageValue)

@@ -43,11 +43,11 @@
     <string name="initialisation_downloading_data">Downloading data files…</string>
     <string name="initialise_act_proceed_button">Proceed</string>
 
-    <string name="input_text_field">Input Text</string>
+    <string name="input_text_field">Input text here</string>
     <string name="transliterate_tab_info_default">Enter text to transliterate</string>
     <string name="language_detected">Language detected: %s</string>
-    <string name="lang_could_not_detect">
-        Could not detect language. Have you downloaded its data?
+    <string name="could_not_detect_language">
+        Could not detect language.
     </string>
     <string name="transliteration">Transliteration</string>
     <string name="output_text_field">Output</string>
