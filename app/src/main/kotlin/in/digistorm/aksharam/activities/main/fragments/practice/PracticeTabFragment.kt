@@ -28,7 +28,6 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.google.android.material.snackbar.Snackbar
-import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.databinding.FragmentPracticeTabBinding
 

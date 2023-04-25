@@ -18,9 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-package `in`.digistorm.aksharam.activities.main
+package `in`.digistorm.aksharam.activities.main.fragments.settings
 
-import `in`.digistorm.aksharam.activities.main.fragments.settings.SettingsViewModel
 import `in`.digistorm.aksharam.databinding.FragmentSettingsBinding
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.os.Bundle
@@ -28,26 +27,23 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.activities.main.fragments.settings.LanguageListAdapter
 import kotlinx.coroutines.*
 
 class SettingsFragment: Fragment() {
     private val logTag = javaClass.simpleName
     private lateinit var binding: FragmentSettingsBinding
-    private val activityViewModel: ActivityViewModel by activityViewModels()
     private val settingsViewModel: SettingsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSettingsBinding.inflate(inflater, container, false)
         return binding.root
     }

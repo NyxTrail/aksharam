@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.*
 import `in`.digistorm.aksharam.activities.main.language.*
 import `in`.digistorm.aksharam.activities.main.util.logDebug
-import `in`.digistorm.aksharam.util.transliterate
+import `in`.digistorm.aksharam.activities.main.language.transliterate
 
 // View model for the 'Transliterate' tab fragment
 class TransliterateTabViewModel(

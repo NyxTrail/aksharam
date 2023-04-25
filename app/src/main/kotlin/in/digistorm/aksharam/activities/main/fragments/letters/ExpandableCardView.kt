@@ -44,7 +44,7 @@ class ExpandableCardView: MaterialCardView {
     constructor(context: Context, attrs: AttributeSet, defStyleAttr: Int):
             super(context, attrs, defStyleAttr)
 
-    val categoryHeader: ConstraintLayout by lazy {
+    private val categoryHeader: ConstraintLayout by lazy {
         findViewById(R.id.letter_category_header)
     }
     val letterCategoryHeaderTextView: TextView by lazy {

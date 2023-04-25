@@ -39,7 +39,7 @@ class HelpFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentHelpBinding.inflate(layoutInflater, container, false)
         binding.textView.text = HtmlCompat.fromHtml(getString(R.string.help_text), HtmlCompat.FROM_HTML_MODE_LEGACY)
         return binding.root

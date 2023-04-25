@@ -21,7 +21,6 @@ package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import `in`.digistorm.aksharam.activities.main.ActivityViewModel
 import `in`.digistorm.aksharam.databinding.FragmentLettersTabBinding
-import `in`.digistorm.aksharam.util.*
 
 import android.os.Bundle
 import android.view.*
@@ -53,7 +52,7 @@ class LettersTabFragment: Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentLettersTabBinding.inflate(inflater, container, false)
         binding.lifecycleOwner = viewLifecycleOwner
         return binding.root

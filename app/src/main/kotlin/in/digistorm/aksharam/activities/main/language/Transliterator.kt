@@ -1,6 +1,5 @@
-package `in`.digistorm.aksharam.util
+package `in`.digistorm.aksharam.activities.main.language
 
-import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.lang.StringBuilder
 
@@ -29,7 +28,8 @@ fun transliterate(str: String, targetLanguage: String, languageData: Language): 
                     out.append(
                         languageData.getLetterDefinition(character)!!.transliterationHints!![targetLangCode]!![0])
                 else {
-                    logDebug(logTag, "Could not find transliteration hints for character: \""
+                    logDebug(
+                        logTag, "Could not find transliteration hints for character: \""
                             + character + "\" of language: " + languageData.language
                             + "for transliteration to language: " + targetLanguageLC)
                     out.append(character)

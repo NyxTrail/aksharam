@@ -21,14 +21,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".activities.settings.SettingsActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustPan" />
-        <activity
-            android:name=".activities.htmlinfo.HTMLInfoActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustPan" />
     </application>
 
 </manifest>

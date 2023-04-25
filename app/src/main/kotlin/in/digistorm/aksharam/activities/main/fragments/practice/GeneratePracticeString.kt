@@ -108,7 +108,7 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
                         // Find the base of this ligature, if any.
                         // "base" of a ligature is the actual consonant used for combining with
                         // the vowel sign
-                        predecessor = if (base == null || base.isEmpty()) letter else base
+                        predecessor = if (base.isNullOrEmpty()) letter else base
                         logDebug(logTag, "base: $predecessor")
                         if (isCombineAfter && isCombineBefore) {
                             // If letter can be combined before and after another letter,

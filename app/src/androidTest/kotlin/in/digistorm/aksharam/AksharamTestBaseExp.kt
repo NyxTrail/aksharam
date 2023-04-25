@@ -3,7 +3,6 @@ package `in`.digistorm.aksharam
 import android.view.View
 import android.widget.Spinner
 import android.widget.TextView
-import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
@@ -14,7 +13,7 @@ import org.hamcrest.Matcher
 open class AksharamTestBaseExp {
     protected val logTag: String = javaClass.simpleName
 
-    protected fun upperCaseFirstLetter(s: String): String? {
+    protected fun upperCaseFirstLetter(s: String): String {
         return s.substring(0, 1).uppercase() + s.substring(1)
     }
 

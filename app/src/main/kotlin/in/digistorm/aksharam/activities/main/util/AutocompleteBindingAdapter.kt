@@ -2,13 +2,12 @@ package `in`.digistorm.aksharam.activities.main.util
 
 import android.widget.ArrayAdapter
 import androidx.databinding.BindingAdapter
-import androidx.databinding.InverseBindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.fragments.letters.LetterCategoryAdapter
 
-private val logTag: String = "AutoCompleteBindingAdapter"
+private const val logTag: String = "AutoCompleteBindingAdapter"
 
 @BindingAdapter(value = ["list", "android:text"], requireAll = false)
 fun MaterialAutoCompleteTextView.writeSimpleItems(
@@ -43,12 +42,4 @@ fun RecyclerView.setLettersCategoryWise(newLettersCategoryWise: List<Map<String,
     if(adapter == null)
         logDebug(logTag, "Could not acquire adapter.")
     (adapter as? LetterCategoryAdapter)?.submitList(newLettersCategoryWise)
-}
-
-@BindingAdapter("letter_category_adapter")
-fun RecyclerView.setLetterCategoryAdapter(letterCategoryAdapter: LetterCategoryAdapter) {
-    if((adapter as? LetterCategoryAdapter)?.currentList?.equals(letterCategoryAdapter.currentList) != true) { // If it is false or null
-        logDebug(logTag, "Setting letter category adapter in RecyclerView...")
-        adapter = letterCategoryAdapter
-    }
 }

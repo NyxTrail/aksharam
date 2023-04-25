@@ -38,7 +38,7 @@ class TabbedViewsFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         logDebug(logTag, "onCreateView")
         val binding = FragmentTabbedViewsBinding.inflate(inflater, container, false)
         this.binding = binding

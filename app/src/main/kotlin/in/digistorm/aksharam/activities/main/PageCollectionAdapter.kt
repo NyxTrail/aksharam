@@ -53,25 +53,6 @@ class PageCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
         return fragments[position]
     }
 
-    fun replaceFragment(index: Int, fragment: Fragment) {
-        logDebug(logTag, "replacing fragment at index $index")
-        backStack[index].push(fragments[index])
-        fragments[index] = fragment
-        notifyItemChanged(index)
-    }
-
-    /* Returns true if something is actually replaced
-       else returns false
-    */
-    fun restoreFragment(index: Int): Boolean {
-        logDebug(logTag, "Restoring fragment at index: $index")
-        return if (!backStack[index].isEmpty()) {
-            fragments[index] = backStack[index].pop()
-            notifyItemChanged(index)
-            true
-        } else false
-    }
-
     override fun getItemCount(): Int {
         return fragments.size
     }

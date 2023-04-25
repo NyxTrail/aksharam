@@ -20,14 +20,13 @@
 package `in`.digistorm.aksharam.activities.main.fragments.practice
 
 import android.app.Application
-import android.widget.ArrayAdapter
 import androidx.lifecycle.*
 import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
 import `in`.digistorm.aksharam.activities.main.language.getLanguageData
+import `in`.digistorm.aksharam.activities.main.language.transliterate
 import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
 import `in`.digistorm.aksharam.activities.main.util.logDebug
-import `in`.digistorm.aksharam.util.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -52,7 +51,7 @@ class PracticeTabViewModel(
     var practiceInLanguages: LiveData<ArrayList<String>> = language.map { language ->
         logDebug(logTag, "Transforming \"${language.language}\" to a live data of target languages")
         val targetList = language.supportedLanguagesForTransliteration
-        practiceInSelected.setValue(targetList.first())
+        practiceInSelected.value = targetList.first()
         logDebug(logTag, "Practice In language selected: ${practiceInSelected.value}")
         targetList
     }
@@ -81,7 +80,7 @@ class PracticeTabViewModel(
             types.add("Random Ligatures")
         types.add("Random Words")
 
-        practiceTypeSelected.setValue(types.first())
+        practiceTypeSelected.value = types.first()
         logDebug(logTag, "Generated practice types for ${languageSelected.value}: $types")
         logDebug(logTag, "Practice Type selected: ${practiceTypeSelected.value}")
         types

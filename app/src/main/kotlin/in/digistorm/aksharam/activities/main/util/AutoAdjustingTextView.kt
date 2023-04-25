@@ -69,7 +69,7 @@ open class AutoAdjustingTextView : AppCompatTextView {
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-        val text = text.toString()
+        val text = text
         var difference = measuredWidth - paint.measureText(text)
         var size: Float
         if (difference < 9) logDebug(logTag, "Resizing $text container text view")

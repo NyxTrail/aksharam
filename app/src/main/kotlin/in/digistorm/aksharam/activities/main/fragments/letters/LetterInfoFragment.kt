@@ -25,7 +25,7 @@ import `in`.digistorm.aksharam.databinding.LetterInfoBinding
 import `in`.digistorm.aksharam.databinding.LetterViewBinding
 import `in`.digistorm.aksharam.databinding.WordAndMeaningBinding
 import `in`.digistorm.aksharam.activities.main.util.logDebug
-import `in`.digistorm.aksharam.util.transliterate
+import `in`.digistorm.aksharam.activities.main.language.transliterate
 
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
@@ -170,7 +170,7 @@ class LetterInfoFragment : Fragment() {
         showDiacriticExamplesUI(View.VISIBLE)
         binding.diacriticSelectorHintTV.text =
             getString(R.string.letter_with_consonants_and_ligatures, letter)
-        languageData.generateDiacriticsForSign(letter)?.forEach { diacritic ->
+        languageData.generateDiacriticsForSign(letter).forEach { diacritic ->
             val letterView =
                 LetterViewBinding.inflate(
                     inflater,

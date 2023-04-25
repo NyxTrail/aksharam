@@ -19,8 +19,6 @@
  */
 package `in`.digistorm.aksharam.activities.main.fragments.transliterate
 
-import `in`.digistorm.aksharam.util.*
-
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle

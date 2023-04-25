@@ -42,7 +42,7 @@ class LanguageDataFileListAdapter(
     inner class ViewHolder(
         private val binding: LanguageDataFileListItemBinding,
     ) : RecyclerView.ViewHolder(binding.root) {
-        val checkBox: CheckedTextView
+        private val checkBox: CheckedTextView
             get() = binding.checkbox
 
         var languageFile: LanguageFile? = null

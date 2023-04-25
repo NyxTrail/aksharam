@@ -7,7 +7,7 @@ import `in`.digistorm.aksharam.activities.main.util.setRedGreen
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.TextView
-import `in`.digistorm.aksharam.util.transliterate
+import `in`.digistorm.aksharam.activities.main.language.transliterate
 
 class InputTextChangedListener(
     private val practiceTabFragment: PracticeTabFragment,
@@ -40,7 +40,7 @@ class InputTextChangedListener(
 
         // - CharSequence s is usually shorter than practiceString and transliteratedString.
         // - TransliteratedString and practiceString may not always be of the same length.
-        var positionInCopy: Int = 0
+        var positionInCopy = 0
         val spans: MutableList<Triple<Boolean, Int, Int>> = mutableListOf(Triple(true, 0, 0))
         for((positionInPracticeString: Int, char) in viewModel.practiceString.value!!.withIndex()) {
             if(positionInCopy >= s.length)

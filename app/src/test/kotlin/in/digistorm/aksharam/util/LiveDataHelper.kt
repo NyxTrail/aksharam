@@ -1,12 +1,9 @@
 package `in`.digistorm.aksharam.util
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
-import java.util.concurrent.CountDownLatch
 
 fun <T> LiveData<T>.waitAndGetValue(): T {
     val delayTime: Long = 1 * 1000

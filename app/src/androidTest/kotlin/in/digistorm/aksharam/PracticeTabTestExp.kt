@@ -48,7 +48,7 @@ class PracticeTabTestExp(private val languages: LinkedHashMap<String, Language>)
                             CoreMatchers.instanceOf<Any>(
                                 String::class.java
                             )
-                        ), CoreMatchers.`is`<String>(practiceInLanguage)
+                        ), CoreMatchers.`is`(practiceInLanguage)
                     )
                 ).perform(ViewActions.click())
                 for (practiceType in practiceTypes) {

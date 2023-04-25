@@ -29,9 +29,9 @@ import `in`.digistorm.aksharam.activities.main.fragments.TabbedViewsFragmentDire
 import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
 import `in`.digistorm.aksharam.activities.main.language.getLanguageData
+import `in`.digistorm.aksharam.activities.main.language.transliterate
 import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
 import `in`.digistorm.aksharam.activities.main.util.logDebug
-import `in`.digistorm.aksharam.util.*
 
 class LettersTabViewModel(
     application: Application,

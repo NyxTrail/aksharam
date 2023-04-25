@@ -19,7 +19,7 @@ class PrivacyFragment: Fragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentPrivacyBinding.inflate(inflater, container, false)
         binding.textView.text = HtmlCompat.fromHtml(getString(R.string.privacy_text), HtmlCompat.FROM_HTML_MODE_LEGACY)
         return binding.root
