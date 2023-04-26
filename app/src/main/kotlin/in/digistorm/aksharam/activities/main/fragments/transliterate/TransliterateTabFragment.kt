@@ -65,7 +65,6 @@ class TransliterateTabFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         logDebug(logTag, "onViewCreated")
 
-        viewModel.initialise()
         binding.viewModel = viewModel
 
         viewModel.selectableLanguages.observe(viewLifecycleOwner) { value ->
@@ -94,8 +93,13 @@ class TransliterateTabFragment : Fragment() {
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
-                    viewModel.currentInput.value = s.toString()
+                    viewModel.currentInput.postValue(s.toString())
                 }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.resetLanguageDetector()
     }
 }

@@ -25,6 +25,7 @@ import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.util.HashMap
 import java.util.LinkedHashMap
 
+/* TODO: Write unit tests for this */
 class LanguageDetector(context: Context?) {
     private val logTag = javaClass.simpleName
     private val languages: LinkedHashMap<String, Language>
@@ -33,7 +34,7 @@ class LanguageDetector(context: Context?) {
     // in all language definitions combined. That is we detect a language by its script. If two
     // languages use the same script, we cannot distinguish between them. Such a scenario is not
     // supported in this app, since we are primarily an app for script learning (not language learning).
-    fun detectLanguage(input: String): String? {
+    fun detectLanguage(input: String): Language? {
         logDebug(logTag, "Detecting language for $input")
         logDebug(logTag, "languages loaded: " + languages.keys)
 
@@ -63,13 +64,15 @@ class LanguageDetector(context: Context?) {
             }
         }
         logDebug(logTag, "Detected language $langDetected in string $input.")
-        return langDetected?.upperCaseFirstLetter()
+        return languages[langDetected]
     }
 
     init {
+        logDebug(logTag, "Initialising language detector.")
         languages = getAllLanguages(context!!)
         if (languages.isEmpty()) {
             logDebug(logTag, "Could not find any data files.")
         }
+        logDebug(logTag, "Language detector initialised.")
     }
 }

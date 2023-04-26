@@ -31,7 +31,7 @@ fun transliterate(str: String, targetLanguage: String, languageData: Language): 
                     logDebug(
                         logTag, "Could not find transliteration hints for character: \""
                             + character + "\" of language: " + languageData.language
-                            + "for transliteration to language: " + targetLanguageLC)
+                            + " for transliteration to language: " + targetLanguageLC)
                     out.append(character)
                 } else {
                 logDebug(
