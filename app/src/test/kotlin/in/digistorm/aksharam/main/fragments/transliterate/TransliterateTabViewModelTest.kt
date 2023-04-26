@@ -44,7 +44,6 @@ class TransliterateTabViewModelTest: AksharamTestBase() {
         )
 
         assertNull(viewModel.currentInput.value)
-        assertNull(viewModel.detectedLanguage.value)
         assertNull(viewModel.language.value)
         assertNull(viewModel.selectableLanguages.value)
         assertNull(viewModel.targetLanguageSelected.value)
@@ -66,7 +65,7 @@ class TransliterateTabViewModelTest: AksharamTestBase() {
         val viewModel = initialiseViewModel()
 
         viewModel.currentInput.postValue("ಕನ್ನಡ ಲಿಪಿ")
-        assertEquals("Kannada", viewModel.detectedLanguage.waitAndGetValue())
+        assertEquals("Kannada", viewModel.language.waitAndGetValue()?.language)
     }
 
     @Test
@@ -74,7 +73,7 @@ class TransliterateTabViewModelTest: AksharamTestBase() {
         val viewModel = initialiseViewModel()
 
         viewModel.currentInput.postValue("മലയാളം ലിപി")
-        assertEquals("Malayalam", viewModel.detectedLanguage.waitAndGetValue())
+        assertEquals("Malayalam", viewModel.language.waitAndGetValue()?.language)
     }
 
     @Test
@@ -82,7 +81,7 @@ class TransliterateTabViewModelTest: AksharamTestBase() {
         val viewModel = initialiseViewModel()
 
         viewModel.currentInput.postValue("हिन्दी लिपि")
-        assertEquals("Hindi", viewModel.detectedLanguage.waitAndGetValue())
+        assertEquals("Hindi", viewModel.language.waitAndGetValue()?.language)
     }
 
     @Test
@@ -130,6 +129,6 @@ class TransliterateTabViewModelTest: AksharamTestBase() {
     private fun initialiseViewModel(): TransliterateTabViewModel {
         return TransliterateTabViewModel(
             ApplicationProvider.getApplicationContext()
-        ).apply { initialise() }
+        )
     }
 }
