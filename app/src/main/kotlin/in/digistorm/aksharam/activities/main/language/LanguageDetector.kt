@@ -53,7 +53,7 @@ class LanguageDetector(context: Context?) {
                 }
             }
             // We checked all languages and did not find this character.
-            logDebug(logTag, "Character $ch in $input is unknown to us. Ignoring.")
+            logDebug(logTag, "Character '$ch' in '$input' is unknown to us. Ignoring.")
         }
         var langDetected: String? = score.keys.firstOrNull()
         var maxScore = score[langDetected] ?: 0
