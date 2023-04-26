@@ -65,11 +65,4 @@ class TransliterateTabViewModel(
     fun resetLanguageDetector() {
         languageDetector = null
     }
-
-    init {
-        viewModelScope.launch(Dispatchers.IO) {
-            delay(7000)
-            logDebug(logTag, "${selectableLanguages is MediatorLiveData}")
-        }
-    }
 }
