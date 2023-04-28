@@ -37,9 +37,9 @@ class TransliterateTabViewModel(
        The target language to transliterate a string to. This is set by a spinner in the
        Fragment.
      */
-    var targetLanguageSelected: MutableLiveData<String> = MutableLiveData()
+    val targetLanguageSelected: MutableLiveData<String> = MutableLiveData()
 
-    var transliteratedString: MutableLiveData<String?> = MediatorLiveData<String>().apply {
+    val transliteratedString: MutableLiveData<String?> = MediatorLiveData<String>().apply {
         addSource(language) { language ->
             viewModelScope.launch(Dispatchers.IO) {
                 logDebug(logTag, "Change detected in language data. Generating transliterated string.")

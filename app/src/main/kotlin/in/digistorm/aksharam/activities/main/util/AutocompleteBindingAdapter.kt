@@ -37,7 +37,7 @@ fun MaterialAutoCompleteTextView.writeSimpleItems(
 }
 
 @BindingAdapter("letters_category_wise")
-fun RecyclerView.setLettersCategoryWise(newLettersCategoryWise: List<Map<String, ArrayList<Pair<String, String>>>>) {
+fun RecyclerView.setLettersCategoryWise(newLettersCategoryWise: List<Map<String, ArrayList<Pair<String, String>>>>?) {
     logDebug(logTag, "Write letters category wise: $newLettersCategoryWise")
     if(adapter == null)
         logDebug(logTag, "Could not acquire adapter.")

@@ -32,6 +32,7 @@ import `in`.digistorm.aksharam.activities.main.language.getLanguageData
 import `in`.digistorm.aksharam.activities.main.language.transliterate
 import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
 import `in`.digistorm.aksharam.activities.main.util.logDebug
+import kotlinx.coroutines.Dispatchers
 
 class LettersTabViewModel(
     application: Application,
@@ -50,40 +51,53 @@ class LettersTabViewModel(
 
     // The currently selected language in the UI
     var languageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
-        private set
 
     // The actual language data.
-    var language: LiveData<Language> = languageSelected.map { newLanguage ->
-        logDebug(logTag, "Fetching data for $newLanguage")
-        val language: Language = getLanguageData(newLanguage, getApplication())!!
-        activityViewModel.language.value = language
-        language
+    var language: LiveData<Language?> = languageSelected.switchMap { newLanguage ->
+        liveData(Dispatchers.IO) {
+            newLanguage?.let{
+                logDebug(logTag, "Fetching data for $newLanguage")
+                val language: Language? = getLanguageData(newLanguage, getApplication())
+                activityViewModel.language.postValue(language)
+                emit(language)
+            }
+        }
     }
 
     // The list of languages shown in the Convert To drop down.
-    var targetLanguageList: LiveData<ArrayList<String>> = language.map { language ->
-        logDebug(logTag, "Transforming \"${language.language}\" to a live data of target languages")
-        val targetLanguages = language.supportedLanguagesForTransliteration
-        targetLanguageSelected.value = targetLanguages.first()
-        logDebug(logTag, "Selected target language: ${targetLanguageSelected.value}")
-        targetLanguages
+    var targetLanguageList: LiveData<ArrayList<String>> = language.switchMap { language ->
+        liveData(Dispatchers.IO) {
+            logDebug(logTag, "Transforming \"${language?.language}\" to a live data of target languages")
+            val targetLanguages = language?.supportedLanguagesForTransliteration ?: arrayListOf()
+            targetLanguageSelected.postValue(targetLanguages.firstOrNull() ?: "")
+            logDebug(logTag, "Selected target language: ${targetLanguageSelected.value}")
+            emit(targetLanguages)
+        }
     }
     var targetLanguageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
-    val lettersCategoryWise: LiveData<List<Map<String, ArrayList<Pair<String, String>>>>> = targetLanguageSelected.map { newLanguage ->
-        logDebug(logTag, "Generating letters category wise for language: ${language.value?.language}")
-        logDebug(logTag, "Conversion language is: $newLanguage")
-        val categories = mutableListOf<Map<String, ArrayList<Pair<String, String>>>>()
-        // [{"vowels": ["a", "e",...]}, {"consonants":: ["b", "c", "d",...]}, ...]
-        language.value?.lettersCategoryWise?.forEach { (category, letters) ->
-            val transliteratedLetterPairs: ArrayList<Pair<String, String>> = ArrayList()
-            letters.forEach { letter ->
-                transliteratedLetterPairs.add(letter to transliterate(letter, newLanguage, language.value!!))
+    val lettersCategoryWise: LiveData<List<Map<String, ArrayList<Pair<String, String>>>>> = targetLanguageSelected.switchMap { newLanguage ->
+        liveData(Dispatchers.IO) {
+            logDebug(logTag, "Generating letters category wise for language: ${language.value?.language}")
+            logDebug(logTag, "Conversion language is: $newLanguage")
+            val categories = mutableListOf<Map<String, ArrayList<Pair<String, String>>>>()
+            // [{"vowels": ["a", "e",...]}, {"consonants":: ["b", "c", "d",...]}, ...]
+            language.value?.lettersCategoryWise?.forEach { (category, letters) ->
+                val transliteratedLetterPairs: ArrayList<Pair<String, String>> = ArrayList()
+                letters.forEach { letter ->
+                    transliteratedLetterPairs.add(
+                        letter to transliterate(
+                            letter,
+                            newLanguage,
+                            language.value!!
+                        )
+                    )
+                }
+                categories.add(mapOf(category to transliteratedLetterPairs))
             }
-            categories.add(mapOf(category to transliteratedLetterPairs))
+            logDebug(logTag, "Category list created: $categories")
+            emit(categories)
         }
-        logDebug(logTag, "Category list created: $categories")
-        categories
     }
 
     var categoryListAdapter: LetterCategoryAdapter = LetterCategoryAdapter(::letterOnLongClickAction)
@@ -122,16 +136,14 @@ class LettersTabViewModel(
         val mDownloadedLanguages = getDownloadedLanguages(getApplication())
 
         // If there is a change in downloaded languages...
-        if(mDownloadedLanguages != downloadedLanguages.value) {
-            downloadedLanguages.value = mDownloadedLanguages
-            logDebug(logTag, "Downloaded languages set to: ${downloadedLanguages.value}")
+        if (mDownloadedLanguages != downloadedLanguages.value && mDownloadedLanguages.size > 0) {
+            downloadedLanguages.postValue(mDownloadedLanguages)
+            logDebug(logTag, "Downloaded languages set to: $mDownloadedLanguages")
 
             // If currently selected language is no longer available, update the view model with
             // the first available language
-            if (downloadedLanguages.value?.contains(languageSelected.value) != true) {
-                if (downloadedLanguages.value?.isNotEmpty() == true) {
-                    languageSelected.setValueIfDifferent(downloadedLanguages.value!!.first())
-                }
+            if (!mDownloadedLanguages.contains(languageSelected.value)) {
+                languageSelected.postValue(mDownloadedLanguages.first())
             }
         }
     }
