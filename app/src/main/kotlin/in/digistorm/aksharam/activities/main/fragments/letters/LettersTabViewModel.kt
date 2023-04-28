@@ -69,7 +69,7 @@ class LettersTabViewModel(
         liveData(Dispatchers.IO) {
             logDebug(logTag, "Transforming \"${language?.language}\" to a live data of target languages")
             val targetLanguages = language?.supportedLanguagesForTransliteration ?: arrayListOf()
-            targetLanguageSelected.postValue(targetLanguages.firstOrNull() ?: "")
+            targetLanguageSelected.postValueWithTrigger(targetLanguages.firstOrNull() ?: "")
             logDebug(logTag, "Selected target language: ${targetLanguageSelected.value}")
             emit(targetLanguages)
         }

@@ -22,6 +22,10 @@ class CheckedMutableLiveData<T>: MutableLiveData<T> {
             super.postValue(value)
     }
 
+   fun postValueWithTrigger(value: T) {
+        super.postValue(value)
+    }
+
     fun setValueIfDifferent(value: T) {
         if(this.value != value)
             super.setValue(value)
