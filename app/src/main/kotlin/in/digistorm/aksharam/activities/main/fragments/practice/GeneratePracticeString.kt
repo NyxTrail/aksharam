@@ -1,14 +1,17 @@
 package `in`.digistorm.aksharam.activities.main.fragments.practice
 
+import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.lang.StringBuilder
 import java.util.*
 
-fun generatePracticeString(viewModel: PracticeTabViewModel): String {
+fun generatePracticeString(
+    language: Language,
+    practiceType: String,
+): String {
     val logTag = "generatePracticeString"
 
     logDebug(logTag, "Generating practice text.")
-    val language = viewModel.language.value!!
     // get all letters of current language, category-wise
     val vowels = language.vowels
     val consonants = language.consonants
@@ -21,7 +24,7 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
     // Special variable to hold the Virama.
     // Useful to detect chillu letters in Malayalam
     val virama = language.virama
-    when (viewModel.practiceTypeSelected.value!!.lowercase()) {
+    when (practiceType.lowercase()) {
         // Let's construct a made-up word in current language
         // First letter can be a vowel or consonant (not a sign)
         // Second letter onwards can be a vowel sign or consonant (not a vowel)
@@ -48,7 +51,7 @@ fun generatePracticeString(viewModel: PracticeTabViewModel): String {
                     if (random.nextInt(100) < 21 && prevChar != virama) {
                         // for malayalam, there is also a chance the next character is a chillu
                         nextChar =
-                            if (viewModel.languageSelected.value.equals("malayalam", ignoreCase = true)) {
+                            if (language.language.equals("malayalam", ignoreCase = true)) {
                                 if (random.nextInt(100) < 31)
                                     chillu[random.nextInt(chillu.size)]
                                 else  // Since it's malayalam, we can just get one of the ligatures at random

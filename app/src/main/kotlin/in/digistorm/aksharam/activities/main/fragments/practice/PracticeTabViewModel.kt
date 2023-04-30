@@ -27,6 +27,7 @@ import `in`.digistorm.aksharam.activities.main.language.getLanguageData
 import `in`.digistorm.aksharam.activities.main.language.transliterate
 import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
 import `in`.digistorm.aksharam.activities.main.util.logDebug
+import kotlinx.coroutines.Dispatchers
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -36,73 +37,87 @@ class PracticeTabViewModel(
     private val logTag = javaClass.simpleName
 
     // The actual list of languages currently available to the app
-    var downloadedLanguages: CheckedMutableLiveData<ArrayList<String>> = CheckedMutableLiveData(arrayListOf())
+    val downloadedLanguages: CheckedMutableLiveData<ArrayList<String>> = CheckedMutableLiveData(arrayListOf())
 
     // The currently selected language in the UI
-    var languageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
+    val languageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
     // The actual language data
-    var language: LiveData<Language> = languageSelected.map { newLanguage ->
-        logDebug(logTag, "Fetching data for $newLanguage")
-        val language: Language = getLanguageData(newLanguage, getApplication())!!
-        language
-    }
-
-    var practiceInLanguages: LiveData<ArrayList<String>> = language.map { language ->
-        logDebug(logTag, "Transforming \"${language.language}\" to a live data of target languages")
-        val targetList = language.supportedLanguagesForTransliteration
-        practiceInSelected.value = targetList.first()
-        logDebug(logTag, "Practice In language selected: ${practiceInSelected.value}")
-        targetList
-    }
-    var practiceInSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
-
-    var practiceTypes: LiveData<ArrayList<String>> = language.map { language ->
-        val types = arrayListOf<String>()
-        val lettersCategoryWise = language.lettersCategoryWise
-        for(category in lettersCategoryWise.keys) {
-            types.add(category.replaceFirstChar { char ->
-                if(char.isLowerCase())
-                    char.titlecase(Locale.getDefault())
-                else
-                    char.toString()
-            })
+    val language: LiveData<Language?> = languageSelected.switchMap { newLanguage ->
+        liveData(Dispatchers.Default) {
+            logDebug(logTag, "Fetching data for $newLanguage")
+            getLanguageData(newLanguage, getApplication())?.let {
+                emit(it)
+            }
         }
-
-        // Additional practice types
-        // Random ligatures work best in some languages like Kannada where each consonant can form
-        // a unique conjunct with another consonant. Other languages like Malayalam or Hindi
-        // have a few ligatures, yet this is true only for commonly occurring consonant combinations
-        // Most of the combinations in these languages do not result in a meaningful ligature, or are
-        // easily understood (as in the case of Hindi). So, we will add random ligatures only if the
-        // language's data file says we should.
-        if(language.areLigaturesAutoGeneratable())
-            types.add("Random Ligatures")
-        types.add("Random Words")
-
-        practiceTypeSelected.value = types.first()
-        logDebug(logTag, "Generated practice types for ${languageSelected.value}: $types")
-        logDebug(logTag, "Practice Type selected: ${practiceTypeSelected.value}")
-        types
     }
-    var practiceTypeSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
-    var practiceString: LiveData<String> = practiceTypeSelected.map {
-        val _practiceString = generatePracticeString(this)
-        transliteratedString.value = transliterate(_practiceString, practiceInSelected.value!!, language.value!!)
-        practiceSuccessCheck.value = false
-        logDebug(logTag, "Practice string changed to: $_practiceString")
-        logDebug(logTag, "Transliterated string: ${transliteratedString.value}")
-        _practiceString
+    val practiceInLanguages: LiveData<ArrayList<String>> = language.switchMap { language ->
+        liveData(Dispatchers.Default) {
+            logDebug(logTag, "Transforming \"${language?.language}\" to a live data of target languages")
+            language?.supportedLanguagesForTransliteration?.let {
+                practiceInSelected.postValue(it.firstOrNull() ?: "")
+                logDebug(logTag, "Practice In language selected: ${practiceInSelected.value}")
+                emit(it)
+            }
+        }
     }
-    var transliteratedString: MutableLiveData<String> = MutableLiveData()
+    val practiceInSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
+
+    val practiceTypes: LiveData<ArrayList<String>> = language.switchMap { language ->
+        liveData(Dispatchers.Default) {
+            val types = arrayListOf<String>()
+            language?.lettersCategoryWise?.let { lettersCategoryWise ->
+                for (category in lettersCategoryWise.keys) {
+                    types.add(category.replaceFirstChar { char ->
+                        if (char.isLowerCase())
+                            char.titlecase(Locale.getDefault())
+                        else
+                            char.toString()
+                    })
+                }
+                // Additional practice types
+                // Random ligatures work best in some languages like Kannada where each consonant can form
+                // a unique conjunct with another consonant. Other languages like Malayalam or Hindi
+                // have a few ligatures, yet this is true only for commonly occurring consonant combinations
+                // Most of the combinations in these languages do not result in a meaningful ligature, or are
+                // easily understood (as in the case of Hindi). So, we will add random ligatures only if the
+                // language's data file says we should.
+                if (language.areLigaturesAutoGeneratable())
+                    types.add("Random Ligatures")
+                types.add("Random Words")
+
+                logDebug(logTag, "Generated practice types for ${languageSelected.value}: $types")
+
+                practiceTypeSelected.postValueWithTrigger(value = types.firstOrNull() ?: "")
+                logDebug(logTag, "Practice Type selected: ${practiceTypeSelected.value}")
+                emit(types)
+            }
+        }
+    }
+    val practiceTypeSelected = CheckedMutableLiveData<String>()
+
+    val practiceString: LiveData<String> = practiceTypeSelected.switchMap { practiceType ->
+        liveData(Dispatchers.Default) {
+            language.value?.let { language ->
+                with(generatePracticeString(language, practiceType)) {
+                    transliteratedString.postValue(transliterate(this, practiceInSelected.value!!, language))
+                    practiceSuccessCheck.postValue(false)
+                    logDebug(logTag, "Practice string changed to: $this")
+                    logDebug(logTag, "Transliterated string: ${transliteratedString.value}")
+                    emit(this)
+                }
+            }
+        }
+    }
+    val transliteratedString: MutableLiveData<String> = MutableLiveData()
 
     fun generateNewPracticeString() {
         practiceTypeSelected.trigger()
     }
 
     // Variable is true if user's transliteration is correct
-    var practiceSuccessCheck: MutableLiveData<Boolean> = MutableLiveData(false)
+    val practiceSuccessCheck: MutableLiveData<Boolean> = MutableLiveData(false)
 
     fun initialise() {
         logDebug(logTag, "Initialising.")
@@ -115,9 +130,10 @@ class PracticeTabViewModel(
 
             // If currently selected language is no longer available, update the view model with
             // the first available language
-            if (downloadedLanguages.value?.contains(languageSelected.value) != true) {
-                if(downloadedLanguages.value?.isNotEmpty() == true)
-                    languageSelected.setValueIfDifferent(downloadedLanguages.value!!.first())
+            if(!mDownloadedLanguages.contains(languageSelected.value)) {
+                mDownloadedLanguages.firstOrNull()?.let {
+                    languageSelected.postValue(it)
+                }
             }
         }
     }

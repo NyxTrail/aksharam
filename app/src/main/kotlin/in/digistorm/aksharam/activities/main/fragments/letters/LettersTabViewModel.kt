@@ -43,18 +43,18 @@ class LettersTabViewModel(
     private val logTag = javaClass.simpleName
 
     // The actual list of languages currently available to the app
-    var downloadedLanguages: CheckedMutableLiveData<ArrayList<String>> = CheckedMutableLiveData(arrayListOf())
+    val downloadedLanguages: CheckedMutableLiveData<ArrayList<String>> = CheckedMutableLiveData(arrayListOf())
 
     // A function to initialise the Convert To drop down.
     // This function can access the view which we can't do here in the view model.
     private lateinit var navigateToLanguageInfo: (NavDirections) -> Unit
 
     // The currently selected language in the UI
-    var languageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
+    val languageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
     // The actual language data.
-    var language: LiveData<Language?> = languageSelected.switchMap { newLanguage ->
-        liveData(Dispatchers.IO) {
+    val language: LiveData<Language?> = languageSelected.switchMap { newLanguage ->
+        liveData(Dispatchers.Default) {
             newLanguage?.let{
                 logDebug(logTag, "Fetching data for $newLanguage")
                 val language: Language? = getLanguageData(newLanguage, getApplication())
@@ -65,8 +65,8 @@ class LettersTabViewModel(
     }
 
     // The list of languages shown in the Convert To drop down.
-    var targetLanguageList: LiveData<ArrayList<String>> = language.switchMap { language ->
-        liveData(Dispatchers.IO) {
+    val targetLanguageList: LiveData<ArrayList<String>> = language.switchMap { language ->
+        liveData(Dispatchers.Default) {
             logDebug(logTag, "Transforming \"${language?.language}\" to a live data of target languages")
             val targetLanguages = language?.supportedLanguagesForTransliteration ?: arrayListOf()
             targetLanguageSelected.postValueWithTrigger(targetLanguages.firstOrNull() ?: "")
@@ -74,10 +74,10 @@ class LettersTabViewModel(
             emit(targetLanguages)
         }
     }
-    var targetLanguageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
+    val targetLanguageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
     val lettersCategoryWise: LiveData<List<Map<String, ArrayList<Pair<String, String>>>>> = targetLanguageSelected.switchMap { newLanguage ->
-        liveData(Dispatchers.IO) {
+        liveData(Dispatchers.Default) {
             logDebug(logTag, "Generating letters category wise for language: ${language.value?.language}")
             logDebug(logTag, "Conversion language is: $newLanguage")
             val categories = mutableListOf<Map<String, ArrayList<Pair<String, String>>>>()
@@ -143,7 +143,10 @@ class LettersTabViewModel(
             // If currently selected language is no longer available, update the view model with
             // the first available language
             if (!mDownloadedLanguages.contains(languageSelected.value)) {
-                languageSelected.postValue(mDownloadedLanguages.first())
+
+                mDownloadedLanguages.firstOrNull()?.let {
+                    languageSelected.postValue(it)
+                }
             }
         }
     }
