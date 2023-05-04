@@ -29,8 +29,8 @@
 
     </data>
 
-    <in.digistorm.aksharam.activities.main.fragments.letters.ExpandableCardView
-        android:id="@+id/expandable_card_view"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/card_view"
         style="@style/Widget.Material3.CardView.Filled"
         android:descendantFocusability="afterDescendants"
         android:layout_width="match_parent"
@@ -89,5 +89,5 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintEnd_toEndOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
-    </in.digistorm.aksharam.activities.main.fragments.letters.ExpandableCardView>
+    </com.google.android.material.card.MaterialCardView>
 </layout>

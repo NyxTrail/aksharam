@@ -11,11 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import org.hamcrest.Matcher
 
 open class AksharamTestBaseExp {
-    protected val logTag: String = javaClass.simpleName
-
-    protected fun upperCaseFirstLetter(s: String): String {
-        return s.substring(0, 1).uppercase() + s.substring(1)
-    }
+    protected open val logTag: String = javaClass.simpleName
 
     /* Obtain text from a text view.
        https://stackoverflow.com/a/23467629

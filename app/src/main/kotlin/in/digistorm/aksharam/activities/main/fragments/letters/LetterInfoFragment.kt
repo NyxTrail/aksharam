@@ -21,7 +21,6 @@ package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.ActivityViewModel
-import `in`.digistorm.aksharam.databinding.LetterInfoBinding
 import `in`.digistorm.aksharam.databinding.LetterViewBinding
 import `in`.digistorm.aksharam.databinding.WordAndMeaningBinding
 import `in`.digistorm.aksharam.activities.main.util.logDebug
@@ -39,11 +38,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import `in`.digistorm.aksharam.databinding.FragmentLetterInfoBinding
 
 class LetterInfoFragment : Fragment() {
     private val logTag = javaClass.simpleName
 
-    private lateinit var binding: LetterInfoBinding
+    private lateinit var binding: FragmentLetterInfoBinding
     private val args: LetterInfoFragmentArgs by navArgs()
     private val activityViewModel: ActivityViewModel by activityViewModels()
 
@@ -59,7 +59,7 @@ class LetterInfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
-        binding = LetterInfoBinding.inflate(inflater, container, false)
+        binding = FragmentLetterInfoBinding.inflate(inflater, container, false)
         return binding.root
     }
 
@@ -75,8 +75,8 @@ class LetterInfoFragment : Fragment() {
     }
 
     private fun showDiacriticExamplesUI(visibility: Int) {
-        binding.diacriticSelectorHintTV.visibility = visibility
-        binding.diacriticExamplesGL.visibility = visibility
+        binding.diacriticHint.visibility = visibility
+        binding.diacriticExamplesContainer.visibility = visibility
     }
 
     // Set up the LetterInfo dialog
@@ -84,8 +84,8 @@ class LetterInfoFragment : Fragment() {
     private fun setUp(inflater: LayoutInflater) {
         logDebug(logTag, "Showing info dialog for: ${args.letter}")
 
-        binding.letterInfoHeadingTV.text = args.letter
-        binding.letterInfoTransliteratedHeadingTV.text =
+        binding.heading.text = args.letter
+        binding.transliteratedHeading.text =
             transliterate(args.letter, args.targetLanguage, languageData)
 
         /**
@@ -97,8 +97,8 @@ class LetterInfoFragment : Fragment() {
         // If there are no examples, hide this section
         if (letterExamples.isEmpty()) {
             logDebug(logTag, "No examples found for letter: $letter")
-            binding.letterInfoWordsTV.visibility = View.GONE
-            binding.letterInfoMeaningTV.visibility = View.GONE
+            binding.wordsHeading.visibility = View.GONE
+            binding.meaningHeading.visibility = View.GONE
         } else {
             showExamplesWordsAndMeanings(letterExamples, inflater)
         }
@@ -109,10 +109,10 @@ class LetterInfoFragment : Fragment() {
         // Check if extra info exists for this letter
         if (letterDefinition?.info?.get("en") == null) {
             logDebug(logTag, "No additional info for $letter was found. Hiding UI element.")
-            binding.letterInfoInfoTV.visibility = View.GONE
+            binding.info.visibility = View.GONE
         } else {
             logDebug(logTag, "Info found for letter $letter: ${letterDefinition?.info}")
-            binding.letterInfoInfoTV.text = HtmlCompat.fromHtml(
+            binding.info.text = HtmlCompat.fromHtml(
                 letterDefinition?.info?.get("en")!!, HtmlCompat.FROM_HTML_MODE_LEGACY
             )
         }
@@ -150,14 +150,14 @@ class LetterInfoFragment : Fragment() {
     ) {
         letterExamples.forEach { (word, meanings) ->
             val wordsAndMeaningBinding = WordAndMeaningBinding.inflate(
-                inflater, binding.letterInfoWordAndMeaningLL, false
+                inflater, binding.wordAndMeaningContents, false
             )
             logDebug(logTag, "Word: $word; meaning: ${meanings[targetLanguageCode]}")
-            wordsAndMeaningBinding.wordAndMeaningWordTV.text = word
-            wordsAndMeaningBinding.wordAndMeaningMeaningTV.text = meanings[targetLanguageCode]!!
-            wordsAndMeaningBinding.wordAndMeaningTransliterationTV.text =
+            wordsAndMeaningBinding.word.text = word
+            wordsAndMeaningBinding.meaning.text = meanings[targetLanguageCode]!!
+            wordsAndMeaningBinding.transliteration.text =
                 transliterate(word, targetLanguage, languageData)
-            binding.letterInfoWordAndMeaningLL.addView(wordsAndMeaningBinding.root)
+            binding.wordAndMeaningContents.addView(wordsAndMeaningBinding.root)
         }
     }
 
@@ -168,17 +168,17 @@ class LetterInfoFragment : Fragment() {
         inflater: LayoutInflater
     ) {
         showDiacriticExamplesUI(View.VISIBLE)
-        binding.diacriticSelectorHintTV.text =
+        binding.diacriticHint.text =
             getString(R.string.letter_with_consonants_and_ligatures, letter)
         languageData.generateDiacriticsForSign(letter).forEach { diacritic ->
             val letterView =
                 LetterViewBinding.inflate(
                     inflater,
-                    binding.diacriticExamplesGL,
+                    binding.diacriticExamplesContainer,
                     false
                 )
             letterView.letterView.text = diacritic
-            binding.diacriticExamplesGL.addView(letterView.root)
+            binding.diacriticExamplesContainer.addView(letterView.root)
         }
     }
 
@@ -189,16 +189,16 @@ class LetterInfoFragment : Fragment() {
         inflater: LayoutInflater
     ) {
         showDiacriticExamplesUI(View.VISIBLE)
-        binding.diacriticSelectorHintTV.text =
+        binding.diacriticHint.text =
             getString(R.string.letter_with_vowel_signs, letter)
         languageData.generateDiacriticsForLetter(letter).forEach { diacritic ->
             val letterView = LetterViewBinding.inflate(
                 inflater,
-                binding.diacriticExamplesGL,
+                binding.diacriticExamplesContainer,
                 false
             )
             letterView.letterView.text = diacritic
-            binding.diacriticExamplesGL.addView(letterView.root)
+            binding.diacriticExamplesContainer.addView(letterView.root)
         }
     }
 

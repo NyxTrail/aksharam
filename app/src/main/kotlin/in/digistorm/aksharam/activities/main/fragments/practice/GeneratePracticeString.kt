@@ -89,10 +89,11 @@ fun generatePracticeString(
             }
         }
         "signs" -> {
-            // predecessor is the consonant or ligature to combine the sign with
+            // Predecessor is the consonant or ligature to combine the sign with
             var predecessor = ""
             var i = 0
             while (i < 10) {
+                // Vowel signs can be joined with a consonant or a ligature. Choose one at random.
                 when (random.nextInt(2)) {
                     0 -> predecessor = consonants[random.nextInt(consonants.size)]
                     1 -> {

@@ -23,7 +23,7 @@
  -->
 
 <resources>
-    <dimen name="text_normal_size">20sp</dimen>
+    <dimen name="text_normal_size">16sp</dimen>
 
     <dimen name="text_hint_size">20sp</dimen>
     <dimen name="text_clickable_size">20sp</dimen>
@@ -33,9 +33,9 @@
     <!-- Letter info view stuff !-->
     <dimen name="letter_info_heading">60sp</dimen>
     <dimen name="letter_info_transliterated_heading">40sp</dimen>
-    <dimen name="letter_info_word_size">22sp</dimen>
-    <dimen name="letter_info_transliteration_size">16sp</dimen>
-    <dimen name="letter_info_meaning">22sp</dimen>
+    <dimen name="letter_info_word">18sp</dimen>
+    <dimen name="letter_info_transliteration">16sp</dimen>
+    <dimen name="letter_info_meaning">18sp</dimen>
 
     <!-- dimensions for grid-related stuff -->
     <dimen name="letter_grid_tv_margin">2dp</dimen>

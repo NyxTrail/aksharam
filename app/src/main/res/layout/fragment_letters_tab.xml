@@ -47,6 +47,7 @@
             app:layout_constraintTop_toTopOf="parent">
 
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                android:id="@+id/language_option"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="none"

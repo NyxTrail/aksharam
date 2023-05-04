@@ -19,25 +19,38 @@
  */
 package `in`.digistorm.aksharam.activities.main.fragments.letters
 
+import android.animation.ObjectAnimator
+import android.util.SparseBooleanArray
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.databinding.LetterCategoryBinding
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AccelerateDecelerateInterpolator
+import android.widget.TextView
+import androidx.core.util.getOrDefault
+import androidx.core.util.set
+import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import androidx.transition.ChangeBounds
+import androidx.transition.Transition
+import androidx.transition.TransitionManager
+import com.google.android.material.card.MaterialCardView
+import `in`.digistorm.aksharam.activities.main.helpers.upperCaseFirstLetter
 
 /* RecyclerView adapter for each category of letters (e.g. Vowels, Consonants, etc).
    Each category is displayed in a separate Material 3 Card View.
  */
 class LetterCategoryAdapter(
-    private var letterOnLongClickAction: (String) -> NavDirections
+    private var letterOnLongClickAction: (String) -> NavDirections,
+    private val cardStates: SparseBooleanArray = SparseBooleanArray()
 ): ListAdapter<Map<String, List<Pair<String, String>>>, LetterCategoryAdapter.LetterCategoryCardViewHolder>(
-    LetterCategoryDiff()
+    LetterCategoryDiff { cardStates }
 ) {
     private val logTag = this.javaClass.simpleName
 
@@ -45,8 +58,9 @@ class LetterCategoryAdapter(
         logDebug(logTag, "LetterCategoryAdapter initialised with list: $currentList")
     }
 
-    private class LetterCategoryDiff: DiffUtil.ItemCallback<Map<String, List<Pair<String, String>>>>() {
+    private class LetterCategoryDiff(val getCardStates: (() -> SparseBooleanArray)): DiffUtil.ItemCallback<Map<String, List<Pair<String, String>>>>() {
         private val logTag = this.javaClass.simpleName
+
         override fun areItemsTheSame(
             oldItem: Map<String, List<Pair<String, String>>>,
             newItem: Map<String, List<Pair<String, String>>>
@@ -55,15 +69,18 @@ class LetterCategoryAdapter(
                     " ${oldItem == newItem}")
             /**
              * Items are same if:
-             * 1. their keys are same,
-             * 2. for each value in the Arraylist, first of the pair are the same
+             * 1. Their keys are same,
+             * 2. For each value in the Arraylist, first of the pair are the same
+             *    This means only the transliteration language has been changed.
              **/
             val oldCategory = oldItem.keys.singleOrNull()
             val newCategory = newItem.keys.singleOrNull()
             if(oldCategory == newCategory) {
                 oldItem[newCategory]!!.forEachIndexed { i, letterPair ->
-                    if(letterPair.first != newItem[newCategory]!![i].first)
+                    if(letterPair.first != newItem[newCategory]!![i].first) {
+                        getCardStates.invoke().clear()
                         return false
+                    }
                 }
             }
             else
@@ -82,11 +99,100 @@ class LetterCategoryAdapter(
         }
     }
 
-    class LetterCategoryCardViewHolder(
-        private val letterCategoryBinding: LetterCategoryBinding
+    inner class LetterCategoryCardViewHolder(
+        private val letterCategoryBinding: LetterCategoryBinding,
+        // TODO: Remove this
+        private val initialisation_time: Long = System.currentTimeMillis()
     ): RecyclerView.ViewHolder(letterCategoryBinding.root) {
-        val expandableCardView: ExpandableCardView
-            get() = letterCategoryBinding.expandableCardView
+        private val logTag = this.javaClass.simpleName
+
+        private var position: Int = RecyclerView.NO_POSITION
+
+        private val transition: Transition
+            get() {
+                return ChangeBounds()
+                    .setDuration(300)
+                    .setInterpolator(AccelerateDecelerateInterpolator())
+            }
+
+        val cardView: MaterialCardView by lazy {
+            letterCategoryBinding.cardView
+        }
+
+        val letterGrid: GridLayout by lazy {
+            letterCategoryBinding.letterGrid
+        }
+
+        fun getTag(): Any {
+            return cardView.tag
+        }
+
+        private fun isCollapsed(): Boolean {
+            return cardStates.getOrDefault(position, false)
+        }
+
+        var text: CharSequence
+            get() = letterCategoryBinding.letterCategoryHeaderText.text
+            set(value) {
+                letterCategoryBinding.letterCategoryHeaderText.text = value
+            }
+
+        var findNextSiblings: (() -> MutableList<MaterialCardView>)? = null
+
+        fun initialise(position: Int) {
+            this.position = position
+
+            // TODO: Remove this
+            if(System.currentTimeMillis() - initialisation_time > 5 * 1000)
+                logDebug(logTag, "Re-using collapsed ViewHolder")
+
+            if(isCollapsed()) {
+                letterGrid.visibility = View.GONE
+            } else {
+                letterGrid.visibility = View.VISIBLE
+            }
+
+            letterCategoryBinding.apply {
+                letterCategoryHeader.setOnClickListener {
+                    val logTag = "categoryHeaderClickListener"
+                    val imageView = downArrow
+
+                    if (isCollapsed()) {
+                        TransitionManager.beginDelayedTransition(
+                            cardView.parent as ViewGroup,
+                            transition.addTarget(cardView)
+                        )
+                        letterGrid.visibility = View.VISIBLE
+
+                        ObjectAnimator.ofFloat(imageView, "rotation", 0f).apply {
+                            duration = 300
+                            start()
+                        }
+                        cardStates[position] = false
+                    } else {
+                        logDebug(logTag, "Finding siblings...")
+                        val siblings: MutableList<MaterialCardView> = findNextSiblings?.invoke()!!
+                        val newTransition: Transition = transition.apply {
+                            logDebug(logTag, "adding siblings as target for animation")
+                            logDebug(logTag, "Siblings size: ${siblings.size}")
+                            siblings.forEach { sibling ->
+                                logDebug(logTag, "Found CardView for: " +
+                                        "${sibling.findViewById<TextView>(R.id.letter_category_header_text)?.text}")
+                                addTarget(sibling)
+                            }
+                        }
+                        TransitionManager.beginDelayedTransition(cardView.parent as ViewGroup, newTransition)
+                        letterGrid.visibility = View.GONE
+                        ObjectAnimator.ofFloat(imageView, "rotation", 180f).apply {
+                            duration = 300
+                            start()
+                        }
+                        cardStates[position] = true
+                    }
+                }
+            }
+
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): LetterCategoryCardViewHolder {
@@ -99,42 +205,53 @@ class LetterCategoryAdapter(
     override fun onBindViewHolder(holder: LetterCategoryCardViewHolder, position: Int) {
         logDebug(logTag, "Binding view for position: $position")
         logDebug(logTag, "Item: ${getItem(position)}")
-        holder.expandableCardView.tag = getItem(position).keys.first()
-        holder.expandableCardView.initialise()
+        holder.cardView.tag = getItem(position).keys.first()
+        holder.initialise(position)
 
         // Give an ExpandableCardView the ability to find its sibling, so that they are animated correctly
-        holder.expandableCardView.findSiblings = fun () : MutableList<ExpandableCardView> {
-            var nextCategory = if(position + 1 < currentList.size)
-                currentList[position + 1]
-            else
-                null
-            val siblingList = mutableListOf<ExpandableCardView>()
-            var cardView: ExpandableCardView? = null
-            // Collect all Card Views sequentially, until the first un-collapsed one
-            var i = 0
-            while(nextCategory != null) {
-                logDebug(logTag, "In loop")
-                cardView = (holder.expandableCardView.parent as View).findViewWithTag(nextCategory.keys.first())
-                        ?: break // We couldn't find the next category
-                if(cardView.collapsed)
-                    siblingList.add(cardView)
-                else
-                    break // We break at the first Card View that is not collapsed
-                // Next category
-                nextCategory = currentList[position + i++]
+        holder.findNextSiblings = fun () : MutableList<MaterialCardView> {
+            var pos = holder.bindingAdapterPosition
+            if(pos == RecyclerView.NO_POSITION) {
+                logDebug(logTag, "bindingAdapterPosition was NO_POSITION")
+                return mutableListOf()
+            } else {
+                val siblingList = mutableListOf<MaterialCardView>()
+                logDebug(logTag, "bindingAdapterPosition is $pos")
+                while(++pos < itemCount) {
+                    (((holder.cardView.parent as? RecyclerView)
+                        ?.findViewHolderForAdapterPosition(pos)) as? LetterCategoryCardViewHolder)?.cardView?.let {
+                            siblingList.add(it)
+                    }
+                }
+               return mutableListOf()
             }
-            if(cardView != null && !cardView.collapsed)
-                siblingList.add(cardView)
-
-            return siblingList
+//
+//            var nextCategory = if(position + 1 < currentList.size)
+//                currentList[position + 1]
+//            else
+//                null
+//            val siblingList = mutableListOf<ExpandableCardView>()
+//            var cardView: ExpandableCardView? = null
+//            // Collect all Card Views sequentially, until the first un-collapsed one
+//            var i = 0
+//            while(nextCategory != null) {
+//                logDebug(logTag, "In loop")
+//                cardView = (holder.expandableCardView.parent as View).findViewWithTag(nextCategory.keys.first())
+//                        ?: break // We couldn't find the next category
+//                if(cardView.collapsed)
+//                    siblingList.add(cardView)
+//                else
+//                    break // We break at the first Card View that is not collapsed
+//                // Next category
+//                nextCategory = currentList[position + i++]
+//            }
+//            if(cardView != null && !cardView.collapsed)
+//                siblingList.add(cardView)
+//
+//            return siblingList
         }
 
-        holder.expandableCardView.letterCategoryHeaderTextView.text = getItem(position).keys.first().replaceFirstChar {
-            if(it.isLowerCase())
-                it.titlecase()
-            else
-                it.toString()
-        }
+        holder.text = getItem(position).keys.first().upperCaseFirstLetter()
 
         initialiseLetterGrid(holder, position)
     }
@@ -145,26 +262,27 @@ class LetterCategoryAdapter(
         letterCategoryCardViewHolder: LetterCategoryCardViewHolder,
         position: Int,
     ) {
-        letterCategoryCardViewHolder.expandableCardView.letterGrid.apply {
+        letterCategoryCardViewHolder.letterGrid.apply {
             removeAllViews()
 
-            logDebug(logTag, "Position to get: $position")
+            logDebug(logTag, "Initialising letter grid for position: $position")
             val category = getItem(position).keys.first()
             val letterPairs: List<Pair<String, String>> = getItem(position)[category] ?: ArrayList()
             logDebug(logTag, "Current category: $category")
             logDebug(logTag, "Letter Pairs: $letterPairs")
             for(letterPair in letterPairs) {
                 val letterView: LetterPairView = LayoutInflater
-                    .from(letterCategoryCardViewHolder.expandableCardView.letterGrid.context)
+                    .from(letterCategoryCardViewHolder.letterGrid.context)
                     .inflate(R.layout.letter_pair_view,
-                        letterCategoryCardViewHolder.expandableCardView.letterGrid, false) as LetterPairView
+                        letterCategoryCardViewHolder.letterGrid, false) as LetterPairView
                 // letterView.setOnLongClickListener(letterOnLongClickListener(letterPair.first))
                 letterView.setOnLongClickListener { view ->
                     view.findNavController().navigate(letterOnLongClickAction(letterPair.first))
                     true
                 }
                 letterView.letters = letterPair
-                letterCategoryCardViewHolder.expandableCardView.letterGrid.addView(letterView)
+                letterView.tag = letterPair.first
+                letterCategoryCardViewHolder.letterGrid.addView(letterView)
             }
         }
     }

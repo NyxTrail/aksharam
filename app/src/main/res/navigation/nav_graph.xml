@@ -60,7 +60,7 @@
         android:id="@+id/letterInfoFragment"
         android:name="in.digistorm.aksharam.activities.main.fragments.letters.LetterInfoFragment"
         android:label="{letter} ({category})"
-        tools:layout="@layout/letter_info" >
+        tools:layout="@layout/fragment_letter_info" >
         <argument
             android:name="letter"
             app:argType="string" />
