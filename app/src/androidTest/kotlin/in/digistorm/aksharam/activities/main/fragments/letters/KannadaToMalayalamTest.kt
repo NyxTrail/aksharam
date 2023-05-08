@@ -20,7 +20,6 @@ class KannadaToMalayalamTest: LettersTabTest() {
         Log.d(logTag, "Selecting Kannada as the source language.")
         chooseLanguage("Kannada")
 
-        // Test a few Malayalam letters
         chooseTransliterationLanguage("Malayalam")
     }
 

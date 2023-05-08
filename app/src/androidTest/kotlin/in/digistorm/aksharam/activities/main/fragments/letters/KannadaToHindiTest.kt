@@ -23,7 +23,6 @@ class KannadaToHindiTest: LettersTabTest() {
 
         chooseLanguage("Kannada")
 
-        // Test a few Hindi letters
         chooseTransliterationLanguage("Hindi")
     }
 
@@ -63,7 +62,6 @@ class KannadaToHindiTest: LettersTabTest() {
         checkLetter("ನ", "न")
         scrollToCardAtPosition(2)
         checkLetter("ೀ", "ी")
-        // Single click after collapsion/expansion
         // Collapse Everything
         clickCardCategory(0, categories[0])
         clickCardCategory(1, categories[1])

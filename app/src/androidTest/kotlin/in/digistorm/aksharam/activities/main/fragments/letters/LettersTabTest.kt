@@ -48,6 +48,14 @@ open class LettersTabTest: AksharamTestBaseExp() {
         ).perform(scrollTo()).perform(click()).check(matches(withText(secondLetter)))
     }
 
+    protected fun checkLetterHidden(letter: String) {
+	onView(
+	    allOf(
+		instanceOf(LetterPairView::class.java),
+		withTagValue(`is`(letter))
+	    )).check(matches(not(isDisplayed())))
+    }
+    
     protected fun scrollToCardAtPosition(position: Int) {
         onView(withId(R.id.letter_categories)).perform(
             RecyclerViewActions.scrollToPosition<LetterCategoryAdapter.LetterCategoryCardViewHolder>(
