@@ -33,11 +33,23 @@ import androidx.lifecycle.ViewModelProvider
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.databinding.FragmentTransliterateBinding
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.Channel.Factory.CONFLATED
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+
+// Delay in milliseconds before sending new input text to view model.
+// The idea is to reduce the number of transliterations we have to do.
+private const val TEXT_COLLECTION_DELAY: Long = 300
 
 class TransliterateTabFragment : Fragment() {
     private val logTag = javaClass.simpleName
 
     private lateinit var binding: FragmentTransliterateBinding
+
+    private val textInputChannel = Channel<String>(CONFLATED)
 
     private val viewModel: TransliterateTabViewModel by viewModels {
         object: ViewModelProvider.Factory {
@@ -93,9 +105,20 @@ class TransliterateTabFragment : Fragment() {
 
                 override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable) {
-                    viewModel.currentInput.postValue(s.toString())
+                    CoroutineScope(Dispatchers.Default).launch {
+                        logDebug(logTag, "Sending string to testInput channel")
+                        textInputChannel.send(s.toString())
+                    }
                 }
         })
+
+        CoroutineScope(Dispatchers.Default).launch {
+            while(true) {
+                logDebug(logTag, "Collecting string from testInput channel.")
+                viewModel.currentInput.postValue(textInputChannel.receive())
+                delay(TEXT_COLLECTION_DELAY)
+            }
+        }
     }
 
     override fun onResume() {

@@ -26,7 +26,8 @@ import org.junit.Before
 enum class Visibility { VISIBLE, HIDDEN }
 
 @LargeTest
-open class LettersTabTest: AksharamTestBaseExp() {
+open class LettersTabTest {
+    open val logTag: String = this.javaClass.simpleName
 
     @Before
     open fun initialise() {
@@ -38,6 +39,17 @@ open class LettersTabTest: AksharamTestBaseExp() {
     @get: Rule
     var mainActivityRule: ActivityScenarioRule<MainActivity> =
         ActivityScenarioRule(MainActivity::class.java)
+
+    protected fun chooseLanguage(language: String): ViewInteraction {
+        Log.d(logTag, "Choosing language: $language")
+        onView(withId(R.id.language_selector)).perform(click())
+        return onData(`is`(language)).inRoot(RootMatchers.isPlatformPopup()).perform(click())
+    }
+
+    protected fun chooseTransliterationLanguage(language: String) {
+        onView(withId(R.id.convert_to_selector)).perform(click())
+        onData(`is`(language)).inRoot(RootMatchers.isPlatformPopup()).perform(click())
+    }
 
     protected fun checkLetter(firstLetter: String, secondLetter: String) {
         onView(
@@ -68,17 +80,6 @@ open class LettersTabTest: AksharamTestBaseExp() {
         scrollToCardAtPosition(position)
         Log.d(logTag, "SCROLLED TO: $category ")
         onView(withText(category)).perform(scrollTo()).perform(click())
-    }
-
-    protected fun chooseTransliterationLanguage(language: String) {
-        onView(withId(R.id.convert_to_selector)).perform(click())
-        onData(`is`(language)).inRoot(RootMatchers.isPlatformPopup()).perform(click())
-    }
-
-    protected fun chooseLanguage(language: String): ViewInteraction {
-        Log.d(logTag, "Choosing language: $language")
-        onView(withId(R.id.language_selector)).perform(click())
-        return onData(`is`(language)).inRoot(RootMatchers.isPlatformPopup()).perform(click())
     }
 
     protected fun longClickLetter(letter: String): ViewInteraction {
