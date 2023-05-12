@@ -60,10 +60,6 @@
         <item name="android:textStyle">normal</item>
     </style>
 
-    <style name="TextAppearance.Aksharam.BodyMedium" parent="TextAppearance.Material3.BodyMedium" >
-        <item name="android:textSize">50sp</item>
-    </style>
-
     <style name="Aksharam.TextView" parent="Widget.MaterialComponents.TextView">
         <item name="android:textSize">22sp</item>
     </style>
