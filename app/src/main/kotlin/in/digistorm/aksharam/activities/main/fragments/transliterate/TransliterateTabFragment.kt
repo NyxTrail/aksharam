@@ -57,7 +57,8 @@ class TransliterateTabFragment : Fragment() {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return (TransliterateTabViewModel(
                     application = requireActivity().application,
-                ) as? T) ?: throw Exception("ViewModelProvider.Factory: TransliterateTabViewModel could not be created.")
+                ) as? T) ?: throw Exception("ViewModelProvider.Factory: TransliterateTabViewModel " +
+                        "could not be created.")
             }
         }
     }
@@ -94,7 +95,7 @@ class TransliterateTabFragment : Fragment() {
         }
 
         // Live transliteration as each new character is entered into the input text box
-        (binding.inputTextField).addTextChangedListener(object : TextWatcher {
+        (binding.textInputLayout.editText)!!.addTextChangedListener(object : TextWatcher {
                 override fun beforeTextChanged(
                     s: CharSequence,
                     start: Int,

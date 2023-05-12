@@ -11,9 +11,11 @@ import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withHint
 import androidx.test.espresso.matcher.ViewMatchers.withId
+import androidx.test.espresso.matcher.ViewMatchers.withParent
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.google.android.material.textfield.TextInputEditText
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.MainActivity
 import kotlinx.coroutines.delay
@@ -59,22 +61,22 @@ class TransliterateTabTest {
             ))
     }
 
-    private fun checkInputTextFieldMatchesString(string: String) {
-        onView(withId(R.id.input_text_field))
+    private fun checkInputTextFieldMatchesString(stringToMatch: String) {
+        onView(withId(R.id.text_input_edit_text))
             .check(matches(
                 allOf(
-                    withHint(R.string.input_text_field),
-                    withText(string)
+                    withHint(R.string.transliteration_input_hint),
+                    withText(stringToMatch))
                 )
-            ))
+            )
     }
 
-    private fun checkOutputTextFieldMatchesString(string: String) {
+    private fun checkOutputTextFieldMatchesString(stringToMatch: String) {
         onView(withId(R.id.output_text_view))
             .check(matches(
                 allOf(
                     withHint(R.string.transliteration),
-                    withText(string)
+                    withText(stringToMatch)
                 )
             ))
 
@@ -91,7 +93,7 @@ class TransliterateTabTest {
         // Simulate typing by replacing the string character by character with
         // a small delay before a new character is input into the edit text.
         for(i in 1 .. text.length) {
-            onView(withId(R.id.input_text_field))
+            onView(withId(R.id.text_input_edit_text))
                 .perform(replaceText(text.substring(0, i)))
             runBlocking { delay(TYPING_DELAY) }
         }
@@ -99,7 +101,7 @@ class TransliterateTabTest {
     }
 
     private fun clearText() {
-        onView(withId(R.id.input_text_field))
+        onView(withId(R.id.text_input_edit_text))
             .perform(replaceText(""))
         runBlocking { delay(UI_WAIT_TIME) }
     }

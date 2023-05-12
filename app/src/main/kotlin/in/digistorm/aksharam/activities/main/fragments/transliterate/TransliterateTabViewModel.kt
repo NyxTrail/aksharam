@@ -2,6 +2,7 @@ package `in`.digistorm.aksharam.activities.main.fragments.transliterate
 
 import android.app.Application
 import androidx.lifecycle.*
+import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.language.*
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.activities.main.language.transliterate
@@ -19,6 +20,7 @@ class TransliterateTabViewModel(
 
     val currentInput: MutableLiveData<String> = MutableLiveData()
 
+    val error: MutableLiveData<String?> = MutableLiveData(null)
     val language: LiveData<Language?> = currentInput.switchMap {
         liveData(Dispatchers.IO) {
             if (languageDetector == null)

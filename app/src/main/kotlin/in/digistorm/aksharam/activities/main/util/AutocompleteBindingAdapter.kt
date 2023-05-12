@@ -4,6 +4,7 @@ import android.widget.ArrayAdapter
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
+import com.google.android.material.textfield.TextInputLayout
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.fragments.letters.LetterCategoryAdapter
 

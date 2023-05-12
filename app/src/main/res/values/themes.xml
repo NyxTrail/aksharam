@@ -59,4 +59,28 @@
         <item name="android:textSize">22sp</item>
         <item name="android:textStyle">normal</item>
     </style>
+
+    <style name="TextAppearance.Aksharam.BodyMedium" parent="TextAppearance.Material3.BodyMedium" >
+        <item name="android:textSize">50sp</item>
+    </style>
+
+    <style name="Aksharam.TextView" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style name="Aksharam.TextInputLayout.FilledBox" parent="Widget.Material3.TextInputLayout.FilledBox">
+        <item name="hintTextAppearance">@style/Aksharam.TextAppearance.BodySmall</item>
+    </style>
+
+    <style
+        name="Aksharam.TextAppearance.BodyMedium"
+        parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">22sp</item>
+    </style>
+
+    <style
+        name="Aksharam.TextAppearance.BodySmall"
+        parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">16sp</item>
+    </style>
 </resources>

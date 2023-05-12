@@ -42,14 +42,17 @@
             style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_margin="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
             android:hint="@string/transliterate_tab_info_default"
             android:orientation="vertical"
             android:enabled="false"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/text_input_layout">
             <com.google.android.material.textfield.MaterialAutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -58,39 +61,59 @@
                 android:text="@={viewModel.targetLanguageSelected}" />
         </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/input_text_field"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/text_input_layout"
+            style="@style/Aksharam.TextInputLayout.FilledBox"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:ems="10"
-            android:hint="@string/input_text_field"
+            android:hint="@string/transliteration_input_hint"
             android:inputType="text|textMultiLine"
             android:textColorHint="#78909C"
             android:textSize="@dimen/text_normal_size"
-            android:layout_margin="10dp"
-            android:lines="3"
+            android:layout_margin="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/language_spinner"
-            app:layout_constraintVertical_chainStyle="packed"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/output_text_view"
+            app:layout_constraintVertical_weight="1"
             android:importantForAutofill="no"
-            tools:hint="@string/input_text_field"/>
+            tools:hint="@string/transliteration_input_hint">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/text_input_edit_text"
+                style="@style/Aksharam.TextAppearance.BodyMedium"
+                android:gravity="top"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </com.google.android.material.textfield.TextInputLayout>
 
         <TextView
             android:id="@+id/output_text_view"
-            style="@style/Widget.MaterialComponents.TextView"
+            style="@style/Aksharam.TextView"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:hint="@string/transliteration"
             android:textColorHint="#78909C"
-            android:textSize="@dimen/text_normal_size"
             android:text="@{viewModel.transliteratedString}"
-            android:layout_marginTop="16dp"
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
+            android:paddingTop="8dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:textIsSelectable="true"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHeight_percent="0.40"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/input_text_field" />
+            app:layout_constraintTop_toBottomOf="@id/text_input_layout"
+            app:layout_constraintBottom_toTopOf="@id/space_at_bottom"
+            app:layout_constraintVertical_weight="1" />
+        <Space
+            android:id="@+id/space_at_bottom"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/output_text_view"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintVertical_weight="1" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
