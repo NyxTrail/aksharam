@@ -19,6 +19,8 @@
  */
 package `in`.digistorm.aksharam.activities.main.fragments.practice
 
+import android.content.res.ColorStateList
+import android.graphics.Color
 import `in`.digistorm.aksharam.R
 
 import android.view.LayoutInflater
@@ -60,7 +62,6 @@ class PracticeTabFragment : Fragment() {
             logDebug(logTag, "Refresh button clicked!")
             binding.practiceInputEditText.setText("")
             binding.practiceInputEditText.isEnabled = true
-            binding.practiceSuccess.visibility = View.GONE
             viewModel.generateNewPracticeString()
         }
 
@@ -70,16 +71,17 @@ class PracticeTabFragment : Fragment() {
             if(successCheck == true) {
                 logDebug(logTag, "Showing results and disabling text input.")
                 binding.practiceInputEditText.isEnabled = false
-                binding.practiceSuccess.visibility = View.VISIBLE
+                binding.practiceTextInputLayout.setEndIconDrawable(R.drawable.ic_baseline_check_green_24)
+                binding.practiceTextInputLayout.setEndIconTintList(ColorStateList.valueOf(Color.GREEN))
                 Snackbar.make(
-                    binding.practiceSuccess,
+                    binding.practiceTextInputLayout,
                     R.string.practice_tab_correct_text_entered,
-                    Snackbar.LENGTH_SHORT
+                    Snackbar.LENGTH_LONG
                 ).show()
             } else {
                 logDebug(logTag, "Hiding results and enabling text input.")
                 binding.practiceInputEditText.isEnabled = true
-                binding.practiceSuccess.visibility = View.GONE
+                binding.practiceTextInputLayout.endIconDrawable = null
             }
         }
 

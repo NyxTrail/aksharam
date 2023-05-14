@@ -11,7 +11,7 @@ import androidx.test.espresso.matcher.ViewMatchers.withId
 import org.hamcrest.Matcher
 
 open class AksharamTestBaseExp {
-    protected open val logTag: String = javaClass.simpleName
+    open val logTag: String = javaClass.simpleName
 
     /* Obtain text from a text view.
        https://stackoverflow.com/a/23467629

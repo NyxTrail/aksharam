@@ -50,10 +50,12 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
                 android:hint="@string/practice_tab_language_hint"
+                app:layout_constraintVertical_weight="1"
                 app:layout_constraintWidth_default="percent"
                 app:layout_constraintWidth_percent="0.45"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toTopOf="@id/practice_type_selector">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:layout_width="match_parent"
@@ -73,9 +75,10 @@
                 android:layout_marginTop="8dp"
                 android:contentDescription="@string/test_text"
                 app:layout_constraintWidth_default="percent"
-                app:layout_constraintWidth_percent="0.4"
+                app:layout_constraintWidth_percent="0.45"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent">
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="@id/language_selector">
 
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:layout_width="match_parent"
@@ -92,13 +95,14 @@
                 style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
+                android:layout_marginStart="16dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
                 android:contentDescription="@string/test_text"
-                app:layout_constraintWidth_default="percent"
-                app:layout_constraintWidth_percent="0.45"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/language_selector">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/language_selector"
+                app:layout_constraintBottom_toTopOf="@id/practice_text">
                 <com.google.android.material.textfield.MaterialAutoCompleteTextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -111,6 +115,26 @@
                     tools:text="Random Ligatures"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <TextView
+                android:id="@+id/practice_text"
+                style="@style/Aksharam.TextView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"
+                android:paddingTop="20dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
+                android:text="@{viewModel.practiceString}"
+                android:gravity="center_horizontal"
+                android:lines="4"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/practice_type_selector"
+                app:layout_constraintBottom_toTopOf="@id/practice_text_input_layout"
+                app:layout_constraintEnd_toStartOf="@id/refresh_button"
+                tools:text="ಖ ಖಾ ಖೆ ಖೇ ಖು ಖೂ ಖೃ ಖೆ ಖೇ ಖೊ ಖೋ ಖೌ ಖಂ ಖಃ"/>
+
             <Button
                 android:id="@+id/refresh_button"
                 style="?attr/materialIconButtonOutlinedStyle"
@@ -118,71 +142,47 @@
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
                 android:layout_marginTop="8dp"
+                android:layout_marginStart="16dp"
                 app:icon="@drawable/ic_outline_refresh_24"
+                app:layout_constraintStart_toEndOf="@id/practice_text"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/practice_in_selector" />
-
-            <androidx.appcompat.widget.LinearLayoutCompat
-                android:id="@+id/practice_text_container"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="32dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="4dp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/practice_type_selector"
-                app:layout_constraintEnd_toStartOf="@id/practice_success">
-                <TextView
-                    android:id="@+id/practice_text"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="4dp"
-                    android:text="@{viewModel.practiceString}"
-                    android:textSize="@dimen/text_normal_size"
-                    android:gravity="center"
-                    android:lines="5"
-                    tools:text="ಖ ಖಾ ಖೆ ಖೇ ಖು ಖೂ ಖೃ ಖೆ ಖೇ ಖೊ ಖೋ ಖೌ ಖಂ ಖಃ"/>
-            </androidx.appcompat.widget.LinearLayoutCompat>
-
-            <ImageView
-                android:id="@+id/practice_success"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="10dp"
-                android:elevation="5dp"
-                android:minWidth="30dp"
-                android:minHeight="48dp"
-                android:src="@drawable/ic_baseline_check_green_24"
-                android:visibility="gone"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@id/practice_text_container"
-                app:layout_constraintTop_toTopOf="@id/practice_text_container"
-                app:layout_constraintBottom_toBottomOf="@id/practice_text_container"
-                tools:visibility="visible" />
+                app:layout_constraintTop_toTopOf="@+id/practice_text"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/practice_text_input_layout"
+                style="@style/Aksharam.TextInputLayout.FilledBox"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
-                android:layout_marginTop="32dp"
+                android:layout_marginTop="8dp"
                 android:layout_marginEnd="10dp"
                 android:gravity="center"
                 android:padding="4dp"
+                app:endIconMode="custom"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/practice_text_container">
+                app:layout_constraintTop_toBottomOf="@id/practice_text"
+                app:layout_constraintBottom_toTopOf="@id/bottom_space">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/practice_input_edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:gravity="center"
-                    android:lines="2"
+                    android:gravity="center_horizontal"
+                    android:lines="5"
                     android:hint="@{@string/practice_tab_practice_input_hint(viewModel.practiceInSelected)}"
                     tools:hint="Practice in Malayalam"/>
             </com.google.android.material.textfield.TextInputLayout>
 
+            <Space
+                android:id="@+id/bottom_space"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/practice_text_input_layout"
+                app:layout_constraintBottom_toBottomOf="parent"
+                />
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.core.widget.NestedScrollView>
 </layout>

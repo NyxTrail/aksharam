@@ -38,19 +38,30 @@ class InputTextChangedListener(
         // If we reach here, user has not finished entering text
         var correctInProgress = true
 
-        // - CharSequence s is usually shorter than practiceString and transliteratedString.
-        // - TransliteratedString and practiceString may not always be of the same length.
+        // - CharSequence s is usually(?) shorter than practiceString and transliteratedString.
+        // - transliteratedString and practiceString may not always be of the same length.
         var positionInCopy = 0
         val spans: MutableList<Triple<Boolean, Int, Int>> = mutableListOf(Triple(true, 0, 0))
         for((positionInPracticeString: Int, char) in viewModel.practiceString.value!!.withIndex()) {
             if(positionInCopy >= s.length)
                 break
+            // Transliterate the next character in the practice string. The transliterated string may be
+            // more than one character in length.
             val transChar = transliterate(char.toString(),
                 viewModel.practiceInSelected.value!!, viewModel.language.value!!)
 
-            // get transChar.length characters from sCopy
+            // We should check these many characters in the string input by the user, starting from
+            // positionInCopy.
             var charsToCheck = ""
-            charsToCheck = s.substring(positionInCopy until (transChar.length + positionInCopy))
+            // While the user is typing the character combination for the transliteration of char,
+            // the transliteration (by user) is not complete. In this situation we do not have enough
+            // characters in s yet for a full transliteration.
+            val endIndex = if(transChar.length + positionInCopy > s.length)
+                s.length
+            else
+                transChar.length + positionInCopy
+
+            charsToCheck = s.substring(positionInCopy until endIndex)
             logDebug(logTag, "Characters to check: \"$charsToCheck\"")
             positionInCopy += transChar.length
 
