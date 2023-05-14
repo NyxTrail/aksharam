@@ -38,6 +38,9 @@ open class PracticeTabTest: AksharamTestBaseExp() {
     open fun initialise() {
         Log.d(logTag, "Selecting the practice tab.")
         onView(withText(R.string.practice_tab_header)).perform(click())
+        // Without this wait, during second test the click on language_selector (which is the next action
+        // in most tests) does not happen.
+        runBlocking { delay(UI_WAIT_TIME) }
     }
 
     protected fun chooseLanguage(language: String): ViewInteraction {
