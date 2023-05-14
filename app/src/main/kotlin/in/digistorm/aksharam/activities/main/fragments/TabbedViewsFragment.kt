@@ -2,8 +2,10 @@ package `in`.digistorm.aksharam.activities.main.fragments
 
 import android.os.Bundle
 import android.view.*
+import androidx.appcompat.widget.PopupMenu
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.onNavDestinationSelected
@@ -49,6 +51,26 @@ class TabbedViewsFragment: Fragment() {
         logDebug(logTag, "onViewCreated")
         goToInitialisationScreenIfNoDownloadedFiles()
 
+        binding.moreOptions.setOnClickListener {
+            PopupMenu(requireContext(), binding.moreOptions, Gravity.TOP).apply {
+                inflate(R.menu.action_bar_menu)
+                setOnMenuItemClickListener {
+                    when(it.itemId) {
+                        R.id.settingsFragment -> findNavController().navigate(
+                            TabbedViewsFragmentDirections.actionTabbedViewsFragmentToSettingsFragment()
+                        )
+                        R.id.helpFragment -> findNavController().navigate(
+                            TabbedViewsFragmentDirections.actionTabbedViewsFragmentToHelpFragment()
+                        )
+                        R.id.privacyPolicyFragment -> findNavController().navigate(
+                            TabbedViewsFragmentDirections.actionTabbedViewsFragmentToPrivacyPolicyFragment()
+                        )
+                    }
+                    true
+                }
+                show()
+            }
+        }
         pageCollectionAdapter = PageCollectionAdapter(this)
         binding.pager.adapter = pageCollectionAdapter
         binding.tabLayout.addOnTabSelectedListener(TabSelectedListener())
@@ -57,28 +79,6 @@ class TabbedViewsFragment: Fragment() {
             binding.pager
         ) { tab: TabLayout.Tab, position: Int -> tab.text = tabHeads[position] }
             .attach()
-
-        setUpMenus()
-        val navController = findNavController()
-        binding.toolbar.setupWithNavController(
-            navController,
-            AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
-        )
-    }
-
-    private fun setUpMenus() {
-        binding.toolbar.addMenuProvider(object : MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                logDebug(logTag, "Menu created!")
-                menuInflater.inflate(R.menu.action_bar_menu, menu)
-            }
-
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                logDebug(logTag, "Menu Item selected: $menuItem")
-                return menuItem.onNavDestinationSelected(findNavController())
-            }
-
-        }, viewLifecycleOwner)
     }
 
     override fun onResume() {

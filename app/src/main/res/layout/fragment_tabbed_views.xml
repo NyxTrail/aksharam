@@ -12,27 +12,24 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar_layout"
-            android:layout_width="match_parent"
-            android:layout_height="60dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-               <androidx.appcompat.widget.Toolbar
-                   android:id="@+id/toolbar"
-                   android:layout_width="match_parent"
-                   android:layout_height="match_parent"
-                   app:layout_collapseMode="pin"
-                   android:elevation="10dp"/>
-        </com.google.android.material.appbar.AppBarLayout>
-
         <com.google.android.material.tabs.TabLayout
             android:id="@+id/tab_layout"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/app_bar_layout"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent" />
+            app:layout_constraintEnd_toStartOf="@id/more_options" />
+
+        <ImageView
+            android:id="@+id/more_options"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/more_options"
+            android:layout_margin="4dp"
+            app:layout_constraintStart_toEndOf="@id/tab_layout"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="@id/tab_layout"
+            app:layout_constraintBottom_toBottomOf="@id/tab_layout" />
 
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/pager"

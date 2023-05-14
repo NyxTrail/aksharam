@@ -27,11 +27,6 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/dark_light_mode"
-        android:title="@string/dark_light_mode"
-        android:icon="@drawable/ic_outline_brightness_medium_24"
-        app:showAsAction="ifRoom" />
-    <item
         android:id="@+id/settingsFragment"
         android:title="@string/settings"
         android:icon="@drawable/ic_baseline_settings_24" />
