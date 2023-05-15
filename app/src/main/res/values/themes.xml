@@ -79,4 +79,11 @@
         parent="TextAppearance.Material3.BodySmall">
         <item name="android:textSize">16sp</item>
     </style>
+    <style name="Aksharam.Button.IconButton" parent="Widget.Material3.Button.IconButton">
+        <item name="shapeAppearance">@style/Aksharam.Shape.circular</item>
+    </style>
+    <style name="Aksharam.Shape.circular"
+        parent="ShapeAppearance.Material3.Corner.Full">
+        <item name="cornerSize">100%</item>
+    </style>
 </resources>
