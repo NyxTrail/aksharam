@@ -37,7 +37,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/language_selector"
-            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
@@ -57,7 +57,7 @@
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/convert_to_selector"
-            style="@style/Widget.Material3.TextInputLayout.FilledBox.Dense.ExposedDropdownMenu"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox.Dense.ExposedDropdownMenu"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="8dp"
