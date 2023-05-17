@@ -30,10 +30,11 @@
 
     <in.digistorm.aksharam.activities.main.fragments.letters.LetterPairView
         android:id="@+id/letter_pair_view"
-        style="@style/LetterViewSmall"
+        style="@style/Aksharam.LetterButton"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_margin="4dp"
         android:text="@string/test_text"
+        android:textSize="20sp"
         android:gravity="center" />
 </layout>

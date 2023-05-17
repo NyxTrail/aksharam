@@ -91,6 +91,8 @@
     <color name="md_theme_dark_outlineVariant">#514347</color>
     <color name="md_theme_dark_scrim">#000000</color>
 
+    <color name="ripple">#75000000</color>
+
     <color name="text_green">#FF7FFF00</color>
     <color name="text_red">#FFDC143C</color>
 </resources>

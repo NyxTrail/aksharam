@@ -30,7 +30,7 @@
 
     <in.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
         android:id="@+id/letter_view"
-        style="@style/LetterViewSmall"
+        style="@style/Aksharam.LetterButton"
         android:layout_width="45dp"
         android:layout_height="45dp"
         android:layout_margin="4dp"

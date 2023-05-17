@@ -86,4 +86,11 @@
         parent="ShapeAppearance.Material3.Corner.Full">
         <item name="cornerSize">100%</item>
     </style>
+
+    <style name="Aksharam.LetterButton"
+        parent="Widget.MaterialComponents.TextView">
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">@drawable/ripple</item>
+    </style>
 </resources>
