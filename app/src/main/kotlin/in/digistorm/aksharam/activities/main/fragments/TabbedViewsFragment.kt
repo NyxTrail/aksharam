@@ -91,9 +91,11 @@ class TabbedViewsFragment: Fragment() {
         // if there are no downloaded files, switch to initialisation screen
         if (getDownloadedLanguages(requireContext()).isEmpty()) {
             logDebug(logTag, "No files found in data directory. Switching to initialisation screen.")
-            findNavController().navigate(
-                TabbedViewsFragmentDirections.actionTabbedViewsFragmentToInitialisationScreen())
-            // if(findNavController().currentDestination?.id != R.id.initialisationScreen)
+            if(findNavController().currentDestination?.id == R.id.tabbedViewsFragment)
+                findNavController().navigate(
+                    TabbedViewsFragmentDirections.actionTabbedViewsFragmentToInitialisationScreen())
+            else
+                logDebug(logTag, "Already navigated to initialisation screen.")
         }
     }
 }
