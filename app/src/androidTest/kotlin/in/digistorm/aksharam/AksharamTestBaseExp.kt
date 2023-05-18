@@ -10,6 +10,11 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import org.hamcrest.Matcher
 
+// Delay in milliseconds before updating EdiText with new string.
+const val TYPING_DELAY: Long = 10
+// Delay in milliseconds to wait UI update before continuing tests.
+const val UI_WAIT_TIME: Long = 500
+
 open class AksharamTestBaseExp {
     open val logTag: String = javaClass.simpleName
 

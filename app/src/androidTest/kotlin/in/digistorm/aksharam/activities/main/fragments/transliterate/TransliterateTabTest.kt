@@ -11,12 +11,13 @@ import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.hasDescendant
 import androidx.test.espresso.matcher.ViewMatchers.withHint
 import androidx.test.espresso.matcher.ViewMatchers.withId
-import androidx.test.espresso.matcher.ViewMatchers.withParent
 import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.google.android.material.textfield.TextInputEditText
+import `in`.digistorm.aksharam.AksharamTestBaseExp
 import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.TYPING_DELAY
+import `in`.digistorm.aksharam.UI_WAIT_TIME
 import `in`.digistorm.aksharam.activities.main.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -26,11 +27,6 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-
-// Delay in milliseconds before updating EdiText with new string.
-private const val TYPING_DELAY: Long = 10
-// Delay in milliseconds to wait UI update before continuing tests.
-private const val UI_WAIT_TIME: Long = 500
 
 @RunWith(AndroidJUnit4::class)
 class TransliterateTabTest {
