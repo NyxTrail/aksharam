@@ -29,7 +29,10 @@ import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.findNavController
+import androidx.test.espresso.IdlingResource
+import androidx.test.espresso.idling.CountingIdlingResource
 import `in`.digistorm.aksharam.activities.main.fragments.initialise.InitialisationScreenDirections
+import `in`.digistorm.aksharam.activities.main.util.IdlingResourceHelper
 
 class MainActivity : AppCompatActivity() {
     private val logTag = javaClass.simpleName
@@ -61,5 +64,9 @@ class MainActivity : AppCompatActivity() {
     public override fun onResume() {
         logDebug(logTag, "onResume")
         super.onResume()
+    }
+
+    public fun getIdlingResource(): CountingIdlingResource {
+        return IdlingResourceHelper.countingIdlingResource
     }
 }

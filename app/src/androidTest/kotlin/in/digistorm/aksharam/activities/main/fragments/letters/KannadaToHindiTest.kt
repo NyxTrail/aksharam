@@ -17,10 +17,8 @@ class KannadaToHindiTest: LettersTabTest() {
 
     @Before
     override fun initialise() {
-        // Make sure we are on the letters tab.
-        Log.d(logTag, "Selecting the letters tab.")
-        onView(withText(R.string.letters_tab_header)).perform(click())
-
+        super.initialise()
+        Log.d(logTag, "Selecting Kannada as the source language.")
         chooseLanguage("Kannada")
 
         chooseTransliterationLanguage("Hindi")

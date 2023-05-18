@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.test.espresso.AmbiguousViewMatcherException
 import androidx.test.espresso.Espresso.onData
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
@@ -12,15 +13,17 @@ import androidx.test.espresso.assertion.PositionAssertions.isBottomAlignedWith
 import androidx.test.espresso.assertion.PositionAssertions.isTopAlignedWith
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
+import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.espresso.matcher.RootMatchers
+import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.LargeTest
-import `in`.digistorm.aksharam.AksharamTestBaseExp
 import `in`.digistorm.aksharam.activities.main.MainActivity
 import org.hamcrest.Matchers.*
 import org.junit.Rule
 import `in`.digistorm.aksharam.R
+import org.junit.After
 import org.junit.Before
 
 enum class Visibility { VISIBLE, HIDDEN }
@@ -29,11 +32,24 @@ enum class Visibility { VISIBLE, HIDDEN }
 open class LettersTabTest {
     open val logTag: String = this.javaClass.simpleName
 
+    var idlingResource: CountingIdlingResource? = null
+
     @Before
     open fun initialise() {
+        mainActivityRule.scenario.onActivity {
+            idlingResource = it.getIdlingResource()
+            IdlingRegistry.getInstance().register(idlingResource)
+        }
+
         // Make sure we are on the letters tab.
         Log.d(logTag, "Selecting the letters tab.")
         onView(withText(R.string.letters_tab_header)).perform(click())
+    }
+
+    @After
+    open fun releaseIdlingResource() {
+        if(idlingResource != null)
+            IdlingRegistry.getInstance().unregister(idlingResource)
     }
 
     @get: Rule
@@ -43,12 +59,16 @@ open class LettersTabTest {
     protected fun chooseLanguage(language: String): ViewInteraction {
         Log.d(logTag, "Choosing language: $language")
         onView(withId(R.id.language_selector)).perform(click())
-        return onData(`is`(language)).inRoot(RootMatchers.isPlatformPopup()).perform(click())
+        return onData(`is`(language))
+            .inRoot(RootMatchers.isPlatformPopup())
+            .perform(click())
     }
 
     protected fun chooseTransliterationLanguage(language: String) {
         onView(withId(R.id.convert_to_selector)).perform(click())
-        onData(`is`(language)).inRoot(RootMatchers.isPlatformPopup()).perform(click())
+        onData(`is`(language))
+            .inRoot(RootMatchers.isPlatformPopup())
+            .perform(click())
     }
 
     protected fun checkLetter(firstLetter: String, secondLetter: String) {
