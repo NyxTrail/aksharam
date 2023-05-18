@@ -165,13 +165,17 @@ open class LettersTabTest {
     }
 
     protected fun checkLigaturesWithLetterAsPrefixHidden() {
-        onView(withId(R.id.ligatures_with_letter_as_prefix_tv)).check(matches(not(isDisplayed())))
-        onView(withId(R.id.ligatures_with_letter_as_prefix_gl)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.ligatures_with_letter_as_prefix_tv))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
+        onView(withId(R.id.ligatures_with_letter_as_prefix_gl))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
     }
 
     protected fun checkLigaturesWithLetterAsSuffixHidden() {
-        onView(withId(R.id.ligatures_with_letter_as_suffix_tv)).check(matches(not(isDisplayed())))
-        onView(withId(R.id.ligatures_with_letter_as_suffix_gl)).check(matches(not(isDisplayed())))
+        onView(withId(R.id.ligatures_with_letter_as_suffix_tv))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
+        onView(withId(R.id.ligatures_with_letter_as_suffix_gl))
+            .check(matches(withEffectiveVisibility(ViewMatchers.Visibility.GONE)))
     }
 
     protected fun checkInfoHidden() {

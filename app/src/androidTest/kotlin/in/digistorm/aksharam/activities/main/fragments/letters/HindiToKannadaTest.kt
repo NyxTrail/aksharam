@@ -88,8 +88,8 @@ class HindiToKannadaTest: LettersTabTest() {
         checkWordAndMeaningDisplayed("धरती", "ಧರತೀ", "ಭೂಮಿ")
         checkInfoHidden()
         checkCombineConsonantWithVowelSigns("ध", listOf("ा", "ै", "ी"))
-        checkLigaturesWithLetterAsPrefixHidden()
-        checkLigaturesWithLetterAsSuffixHidden()
+        checkConsonantAsSuffix("ध", "्", listOf("ध", "द", "ण", "न"))
+        checkConsonantAsPrefix("ध", "्", listOf("ध", "द", "ण", "न"))
         onView(withId(R.id.letter_info_container)).perform(pressBack())
 
         // Check ligatures
