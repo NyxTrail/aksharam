@@ -225,30 +225,6 @@ class LetterCategoryAdapter(
                 }
                return mutableListOf()
             }
-//
-//            var nextCategory = if(position + 1 < currentList.size)
-//                currentList[position + 1]
-//            else
-//                null
-//            val siblingList = mutableListOf<ExpandableCardView>()
-//            var cardView: ExpandableCardView? = null
-//            // Collect all Card Views sequentially, until the first un-collapsed one
-//            var i = 0
-//            while(nextCategory != null) {
-//                logDebug(logTag, "In loop")
-//                cardView = (holder.expandableCardView.parent as View).findViewWithTag(nextCategory.keys.first())
-//                        ?: break // We couldn't find the next category
-//                if(cardView.collapsed)
-//                    siblingList.add(cardView)
-//                else
-//                    break // We break at the first Card View that is not collapsed
-//                // Next category
-//                nextCategory = currentList[position + i++]
-//            }
-//            if(cardView != null && !cardView.collapsed)
-//                siblingList.add(cardView)
-//
-//            return siblingList
         }
 
         holder.text = getItem(position).keys.first().upperCaseFirstLetter()
@@ -275,7 +251,6 @@ class LetterCategoryAdapter(
                     .from(letterCategoryCardViewHolder.letterGrid.context)
                     .inflate(R.layout.letter_pair_view,
                         letterCategoryCardViewHolder.letterGrid, false) as LetterPairView
-                // letterView.setOnLongClickListener(letterOnLongClickListener(letterPair.first))
                 letterView.setOnLongClickListener { view ->
                     view.findNavController().navigate(letterOnLongClickAction(letterPair.first))
                     true

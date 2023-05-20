@@ -80,7 +80,6 @@ class LetterInfoFragment : Fragment() {
     }
 
     // Set up the LetterInfo dialog
-    @SuppressLint("SetTextI18n")
     private fun setUp(inflater: LayoutInflater) {
         logDebug(logTag, "Showing info dialog for: ${args.letter}")
 

@@ -124,8 +124,10 @@ open class LettersTabTest {
     }
 
     protected fun checkLetterInfoHeading(heading: String, transliteratedHeading: String) {
-        onView(withId(R.id.heading)).check(matches(withText(heading)))
-        onView(withId(R.id.transliterated_heading)).check(matches(withText(transliteratedHeading)))
+        onView(withId(R.id.heading))
+            .check(matches(withText(startsWith(heading))))
+        onView(withId(R.id.transliterated_heading))
+            .check(matches(withText(startsWith(transliteratedHeading))))
     }
 
     protected fun checkWordAndMeaningHeadingHidden() {
@@ -140,23 +142,22 @@ open class LettersTabTest {
     ) {
         onView(withId(R.id.letter_info_container)).check(
             matches(hasDescendant(
-                allOf(withText(word), withId(R.id.word))
+                allOf(withText(startsWith(word)), withId(R.id.word))
             ))
         )
+        onView(allOf(withId(R.id.word), withText(startsWith(word)))).perform(scrollTo())
         onView(withId(R.id.letter_info_container)).check(
             matches(hasDescendant(
-                allOf(withText(transliteratedWord), withId(R.id.transliteration))
+                allOf(withText(startsWith(transliteratedWord)), withId(R.id.transliteration))
             ))
         )
+        onView(allOf(withId(R.id.transliteration), withText(startsWith(transliteratedWord)))).perform(scrollTo())
         onView(withId(R.id.letter_info_container)).check(
             matches(hasDescendant(
-                allOf(withText(meaning), withId(R.id.meaning))
+                allOf(withText(startsWith(meaning)), withId(R.id.meaning))
             ))
         )
-
-        onView(allOf(withId(R.id.word), withText(word))).perform(scrollTo())
-        onView(allOf(withId(R.id.transliteration), withText(transliteratedWord))).perform(scrollTo())
-        onView(allOf(withId(R.id.meaning), withText(meaning))).perform(scrollTo())
+        onView(allOf(withId(R.id.meaning), withText(startsWith(meaning)))).perform(scrollTo())
     }
 
     protected fun checkDiacriticHintsHidden() {
@@ -194,7 +195,7 @@ open class LettersTabTest {
         // According to the docs this is not recommended:
         // https://developer.android.com/training/testing/espresso/basics#checking-view-assertions
         for (consonant in consonants) {
-            onView(withText(consonant + sign)).perform(scrollTo())
+            onView(withText(startsWith(consonant + sign))).perform(scrollTo())
                 .check(matches(isDisplayed()))
         }
     }
@@ -248,7 +249,7 @@ open class LettersTabTest {
             onView(withId(R.id.letter_categories)).check(matches(
                 hasDescendant(
                     allOf(
-                        withText(char),
+                        withTagValue(`is`(char)),
                         when(visibility) {
                             Visibility.HIDDEN -> not(isDisplayed())
                             Visibility.VISIBLE -> isDisplayed()

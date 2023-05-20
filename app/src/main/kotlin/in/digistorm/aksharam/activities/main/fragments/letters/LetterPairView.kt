@@ -52,7 +52,7 @@ class LetterPairView: AutoAdjustingTextView, View.OnClickListener {
 
     /* Switch letter and transliterated letter on click. */
     override fun onClick(v: View?) {
-        logDebug(logTag, "$text clicked")
+        logDebug(logTag, "\"$text\" clicked")
         if(letters != null) {
             /* Letter is currently shown. Show transliterated letter now. */
             if(letterShown) {

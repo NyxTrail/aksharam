@@ -49,10 +49,10 @@ open class AutoAdjustingTextView : AppCompatTextView {
         get() {
             val _text: CharSequence = super.getText()
             if(_text.toString().contains('\u00A0')) {
-                logNBSPIssue("Text contains a non-breaking space (\\u00A0) when getting text: $_text")
+                logNBSPIssue("Text contains a non-breaking space (\\u00A0) at pos: ${_text.indexOf('\u00A0')}when getting text: $_text")
                 return _text.removeSuffix("\u00A0").toString()
             }
-            logNBSPIssue("nbsp not found when getting text")
+            logNBSPIssue("nbsp not found when getting text: \"$_text\"")
             return _text.toString()
         }
         protected set(value) {
@@ -60,11 +60,8 @@ open class AutoAdjustingTextView : AppCompatTextView {
                 logNBSPIssue("Text contains a non-breaking space (\\u00A0) when setting text: $value")
                 super.setText(value.removeSuffix("\u00A0"))
             }
-            logNBSPIssue("nbsp not found when setting text")
+            logNBSPIssue("nbsp not found when setting text: \"$value\"")
             super.setText(value)
-
-            if (super.getText().contains("\u00A0"))
-                logNBSPIssue("text already contains nbsp")
         }
 
     override fun onDraw(canvas: Canvas) {
