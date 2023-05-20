@@ -31,9 +31,7 @@ import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
 import `in`.digistorm.aksharam.activities.main.language.getLanguageData
 import `in`.digistorm.aksharam.activities.main.language.transliterate
 import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
-import `in`.digistorm.aksharam.activities.main.util.IdlingResourceHelper
 import `in`.digistorm.aksharam.activities.main.util.logDebug
-import `in`.digistorm.aksharam.activities.main.util.trackedLiveData
 import kotlinx.coroutines.Dispatchers
 import java.util.concurrent.atomic.AtomicBoolean
 
@@ -55,29 +53,8 @@ class LettersTabViewModel(
     // The currently selected language in the UI
     val languageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
-    private var resourceAcquired: AtomicBoolean = AtomicBoolean(false)
-
-    private fun acquireIdlingResource() {
-        synchronized(resourceAcquired) {
-            if(!resourceAcquired.get()) {
-                IdlingResourceHelper.countingIdlingResource.increment()
-                resourceAcquired.set(true)
-            }
-        }
-    }
-
-    private fun releaseIdlingResource() {
-        synchronized(resourceAcquired) {
-            if(resourceAcquired.get()) {
-                IdlingResourceHelper.countingIdlingResource.decrement()
-                resourceAcquired.set(false)
-            }
-        }
-    }
-
     // The actual language data.
     val language: LiveData<Language?> = languageSelected.switchMap { newLanguage ->
-        acquireIdlingResource()
         liveData(Dispatchers.Default) {
             newLanguage?.let{
                 logDebug(logTag, "Fetching data for $newLanguage")
@@ -121,7 +98,7 @@ class LettersTabViewModel(
             }
             logDebug(logTag, "Category list created: $categories")
             emit(categories)
-            releaseIdlingResource()
+            // releaseIdlingResource()
         }
     }
 

@@ -18,7 +18,7 @@ class HindiToMalayalamTest: LettersTabTest() {
     @Before
     override fun initialise() {
         super.initialise()
-        Log.d(logTag, "Selecting Malayalam as the source language.")
+        Log.d(logTag, "Selecting Hindi as the source language.")
         chooseLanguage("Hindi")
 
         chooseTransliterationLanguage("Malayalam")
@@ -121,6 +121,7 @@ class HindiToMalayalamTest: LettersTabTest() {
         // Check a vowel sign
         scrollToCardAtPosition(2)
         checkLetter("े", "േ")
+        checkLetter("ू", "ൂ")
 
         // Collapse Everything
         clickCardCategory(0, categories[0])

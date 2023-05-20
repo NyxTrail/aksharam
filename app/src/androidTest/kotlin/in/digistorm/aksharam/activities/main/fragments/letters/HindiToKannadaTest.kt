@@ -1,7 +1,6 @@
 package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import android.util.Log
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.pressBack
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.withId
@@ -18,7 +17,7 @@ class HindiToKannadaTest: LettersTabTest() {
     @Before
     override fun initialise() {
         super.initialise()
-        Log.d(logTag, "Selecting Malayalam as the source language.")
+        Log.d(logTag, "Selecting Hindi as the source language.")
         chooseLanguage("Hindi")
 
         chooseTransliterationLanguage("Kannada")
@@ -121,6 +120,7 @@ class HindiToKannadaTest: LettersTabTest() {
         // Check a vowel sign
         scrollToCardAtPosition(2)
         checkLetter("े", "ೇ")
+        checkLetter("ू", "ೂ")
 
         // Collapse Everything
         clickCardCategory(0, categories[0])

@@ -15,12 +15,9 @@ import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import `in`.digistorm.aksharam.AksharamTestBaseExp
+import `in`.digistorm.aksharam.DELAYS
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.TYPING_DELAY
-import `in`.digistorm.aksharam.UI_WAIT_TIME
 import `in`.digistorm.aksharam.activities.main.MainActivity
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.allOf
 import org.hamcrest.Matchers.`is`
 import org.junit.Before
@@ -29,8 +26,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class TransliterateTabTest {
-    private val logTag: String = this.javaClass.simpleName
+class TransliterateTabTest: AksharamTestBaseExp() {
+    override val logTag: String = this.javaClass.simpleName
 
     @get: Rule
     var mainActivityRule: ActivityScenarioRule<MainActivity> =
@@ -91,15 +88,15 @@ class TransliterateTabTest {
         for(i in 1 .. text.length) {
             onView(withId(R.id.text_input_edit_text))
                 .perform(replaceText(text.substring(0, i)))
-            runBlocking { delay(TYPING_DELAY) }
+            DELAYS.TYPING_DELAY.waitVeryShortDuration()
         }
-        runBlocking { delay(UI_WAIT_TIME) }
+        DELAYS.UI_WAIT_TIME.waitLongDuration()
     }
 
     private fun clearText() {
         onView(withId(R.id.text_input_edit_text))
             .perform(replaceText(""))
-        runBlocking { delay(UI_WAIT_TIME) }
+        DELAYS.UI_WAIT_TIME.waitShortDuration()
     }
 
     private fun checkTransliterationMatches(string: String) {

@@ -1,9 +1,7 @@
 package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import android.util.Log
-import androidx.test.espresso.AmbiguousViewMatcherException
 import androidx.test.espresso.Espresso.onData
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
@@ -19,6 +17,8 @@ import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.LargeTest
+import `in`.digistorm.aksharam.AksharamTestBaseExp
+import `in`.digistorm.aksharam.DELAYS
 import `in`.digistorm.aksharam.activities.main.MainActivity
 import org.hamcrest.Matchers.*
 import org.junit.Rule
@@ -29,27 +29,15 @@ import org.junit.Before
 enum class Visibility { VISIBLE, HIDDEN }
 
 @LargeTest
-open class LettersTabTest {
-    open val logTag: String = this.javaClass.simpleName
-
-    var idlingResource: CountingIdlingResource? = null
+open class LettersTabTest: AksharamTestBaseExp() {
+    override val logTag: String = this.javaClass.simpleName
 
     @Before
     open fun initialise() {
-        mainActivityRule.scenario.onActivity {
-            idlingResource = it.getIdlingResource()
-            IdlingRegistry.getInstance().register(idlingResource)
-        }
-
         // Make sure we are on the letters tab.
         Log.d(logTag, "Selecting the letters tab.")
         onView(withText(R.string.letters_tab_header)).perform(click())
-    }
-
-    @After
-    open fun releaseIdlingResource() {
-        if(idlingResource != null)
-            IdlingRegistry.getInstance().unregister(idlingResource)
+        DELAYS.UI_WAIT_TIME.waitShortDuration()
     }
 
     @get: Rule
@@ -62,6 +50,9 @@ open class LettersTabTest {
         return onData(`is`(language))
             .inRoot(RootMatchers.isPlatformPopup())
             .perform(click())
+            .also {
+                DELAYS.UI_WAIT_TIME.waitShortDuration()
+            }
     }
 
     protected fun chooseTransliterationLanguage(language: String) {
@@ -69,6 +60,9 @@ open class LettersTabTest {
         onData(`is`(language))
             .inRoot(RootMatchers.isPlatformPopup())
             .perform(click())
+            .also {
+                DELAYS.UI_WAIT_TIME.waitShortDuration()
+            }
     }
 
     protected fun checkLetter(firstLetter: String, secondLetter: String) {
@@ -77,7 +71,10 @@ open class LettersTabTest {
                 instanceOf(LetterPairView::class.java),
                 withTagValue(`is`(firstLetter))
             )
-        ).perform(scrollTo()).perform(click()).check(matches(withText(secondLetter)))
+        )
+            .perform(scrollTo())
+            .perform(click())
+            .check(matches(withText(secondLetter)))
     }
 
     protected fun checkLetterHidden(letter: String) {
@@ -94,28 +91,24 @@ open class LettersTabTest {
                 position
             )
         )
+        DELAYS.UI_WAIT_TIME.waitShortDuration()
     }
 
-    protected fun clickCardCategory(position: Int, category: String) {
+    protected fun clickCardCategory(position: Int, category: String, retrying: Boolean = false) {
         scrollToCardAtPosition(position)
         Log.d(logTag, "SCROLLED TO: $category ")
         onView(withText(category)).perform(scrollTo()).perform(click())
     }
 
     protected fun longClickLetter(letter: String): ViewInteraction {
-        try {
-            return onView(
-                allOf(
-                    instanceOf(LetterPairView::class.java),
-                    withTagValue(`is`(letter))
-                )
+        return onView(
+            allOf(
+                instanceOf(LetterPairView::class.java),
+                withTagValue(`is`(letter))
             )
-                .perform(scrollTo())
-                .perform(longClick())
-        } catch (e: AmbiguousViewMatcherException) {
-            Log.d("huh", "What is going on here?")
-            throw e
-        }
+        )
+            .perform(scrollTo())
+            .perform(longClick())
     }
 
     protected fun checkLetterInfoHeadingAlignment() {
