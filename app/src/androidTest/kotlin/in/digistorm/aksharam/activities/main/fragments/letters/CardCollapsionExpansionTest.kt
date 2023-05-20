@@ -55,7 +55,7 @@ class CardCollapsionExpansionTest: LettersTabTest() {
         val charsToTest = listOf(
             listOf("ആ", "ഈ", "അം", "അഃ"),
             listOf("ച", "ങ", "ഗ", "ഷ", "ഴ"),
-            listOf("ാ", "ു", "ൃ", "ൈ", "ൌ"),
+            listOf("ാ", "ു", "ൃ", "ൈ", "ൊ", "ൌ"),
             listOf("ൺ", "ൻ", "ൽ", "ൾ", "ർ"),
             listOf("ട്ട", "ള്ള", "ണ്ണ", "ഞ്ച", "റ്റ", "ന്റ")
         )
