@@ -14,7 +14,7 @@ private const val logTag: String = "AutoCompleteBindingAdapter"
 fun MaterialAutoCompleteTextView.writeSimpleItems(
     oldItems: List<String>?,
     oldText: String?,
-    newItems: List<String>?, // TODO: null issues in practice tab
+    newItems: List<String>?,
     newText: String?,
 ) {
     logDebug(logTag, "writeSimpleItems")

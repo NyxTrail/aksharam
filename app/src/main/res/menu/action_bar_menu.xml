@@ -24,8 +24,7 @@
 
 <!-- The menu item id's here must match the id's of the fragments defined in
   navigation/nav_graph.xml for automatic navigation to work. -->
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/settingsFragment"
         android:title="@string/settings"

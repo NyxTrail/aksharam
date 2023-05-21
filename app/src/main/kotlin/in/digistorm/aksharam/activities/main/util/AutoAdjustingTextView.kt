@@ -49,7 +49,8 @@ open class AutoAdjustingTextView : AppCompatTextView {
         get() {
             val _text: CharSequence = super.getText()
             if(_text.toString().contains('\u00A0')) {
-                logNBSPIssue("Text contains a non-breaking space (\\u00A0) at pos: ${_text.indexOf('\u00A0')}when getting text: $_text")
+                logNBSPIssue("Text contains a non-breaking space (\\u00A0) at pos: " +
+                        "${_text.indexOf('\u00A0')}when getting text: $_text")
                 return _text.removeSuffix("\u00A0").toString()
             }
             logNBSPIssue("nbsp not found when getting text: \"$_text\"")

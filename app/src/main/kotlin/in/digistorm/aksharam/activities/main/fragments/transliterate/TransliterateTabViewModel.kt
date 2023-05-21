@@ -20,7 +20,6 @@ class TransliterateTabViewModel(
 
     val currentInput: MutableLiveData<String> = MutableLiveData()
 
-    val error: MutableLiveData<String?> = MutableLiveData(null)
     val language: LiveData<Language?> = currentInput.switchMap {
         liveData(Dispatchers.IO) {
             if (languageDetector == null)

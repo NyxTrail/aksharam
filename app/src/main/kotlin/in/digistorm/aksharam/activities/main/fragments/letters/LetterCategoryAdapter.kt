@@ -100,11 +100,9 @@ class LetterCategoryAdapter(
     }
 
     inner class LetterCategoryCardViewHolder(
-        private val letterCategoryBinding: LetterCategoryBinding,
-        // TODO: Remove this
-        private val initialisation_time: Long = System.currentTimeMillis()
+        private val letterCategoryBinding: LetterCategoryBinding
     ): RecyclerView.ViewHolder(letterCategoryBinding.root) {
-        private val logTag = this.javaClass.simpleName
+        // private val logTag = this.javaClass.simpleName
 
         private var position: Int = RecyclerView.NO_POSITION
 
@@ -141,10 +139,6 @@ class LetterCategoryAdapter(
 
         fun initialise(position: Int) {
             this.position = position
-
-            // TODO: Remove this
-            if(System.currentTimeMillis() - initialisation_time > 5 * 1000)
-                logDebug(logTag, "Re-using collapsed ViewHolder")
 
             if(isCollapsed()) {
                 letterGrid.visibility = View.GONE
@@ -211,19 +205,19 @@ class LetterCategoryAdapter(
         // Give an ExpandableCardView the ability to find its sibling, so that they are animated correctly
         holder.findNextSiblings = fun () : MutableList<MaterialCardView> {
             var pos = holder.bindingAdapterPosition
-            if(pos == RecyclerView.NO_POSITION) {
+            return if(pos == RecyclerView.NO_POSITION) {
                 logDebug(logTag, "bindingAdapterPosition was NO_POSITION")
-                return mutableListOf()
+                mutableListOf()
             } else {
                 val siblingList = mutableListOf<MaterialCardView>()
                 logDebug(logTag, "bindingAdapterPosition is $pos")
                 while(++pos < itemCount) {
                     (((holder.cardView.parent as? RecyclerView)
                         ?.findViewHolderForAdapterPosition(pos)) as? LetterCategoryCardViewHolder)?.cardView?.let {
-                            siblingList.add(it)
+                        siblingList.add(it)
                     }
                 }
-               return mutableListOf()
+                mutableListOf()
             }
         }
 

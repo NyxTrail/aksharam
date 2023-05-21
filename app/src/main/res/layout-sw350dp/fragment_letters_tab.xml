@@ -74,22 +74,6 @@
                 android:text="@={viewModel.targetLanguageSelected}"/>
         </com.google.android.material.textfield.TextInputLayout>
 
-<!--        <ImageView-->
-<!--            android:id="@+id/info_button"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginEnd="4dp"-->
-<!--            android:onClick="@{viewModel.languageInfoOnClick}"-->
-<!--            android:src="@drawable/twotone_info_24"-->
-<!--            android:adjustViewBounds="true"-->
-<!--            android:scaleType="centerInside"-->
-<!--            android:maxHeight="40dp"-->
-<!--            app:tint="@color/md_theme_light_primary"-->
-<!--            app:layout_constraintBottom_toTopOf="@+id/letter_categories"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toEndOf="@id/convert_to_selector"-->
-<!--            app:layout_constraintTop_toTopOf="parent" />-->
-
         <Button
             android:id="@+id/info_button"
             style="@style/Aksharam.Button.IconButton"

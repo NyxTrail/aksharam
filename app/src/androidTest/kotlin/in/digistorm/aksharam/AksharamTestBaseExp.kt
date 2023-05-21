@@ -66,23 +66,6 @@ open class AksharamTestBaseExp {
         return stringHolder[0]
     }
 
-    protected fun getSpinnerChoice(id: Int): String {
-        onView(withId(id)).perform(object : ViewAction {
-            override fun getConstraints(): Matcher<View> {
-                return ViewMatchers.isAssignableFrom(Spinner::class.java)
-            }
-
-            override fun getDescription(): String {
-                return "get spinner data"
-            }
-
-            override fun perform(uiController: UiController?, view: View?) {
-                TODO("Not yet implemented")
-            }
-        })
-        return ""
-    }
-
     protected fun onView(
         viewMatcher: Matcher<View>,
         retry: Boolean = true

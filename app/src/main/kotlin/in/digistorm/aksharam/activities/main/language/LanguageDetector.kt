@@ -20,12 +20,10 @@
 package `in`.digistorm.aksharam.activities.main.language
 
 import android.content.Context
-import `in`.digistorm.aksharam.activities.main.helpers.upperCaseFirstLetter
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import java.util.HashMap
 import java.util.LinkedHashMap
 
-/* TODO: Write unit tests for this */
 class LanguageDetector(context: Context?) {
     private val logTag = javaClass.simpleName
     private val languages: LinkedHashMap<String, Language>
