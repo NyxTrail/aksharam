@@ -54,10 +54,10 @@
     <string name="letter_info_example_words">Words</string>
     <string name="letter_info_example_meaning">Meaning</string>
     <string name="ligatures_with_letter_as_prefix">
-        Joint letters (ligatures) of %s before another consonant\n(%s + %s + x):
+        Joint letters (ligatures) of %s before another consonant (%s + %s + x):
     </string>
     <string name="ligatures_with_letter_as_suffix">
-        Joint letters (ligatures) of %s after another consonant\n(x + %s + %s):
+        Joint letters (ligatures) of %s after another consonant (x + %s + %s):
     </string>
     <string name="letter_with_vowel_signs">%s with vowel signs:</string>
     <string name="letter_with_consonants_and_ligatures">%s with consonants and ligatures:</string>

@@ -150,6 +150,7 @@
                 <!-- alignment in this tv is defined by HTML & CSS !-->
                 <TextView
                     android:id="@+id/info"
+                    style="@style/Aksharam.TextView.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -157,7 +158,6 @@
                     android:layout_marginEnd="8dp"
                     android:padding="2dp"
                     android:text="@string/lorem_ipsum"
-                    android:textSize="@dimen/text_normal_size"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/word_and_meaning_contents"
@@ -165,6 +165,7 @@
 
                 <TextView
                     android:id="@+id/diacritic_hint"
+                    style="@style/Aksharam.TextView.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -174,7 +175,6 @@
                     android:minWidth="200dp"
                     android:minHeight="50dp"
                     android:text="@string/test_text"
-                    android:textSize="@dimen/text_normal_size"
                     android:visibility="gone"
                     app:layout_constraintBottom_toTopOf="@id/diacritic_examples_container"
                     app:layout_constraintStart_toStartOf="parent"
@@ -198,6 +198,7 @@
 
                 <TextView
                     android:id="@+id/ligatures_with_letter_as_prefix_tv"
+                    style="@style/Aksharam.TextView.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -205,7 +206,6 @@
                     android:layout_marginEnd="4dp"
                     android:gravity="start|center_vertical"
                     android:text="@string/ligatures_with_letter_as_prefix"
-                    android:textSize="@dimen/text_normal_size"
                     android:visibility="gone"
                     app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_prefix_gl"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -229,6 +229,7 @@
 
                 <TextView
                     android:id="@+id/ligatures_with_letter_as_suffix_tv"
+                    style="@style/Aksharam.TextView.Small"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
@@ -236,7 +237,6 @@
                     android:layout_marginEnd="4dp"
                     android:gravity="start|center_vertical"
                     android:text="@string/ligatures_with_letter_as_suffix"
-                    android:textSize="@dimen/text_normal_size"
                     android:visibility="gone"
                     app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_suffix_gl"
                     app:layout_constraintEnd_toEndOf="parent"

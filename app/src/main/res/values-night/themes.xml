@@ -59,4 +59,9 @@
         <item name="android:textSize">22sp</item>
         <item name="android:textStyle">normal</item>
     </style>
+
+    <style name="Theme.Aksharam.MoreOptions">
+        <item name="android:background">@color/md_theme_dark_tertiary</item>
+        <item name="android:tint">@color/md_theme_dark_onTertiary</item>
+    </style>
 </resources>

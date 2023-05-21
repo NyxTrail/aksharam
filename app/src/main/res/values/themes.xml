@@ -64,6 +64,10 @@
         <item name="android:textSize">22sp</item>
     </style>
 
+    <style name="Aksharam.TextView.Small" parent="Widget.MaterialComponents.TextView">
+        <item name="android:textSize">20sp</item>
+    </style>
+
     <style name="Aksharam.TextInputLayout.FilledBox" parent="Widget.Material3.TextInputLayout.FilledBox">
         <item name="hintTextAppearance">@style/Aksharam.TextAppearance.BodySmall</item>
     </style>
@@ -92,5 +96,10 @@
         <item name="android:clickable">true</item>
         <item name="android:focusable">true</item>
         <item name="android:foreground">@drawable/ripple</item>
+    </style>
+
+    <style name="Theme.Aksharam.MoreOptions">
+        <item name="android:background">@color/md_theme_light_tertiary</item>
+        <item name="android:tint">@color/md_theme_light_onTertiary</item>
     </style>
 </resources>

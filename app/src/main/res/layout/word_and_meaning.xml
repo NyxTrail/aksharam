@@ -36,23 +36,23 @@
 
         <TextView
             android:id="@+id/word"
+            style="@style/Aksharam.TextView"
             android:layout_width="100dp"
-            android:layout_height="0dp"
+            android:layout_height="wrap_content"
             android:text="@string/test_text"
-            android:textSize="@dimen/letter_info_word"
             android:padding="2dp"
             app:layout_constraintHorizontal_chainStyle="spread_inside"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/meaning_container"
-            app:layout_constraintBottom_toBottomOf="@+id/meaning_container"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/transliteration"
             app:layout_constraintEnd_toStartOf="@id/space"/>
 
         <TextView
             android:id="@+id/transliteration"
+            style="@style/Aksharam.TextView.Small"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:textSize="@dimen/letter_info_transliteration"
             android:text="@string/test_text"
             android:padding="2dp"
             app:layout_constraintStart_toStartOf="parent"
@@ -62,31 +62,23 @@
             android:id="@+id/space"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            app:layout_constraintEnd_toStartOf="@+id/meaning_container"
+            app:layout_constraintEnd_toStartOf="@+id/meaning"
             app:layout_constraintStart_toEndOf="@+id/word"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="@id/word"/>
 
-        <androidx.core.widget.NestedScrollView
-            android:id="@+id/meaning_container"
+        <in.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
+            android:id="@+id/meaning"
+            style="@style/Aksharam.TextView"
             android:layout_width="150dp"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:text="@string/test_text"
+            android:padding="2dp"
+            android:maxLines="1"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toEndOf="@id/space" >
-            <TextView
-                android:id="@+id/meaning"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:text="@string/test_text"
-                android:textSize="@dimen/letter_info_meaning"
-                android:padding="2dp"
-                android:maxLines="2"
-                android:ellipsize="end"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toEndOf="@id/space" />
-        </androidx.core.widget.NestedScrollView>
+            app:layout_constraintStart_toEndOf="@id/space"
+            app:layout_constraintBottom_toBottomOf="@id/transliteration"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

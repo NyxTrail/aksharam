@@ -165,6 +165,7 @@
                 app:layout_constraintBottom_toTopOf="@id/bottom_space">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/practice_input_edit_text"
+                    style="@style/Aksharam.TextAppearance.BodyMedium"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"

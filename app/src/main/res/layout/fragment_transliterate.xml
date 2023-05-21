@@ -69,7 +69,6 @@
             android:hint="@string/transliteration_input_hint"
             android:inputType="text|textMultiLine"
             android:textColorHint="#78909C"
-            android:textSize="@dimen/text_normal_size"
             android:layout_margin="8dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/language_spinner"
@@ -91,7 +90,7 @@
         <TextView
             android:id="@+id/output_text_view"
             style="@style/Aksharam.TextView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
             android:hint="@string/transliteration"
             android:textColorHint="#78909C"
