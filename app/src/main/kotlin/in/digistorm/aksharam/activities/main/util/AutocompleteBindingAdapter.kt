@@ -4,9 +4,9 @@ import android.widget.ArrayAdapter
 import androidx.databinding.BindingAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.textfield.MaterialAutoCompleteTextView
-import com.google.android.material.textfield.TextInputLayout
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.fragments.letters.LetterCategoryAdapter
+import `in`.digistorm.aksharam.activities.main.language.TransliteratedLetters
 
 private const val logTag: String = "AutoCompleteBindingAdapter"
 
@@ -20,6 +20,7 @@ fun MaterialAutoCompleteTextView.writeSimpleItems(
     logDebug(logTag, "writeSimpleItems")
     logDebug(logTag, "oldItems: $oldItems, oldText: $oldText")
     logDebug(logTag, "newItems: $newItems, newText: $newText")
+    logDebug(logTag, "text in view: \"$text\"")
 
     if(newItems != null) {
         if(newItems != oldItems)
@@ -38,9 +39,11 @@ fun MaterialAutoCompleteTextView.writeSimpleItems(
 }
 
 @BindingAdapter("letters_category_wise")
-fun RecyclerView.setLettersCategoryWise(newLettersCategoryWise: List<Map<String, ArrayList<Pair<String, String>>>>?) {
-    logDebug(logTag, "Write letters category wise: $newLettersCategoryWise")
-    if(adapter == null)
-        logDebug(logTag, "Could not acquire adapter.")
-    (adapter as? LetterCategoryAdapter)?.submitList(newLettersCategoryWise)
+fun RecyclerView.setLettersCategoryWise(newLettersCategoryWise: TransliteratedLetters?) {
+    (adapter as? LetterCategoryAdapter)?.apply {
+        if(currentList != newLettersCategoryWise?.categories) {
+            logDebug(logTag, "Write letters category wise: $newLettersCategoryWise")
+            submitList(newLettersCategoryWise?.categories)
+        }
+    } ?: logDebug(logTag, "LetterCategoryAdapter could not be accessed.")
 }

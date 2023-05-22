@@ -26,7 +26,6 @@ import `in`.digistorm.aksharam.databinding.WordAndMeaningBinding
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.activities.main.language.transliterate
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.os.Bundle
@@ -36,7 +35,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import `in`.digistorm.aksharam.databinding.FragmentLetterInfoBinding
 
@@ -68,8 +66,12 @@ class LetterInfoFragment : Fragment() {
 
         binding.toolbar.setupWithNavController(
             findNavController(),
-            AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
+            // AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
         )
+
+        findNavController().getBackStackEntry(R.id.tabbedViewsFragment).apply {
+            logDebug(logTag, "Found back stack entry: ${this.id}")
+        }
 
         setUp(layoutInflater)
     }

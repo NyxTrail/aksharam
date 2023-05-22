@@ -42,6 +42,7 @@ import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.google.android.material.card.MaterialCardView
 import `in`.digistorm.aksharam.activities.main.helpers.upperCaseFirstLetter
+import `in`.digistorm.aksharam.activities.main.language.Category
 
 /* RecyclerView adapter for each category of letters (e.g. Vowels, Consonants, etc).
    Each category is displayed in a separate Material 3 Card View.
@@ -49,7 +50,7 @@ import `in`.digistorm.aksharam.activities.main.helpers.upperCaseFirstLetter
 class LetterCategoryAdapter(
     private var letterOnLongClickAction: (String) -> NavDirections,
     private val cardStates: SparseBooleanArray = SparseBooleanArray()
-): ListAdapter<Map<String, List<Pair<String, String>>>, LetterCategoryAdapter.LetterCategoryCardViewHolder>(
+): ListAdapter<Category, LetterCategoryAdapter.LetterCategoryCardViewHolder>(
     LetterCategoryDiff { cardStates }
 ) {
     private val logTag = this.javaClass.simpleName
@@ -58,26 +59,24 @@ class LetterCategoryAdapter(
         logDebug(logTag, "LetterCategoryAdapter initialised with list: $currentList")
     }
 
-    private class LetterCategoryDiff(val getCardStates: (() -> SparseBooleanArray)): DiffUtil.ItemCallback<Map<String, List<Pair<String, String>>>>() {
+    private class LetterCategoryDiff(val getCardStates: (() -> SparseBooleanArray)): DiffUtil.ItemCallback<Category>() {
         private val logTag = this.javaClass.simpleName
 
         override fun areItemsTheSame(
-            oldItem: Map<String, List<Pair<String, String>>>,
-            newItem: Map<String, List<Pair<String, String>>>
+            oldItem: Category,
+            newItem: Category
         ): Boolean {
             logDebug(logTag, "Are oldItem: $oldItem and newItem: $newItem the same:" +
                     " ${oldItem == newItem}")
             /**
              * Items are same if:
-             * 1. Their keys are same,
+             * 1. Their names are same,
              * 2. For each value in the Arraylist, first of the pair are the same
              *    This means only the transliteration language has been changed.
              **/
-            val oldCategory = oldItem.keys.singleOrNull()
-            val newCategory = newItem.keys.singleOrNull()
-            if(oldCategory == newCategory) {
-                oldItem[newCategory]!!.forEachIndexed { i, letterPair ->
-                    if(letterPair.first != newItem[newCategory]!![i].first) {
+            if(oldItem.name == newItem.name) {
+                oldItem.letterPairs.forEachIndexed { i, letterPair ->
+                    if(letterPair.first != newItem.letterPairs[i].first) {
                         getCardStates.invoke().clear()
                         return false
                     }
@@ -90,8 +89,8 @@ class LetterCategoryAdapter(
 
         // Iff items are same, the system checks whether their contents are also same
         override fun areContentsTheSame(
-            oldItem: Map<String, List<Pair<String, String>>>,
-            newItem: Map<String, List<Pair<String, String>>>
+            oldItem: Category,
+            newItem: Category
         ): Boolean {
             logDebug(logTag, "Are contents of oldItem: $oldItem and " +
                     "newItem: $newItem the same: false")
@@ -199,7 +198,7 @@ class LetterCategoryAdapter(
     override fun onBindViewHolder(holder: LetterCategoryCardViewHolder, position: Int) {
         logDebug(logTag, "Binding view for position: $position")
         logDebug(logTag, "Item: ${getItem(position)}")
-        holder.cardView.tag = getItem(position).keys.first()
+        holder.cardView.tag = getItem(position).name
         holder.initialise(position)
 
         // Give an ExpandableCardView the ability to find its sibling, so that they are animated correctly
@@ -221,7 +220,7 @@ class LetterCategoryAdapter(
             }
         }
 
-        holder.text = getItem(position).keys.first().upperCaseFirstLetter()
+        holder.text = getItem(position).name.upperCaseFirstLetter()
 
         initialiseLetterGrid(holder, position)
     }
@@ -236,11 +235,11 @@ class LetterCategoryAdapter(
             removeAllViews()
 
             logDebug(logTag, "Initialising letter grid for position: $position")
-            val category = getItem(position).keys.first()
-            val letterPairs: List<Pair<String, String>> = getItem(position)[category] ?: ArrayList()
+            val category = getItem(position).name
+            // val letterPairs: List<Pair<String, String>> = getItem(position)[category] ?: ArrayList()
             logDebug(logTag, "Current category: $category")
-            logDebug(logTag, "Letter Pairs: $letterPairs")
-            for(letterPair in letterPairs) {
+            logDebug(logTag, "Letter Pairs: ${getItem(position).letterPairs}")
+            for(letterPair in getItem(position).letterPairs) {
                 val letterView: LetterPairView = LayoutInflater
                     .from(letterCategoryCardViewHolder.letterGrid.context)
                     .inflate(R.layout.letter_pair_view,

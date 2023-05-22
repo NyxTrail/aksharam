@@ -125,7 +125,7 @@ class PracticeTabViewModel(
         val mDownloadedLanguages = getDownloadedLanguages(getApplication())
 
         if(mDownloadedLanguages != downloadedLanguages.value) {
-            downloadedLanguages.value = mDownloadedLanguages
+            downloadedLanguages.setValueIfDifferent(mDownloadedLanguages)
             logDebug(logTag, "Downloaded languages set to: ${downloadedLanguages.value}")
 
             // If currently selected language is no longer available, update the view model with

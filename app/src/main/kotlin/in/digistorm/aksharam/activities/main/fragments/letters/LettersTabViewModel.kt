@@ -26,14 +26,17 @@ import `in`.digistorm.aksharam.activities.main.ActivityViewModel
 import androidx.lifecycle.*
 import androidx.navigation.NavDirections
 import `in`.digistorm.aksharam.activities.main.fragments.TabbedViewsFragmentDirections
+import `in`.digistorm.aksharam.activities.main.language.Category
 import `in`.digistorm.aksharam.activities.main.language.Language
+import `in`.digistorm.aksharam.activities.main.language.TransliteratedLetters
 import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
 import `in`.digistorm.aksharam.activities.main.language.getLanguageData
 import `in`.digistorm.aksharam.activities.main.language.transliterate
 import `in`.digistorm.aksharam.activities.main.util.CheckedMutableLiveData
 import `in`.digistorm.aksharam.activities.main.util.logDebug
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import java.util.concurrent.atomic.AtomicBoolean
+import kotlinx.coroutines.launch
 
 class LettersTabViewModel(
     application: Application,
@@ -77,28 +80,47 @@ class LettersTabViewModel(
     }
     val targetLanguageSelected: CheckedMutableLiveData<String> = CheckedMutableLiveData()
 
-    val lettersCategoryWise: LiveData<List<Map<String, ArrayList<Pair<String, String>>>>> = targetLanguageSelected.switchMap { newLanguage ->
-        liveData(Dispatchers.Default) {
-            logDebug(logTag, "Generating letters category wise for language: ${language.value?.language}")
-            logDebug(logTag, "Conversion language is: $newLanguage")
-            val categories = mutableListOf<Map<String, ArrayList<Pair<String, String>>>>()
-            // [{"vowels": ["a", "e",...]}, {"consonants":: ["b", "c", "d",...]}, ...]
-            language.value?.lettersCategoryWise?.forEach { (category, letters) ->
-                val transliteratedLetterPairs: ArrayList<Pair<String, String>> = ArrayList()
-                letters.forEach { letter ->
-                    transliteratedLetterPairs.add(
-                        letter to transliterate(
-                            letter,
-                            newLanguage,
-                            language.value!!
-                        )
-                    )
+    val lettersCategoryWise: LiveData<TransliteratedLetters> = MediatorLiveData<TransliteratedLetters>().also {
+        it.addSource(targetLanguageSelected) { newLanguage ->
+            CoroutineScope(Dispatchers.Default).launch {
+                languageSelected.value?.let { languageSelected ->
+                    targetLanguageSelected.value?.let { targetLanguageSelected ->
+                        if((it.value?.sourceLanguage != languageSelected.lowercase()) ||
+                            (it.value?.targetLanguage != targetLanguageSelected.lowercase())) {
+                                logDebug(
+                                    logTag,
+                                    "Generating letters category wise for language: ${language.value?.language}"
+                                )
+                                logDebug(logTag, "Conversion language is: $newLanguage")
+                                val categories = ArrayList<Category>()
+                                val transliteratedLetters = TransliteratedLetters(
+                                    sourceLanguage = languageSelected.lowercase(),
+                                    targetLanguage = targetLanguageSelected.lowercase(),
+                                    categories = categories
+                                )
+                                language.value?.lettersCategoryWise?.forEach { (iCategory, letters) ->
+                                    val transliteratedLetterPairs: ArrayList<Pair<String, String>> = ArrayList()
+                                    letters.forEach { letter ->
+                                        transliteratedLetterPairs.add(
+                                            letter to transliterate(
+                                                letter,
+                                                newLanguage,
+                                                language.value!!
+                                            )
+                                        )
+                                    }
+                                    val category = Category(
+                                        name = iCategory,
+                                        letterPairs = transliteratedLetterPairs
+                                    )
+                                    categories.add(category)
+                                }
+                                logDebug(logTag, "Category list created: $transliteratedLetters")
+                                it.postValue(transliteratedLetters)
+                            }
+                    }
                 }
-                categories.add(mapOf(category to transliteratedLetterPairs))
             }
-            logDebug(logTag, "Category list created: $categories")
-            emit(categories)
-            // releaseIdlingResource()
         }
     }
 
@@ -135,21 +157,24 @@ class LettersTabViewModel(
         logDebug(logTag, "Initialising.")
         this.navigateToLanguageInfo = navigateToLanguageInfo
 
-        val mDownloadedLanguages = getDownloadedLanguages(getApplication())
+        CoroutineScope(Dispatchers.Default).launch {
+            val mDownloadedLanguages = getDownloadedLanguages(getApplication())
 
-        // If there is a change in downloaded languages...
-        if (mDownloadedLanguages != downloadedLanguages.value && mDownloadedLanguages.size > 0) {
-            downloadedLanguages.postValue(mDownloadedLanguages)
-            logDebug(logTag, "Downloaded languages set to: $mDownloadedLanguages")
+            // If there is a change in downloaded languages...
+            if (mDownloadedLanguages != downloadedLanguages.value && mDownloadedLanguages.size > 0) {
+                downloadedLanguages.postValue(mDownloadedLanguages)
+                logDebug(logTag, "Downloaded languages set to: $mDownloadedLanguages")
 
-            // If currently selected language is no longer available, update the view model with
-            // the first available language
-            if (!mDownloadedLanguages.contains(languageSelected.value)) {
+                // If currently selected language is no longer available, update the view model with
+                // the first available language
+                if (!mDownloadedLanguages.contains(languageSelected.value)) {
 
-                mDownloadedLanguages.firstOrNull()?.let {
-                    languageSelected.postValue(it)
+                    mDownloadedLanguages.firstOrNull()?.let {
+                        languageSelected.postValue(it)
+                    }
                 }
             }
         }
+        logDebug(logTag, "Coroutine launched to find downloaded languages.")
     }
 }
