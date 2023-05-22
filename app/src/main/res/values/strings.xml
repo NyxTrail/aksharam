@@ -105,9 +105,10 @@
     </string>
     <string name="privacy_text">
         &lt;h1>Privacy Policy&lt;/h1>
-        &lt;p>This app needs to connect to the internet to download data files for the languages you wish to learn.
-        &lt;br/>The data files are downloaded from the Github repo here: https://github.com/NyxTrail/aksharam-data
-        &lt;br/>&lt;br/>
+        &lt;p>This app needs to connect to the internet to download data files for the languages you wish to learn.&lt;/p>
+        &lt;p>The data files are downloaded from the Github repo here: &lt;a href="https://github.com/NyxTrail/aksharam-data">
+        https://github.com/NyxTrail/aksharam-data&lt;/a>.&lt;/p>
+        &lt;p>
         Beyond the above requirement, the app does not share any data with anyone. All your data stays on your device.
         &lt;/p>
     </string>
