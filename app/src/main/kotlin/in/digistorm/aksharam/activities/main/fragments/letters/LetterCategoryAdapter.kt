@@ -31,9 +31,11 @@ import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.TextView
 import androidx.core.util.getOrDefault
 import androidx.core.util.set
+import androidx.core.view.ViewCompat
 import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.NavDirections
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -245,11 +247,15 @@ class LetterCategoryAdapter(
                     .inflate(R.layout.letter_pair_view,
                         letterCategoryCardViewHolder.letterGrid, false) as LetterPairView
                 letterView.setOnLongClickListener { view ->
-                    view.findNavController().navigate(letterOnLongClickAction(letterPair.first))
+                    val extras = FragmentNavigatorExtras(letterView to "${letterPair.first}_heading")
+//                        FragmentNavigatorExtras(letterView to "${letterPair.first}_transliterated_heading")
+
+                    view.findNavController().navigate(letterOnLongClickAction(letterPair.first), extras)
                     true
                 }
                 letterView.letters = letterPair
                 letterView.tag = letterPair.first
+                ViewCompat.setTransitionName(letterView, "${letterPair.first}_letter")
                 letterCategoryCardViewHolder.letterGrid.addView(letterView)
             }
         }

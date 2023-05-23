@@ -1,4 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+ ~
+ ~ Copyright (c) 2023 Alan M Varghese <alan@digistorm.in>
+ ~
+ ~ This files is part of Aksharam, a script teaching app for Indic
+ ~ languages.
+ ~
+ ~ Aksharam is free software: you can redistribute it and/or modify
+ ~ it under the terms of the GNU General Public License as published by
+ ~ the Free Software Foundation, either version 3 of the License, or
+ ~ (at your option) any later version.
+ ~
+ ~ Aksharam is distributed in the hope that it will be useful,
+ ~ but WITHOUT ANY WARRANTY; without even teh implied warranty of
+ ~ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ ~ GNU General Public License for more details.
+ ~
+ ~ You should have received a copy of the GNU General Public License
+ ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
+ ~
+ -->
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -10,21 +31,28 @@
         android:name="in.digistorm.aksharam.activities.main.fragments.TabbedViewsFragment"
         android:label="@string/app_name"
         tools:layout="@layout/fragment_tabbed_views">
+
         <action
             android:id="@+id/action_tabbedViewsFragment_to_settingsFragment"
-            app:destination="@id/settingsFragment" />
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
         <action
             android:id="@+id/action_tabbedViewsFragment_to_helpFragment"
-            app:destination="@id/helpFragment" />
+            app:destination="@id/helpFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
         <action
             android:id="@+id/action_tabbedViewsFragment_to_privacyPolicyFragment"
-            app:destination="@id/privacyPolicyFragment" />
-        <action
-            android:id="@+id/action_tabbedViewsFragment_to_languageInfoFragment"
-            app:destination="@id/languageInfoFragment" />
-        <action
-            android:id="@+id/action_tabbedViewsFragment_to_letterInfoFragment"
-            app:destination="@id/letterInfoFragment" />
+            app:destination="@id/privacyPolicyFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
         <action
             android:id="@+id/action_tabbedViewsFragment_to_initialisationScreen"
             app:destination="@id/initialisationScreen" />
@@ -44,33 +72,6 @@
         android:name="in.digistorm.aksharam.activities.main.fragments.PrivacyFragment"
         android:label="@string/privacy"
         tools:layout="@layout/fragment_privacy"/>
-    <fragment
-        android:id="@+id/languageInfoFragment"
-        android:name="in.digistorm.aksharam.activities.main.fragments.letters.LanguageInfoFragment"
-        android:label="{language} ➤ {targetLanguage}"
-        tools:layout="@layout/language_info" >
-        <argument
-            android:name="language"
-            app:argType="string" />
-        <argument
-            android:name="targetLanguage"
-            app:argType="string" />
-    </fragment>
-    <fragment
-        android:id="@+id/letterInfoFragment"
-        android:name="in.digistorm.aksharam.activities.main.fragments.letters.LetterInfoFragment"
-        android:label="{letter} ({category})"
-        tools:layout="@layout/fragment_letter_info" >
-        <argument
-            android:name="letter"
-            app:argType="string" />
-        <argument
-            android:name="category"
-            app:argType="string" />
-        <argument
-            android:name="targetLanguage"
-            app:argType="string" />
-    </fragment>
     <fragment
         android:id="@+id/initialisationScreen"
         android:name="in.digistorm.aksharam.activities.main.fragments.initialise.InitialisationScreen"

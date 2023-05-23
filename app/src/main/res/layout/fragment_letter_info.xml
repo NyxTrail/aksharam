@@ -36,230 +36,228 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <com.google.android.material.appbar.AppBarLayout
-            android:id="@+id/app_bar_layout"
+        <!-- This is the container we will animate -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/content"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:layout_collapseMode="pin"
-                android:elevation="10dp"/>
-        </com.google.android.material.appbar.AppBarLayout>
-
-        <in.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
-            android:id="@+id/heading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:padding="8dp"
-            android:text="@string/test_text"
-            android:textSize="@dimen/letter_info_heading"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/app_bar_layout" />
-
-        <TextView
-            android:id="@+id/transliterated_heading"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:includeFontPadding="true"
-            android:padding="8dp"
-            android:text="@string/test_text"
-            android:textSize="@dimen/letter_info_transliterated_heading"
-            app:layout_constraintBottom_toBottomOf="@+id/heading"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/heading"
-            app:layout_constraintTop_toTopOf="@id/heading" />
-
-        <androidx.core.widget.NestedScrollView
-            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:scrollbars="horizontal|vertical"
-            android:layout_marginTop="5dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
+            android:transitionGroup="true"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/heading"
-            app:layout_constraintVertical_bias="0.0">
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/word_and_meaning_table"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+            <in.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
+                android:id="@+id/heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="8dp"
+                android:text="@string/test_text"
+                android:textSize="@dimen/letter_info_heading"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-                <TextView
-                    android:id="@+id/words_heading"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_weight="1"
-                    android:text="@string/letter_info_example_words"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:gravity="start"
-                    android:padding="2dp"
-                    app:layout_constraintHorizontal_chainStyle="spread_inside"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toStartOf="@id/space"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/word_and_meaning_contents"/>
+            <TextView
+                android:id="@+id/transliterated_heading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:includeFontPadding="true"
+                android:padding="8dp"
+                android:text="@string/test_text"
+                android:textSize="@dimen/letter_info_transliterated_heading"
+                app:layout_constraintBottom_toBottomOf="@+id/heading"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/heading"
+                app:layout_constraintTop_toTopOf="@id/heading" />
 
-                <androidx.legacy.widget.Space
-                    android:id="@+id/space"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    app:layout_constraintEnd_toStartOf="@+id/meaning_heading"
-                    app:layout_constraintStart_toEndOf="@+id/words_heading"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintBottom_toTopOf="@id/word_and_meaning_contents"/>
+            <androidx.core.widget.NestedScrollView
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:scrollbars="horizontal|vertical"
+                android:layout_marginTop="5dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/heading"
+                app:layout_constraintVertical_bias="0.0">
 
-                <TextView
-                    android:id="@+id/meaning_heading"
-                    android:layout_width="150dp"
-                    android:layout_height="0dp"
-                    android:layout_marginEnd="16dp"
-                    android:layout_weight="1"
-                    android:text="@string/letter_info_example_meaning"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:padding="2dp"
-                    app:layout_constraintStart_toEndOf="@id/space"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="@id/words_heading"
-                    app:layout_constraintBottom_toBottomOf="@id/words_heading"/>
-
-                <LinearLayout
-                    android:id="@+id/word_and_meaning_contents"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginEnd="16dp"
-                    android:orientation="vertical"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/words_heading"
-                    app:layout_constraintBottom_toTopOf="@id/info"/>
-
-                <!-- alignment in this tv is defined by HTML & CSS !-->
-                <TextView
-                    android:id="@+id/info"
-                    style="@style/Aksharam.TextView.Small"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/word_and_meaning_table"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="2dp"
-                    android:layout_marginEnd="8dp"
-                    android:padding="2dp"
-                    android:text="@string/lorem_ipsum"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/word_and_meaning_contents"
-                    app:layout_constraintBottom_toTopOf="@id/diacritic_hint"/>
+                    android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/diacritic_hint"
-                    style="@style/Aksharam.TextView.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="8dp"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="start|center_vertical"
-                    android:minWidth="200dp"
-                    android:minHeight="50dp"
-                    android:text="@string/test_text"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@id/diacritic_examples_container"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/info"
-                    tools:visibility="visible"
-                    tools:text="@string/letter_with_vowel_signs" />
+                    <TextView
+                        android:id="@+id/words_heading"
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_weight="1"
+                        android:text="@string/letter_info_example_words"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:gravity="start"
+                        android:padding="2dp"
+                        app:layout_constraintHorizontal_chainStyle="spread_inside"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@id/space"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/word_and_meaning_contents"/>
 
-                <androidx.gridlayout.widget.GridLayout
-                    android:id="@+id/diacritic_examples_container"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:visibility="gone"
-                    app:alignmentMode="alignBounds"
-                    app:columnCount="5"
-                    app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_prefix_tv"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/diacritic_hint"
-                    tools:visibility="visible" />
+                    <androidx.legacy.widget.Space
+                        android:id="@+id/space"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        app:layout_constraintEnd_toStartOf="@+id/meaning_heading"
+                        app:layout_constraintStart_toEndOf="@+id/words_heading"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/word_and_meaning_contents"/>
 
-                <TextView
-                    android:id="@+id/ligatures_with_letter_as_prefix_tv"
-                    style="@style/Aksharam.TextView.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="start|center_vertical"
-                    android:text="@string/ligatures_with_letter_as_prefix"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_prefix_gl"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/diacritic_examples_container"
-                    tools:visibility="visible" />
+                    <TextView
+                        android:id="@+id/meaning_heading"
+                        android:layout_width="150dp"
+                        android:layout_height="0dp"
+                        android:layout_marginEnd="16dp"
+                        android:layout_weight="1"
+                        android:text="@string/letter_info_example_meaning"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:padding="2dp"
+                        app:layout_constraintStart_toEndOf="@id/space"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@id/words_heading"
+                        app:layout_constraintBottom_toBottomOf="@id/words_heading"/>
 
-                <androidx.gridlayout.widget.GridLayout
-                    android:id="@+id/ligatures_with_letter_as_prefix_gl"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:visibility="gone"
-                    app:alignmentMode="alignBounds"
-                    app:columnCount="5"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ligatures_with_letter_as_prefix_tv"
-                    app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_suffix_tv"
-                    tools:visibility="visible" />
+                    <LinearLayout
+                        android:id="@+id/word_and_meaning_contents"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginEnd="16dp"
+                        android:orientation="vertical"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/words_heading"
+                        app:layout_constraintBottom_toTopOf="@id/info"/>
 
-                <TextView
-                    android:id="@+id/ligatures_with_letter_as_suffix_tv"
-                    style="@style/Aksharam.TextView.Small"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
-                    android:layout_marginTop="4dp"
-                    android:layout_marginEnd="4dp"
-                    android:gravity="start|center_vertical"
-                    android:text="@string/ligatures_with_letter_as_suffix"
-                    android:visibility="gone"
-                    app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_suffix_gl"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ligatures_with_letter_as_prefix_gl"
-                    tools:visibility="visible" />
+                    <!-- alignment in this tv is defined by HTML & CSS !-->
+                    <TextView
+                        android:id="@+id/info"
+                        style="@style/Aksharam.TextView.Small"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="2dp"
+                        android:layout_marginEnd="8dp"
+                        android:padding="2dp"
+                        android:text="@string/lorem_ipsum"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/word_and_meaning_contents"
+                        app:layout_constraintBottom_toTopOf="@id/diacritic_hint"/>
 
-                <androidx.gridlayout.widget.GridLayout
-                    android:id="@+id/ligatures_with_letter_as_suffix_gl"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="8dp"
-                    android:visibility="gone"
-                    app:alignmentMode="alignBounds"
-                    app:columnCount="5"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@id/ligatures_with_letter_as_suffix_tv"
-                    tools:visibility="visible">
-                </androidx.gridlayout.widget.GridLayout>
+                    <TextView
+                        android:id="@+id/diacritic_hint"
+                        style="@style/Aksharam.TextView.Small"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="start|center_vertical"
+                        android:minWidth="200dp"
+                        android:minHeight="50dp"
+                        android:text="@string/test_text"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toTopOf="@id/diacritic_examples_container"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/info"
+                        tools:visibility="visible"
+                        tools:text="@string/letter_with_vowel_signs" />
 
-            </androidx.constraintlayout.widget.ConstraintLayout>
-        </androidx.core.widget.NestedScrollView>
+                    <androidx.gridlayout.widget.GridLayout
+                        android:id="@+id/diacritic_examples_container"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:visibility="gone"
+                        app:alignmentMode="alignBounds"
+                        app:columnCount="5"
+                        app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_prefix_tv"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/diacritic_hint"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/ligatures_with_letter_as_prefix_tv"
+                        style="@style/Aksharam.TextView.Small"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="start|center_vertical"
+                        android:text="@string/ligatures_with_letter_as_prefix"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_prefix_gl"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/diacritic_examples_container"
+                        tools:visibility="visible" />
+
+                    <androidx.gridlayout.widget.GridLayout
+                        android:id="@+id/ligatures_with_letter_as_prefix_gl"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:visibility="gone"
+                        app:alignmentMode="alignBounds"
+                        app:columnCount="5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/ligatures_with_letter_as_prefix_tv"
+                        app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_suffix_tv"
+                        tools:visibility="visible" />
+
+                    <TextView
+                        android:id="@+id/ligatures_with_letter_as_suffix_tv"
+                        style="@style/Aksharam.TextView.Small"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginEnd="4dp"
+                        android:gravity="start|center_vertical"
+                        android:text="@string/ligatures_with_letter_as_suffix"
+                        android:visibility="gone"
+                        app:layout_constraintBottom_toTopOf="@id/ligatures_with_letter_as_suffix_gl"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/ligatures_with_letter_as_prefix_gl"
+                        tools:visibility="visible" />
+
+                    <androidx.gridlayout.widget.GridLayout
+                        android:id="@+id/ligatures_with_letter_as_suffix_gl"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_margin="8dp"
+                        android:visibility="gone"
+                        app:alignmentMode="alignBounds"
+                        app:columnCount="5"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/ligatures_with_letter_as_suffix_tv"
+                        tools:visibility="visible">
+                    </androidx.gridlayout.widget.GridLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.core.widget.NestedScrollView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
  ~
- ~ Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
+ ~ Copyright (c) 2023 Alan M Varghese <alan@digistorm.in>
  ~
  ~ This files is part of Aksharam, a script teaching app for Indic
  ~ languages.
@@ -20,18 +20,17 @@
  ~ along with this program. If not, see <http://www.gnu.org/licenses/>.
  ~
  -->
-
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
         <variable
             name="viewModel"
-            type="in.digistorm.aksharam.activities.main.fragments.letters.LettersTabViewModel" />
+            type="in.digistorm.aksharam.activities.main.fragments.letters.LettersViewModel" />
     </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/lettersTabCL"
+        android:transitionGroup="true"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -71,7 +70,7 @@
                 android:layout_height="wrap_content"
                 android:inputType="none"
                 list="@{viewModel.targetLanguageList}"
-                android:text="@={viewModel.targetLanguageSelected}"/>
+                android:text="@={viewModel.targetLanguageSelected}" />
         </com.google.android.material.textfield.TextInputLayout>
 
         <Button

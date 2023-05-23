@@ -20,7 +20,6 @@
 package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import `in`.digistorm.aksharam.activities.main.ActivityViewModel
-import `in`.digistorm.aksharam.databinding.LanguageInfoBinding
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 import android.view.LayoutInflater
@@ -32,14 +31,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
-import `in`.digistorm.aksharam.R
+import `in`.digistorm.aksharam.databinding.FragmentLanguageInfoBinding
 
 class LanguageInfoFragment : Fragment() {
     private val logTag = javaClass.simpleName
 
-    private lateinit var binding: LanguageInfoBinding
+    private lateinit var binding: FragmentLanguageInfoBinding
     private val args: LanguageInfoFragmentArgs by navArgs()
 
     override fun onCreateView(
@@ -47,7 +44,7 @@ class LanguageInfoFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         super.onCreate(savedInstanceState)
-        binding = LanguageInfoBinding.inflate(inflater, container, false)
+        binding = FragmentLanguageInfoBinding.inflate(inflater, container, false)
 
         return binding.root
     }
@@ -55,11 +52,6 @@ class LanguageInfoFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val activityViewModel: ActivityViewModel by activityViewModels()
-
-        binding.toolbar.setupWithNavController(
-            findNavController(),
-            AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
-        )
 
         val languageData = activityViewModel.language.value
         logDebug(logTag, "Info: ${languageData?.info}")

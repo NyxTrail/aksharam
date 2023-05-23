@@ -19,7 +19,7 @@
  */
 package `in`.digistorm.aksharam.activities.main
 
-import `in`.digistorm.aksharam.activities.main.fragments.letters.LettersTabFragment
+import `in`.digistorm.aksharam.activities.main.fragments.letters.LettersContainerFragment
 import `in`.digistorm.aksharam.activities.main.fragments.practice.PracticeTabFragment
 import `in`.digistorm.aksharam.activities.main.fragments.transliterate.TransliterateTabFragment
 import `in`.digistorm.aksharam.activities.main.util.logDebug
@@ -61,7 +61,7 @@ class PageCollectionAdapter(fragment: Fragment) : FragmentStateAdapter(fragment)
         logDebug(logTag, "Setting up fragments")
 
         // there is a separate back stack for each tab
-        fragments.add(LettersTabFragment())
+        fragments.add(LettersContainerFragment())
         backStack.add(Stack())
         fragments.add(TransliterateTabFragment())
         backStack.add(Stack())

@@ -29,7 +29,8 @@ class LetterPairView: AutoAdjustingTextView, View.OnClickListener {
     private var logTag: String = javaClass.simpleName
 
     /* Boolean to track if the letter or its transliterated pair is current displayed. */
-    private var letterShown: Boolean = true
+    var letterShown: Boolean = true
+        private set
 
     /* A pair of two letters. The letter in current language and its pair, the transliterated letter,
        in the target language. Also initialise the backing textView keeping in mind our current state. */

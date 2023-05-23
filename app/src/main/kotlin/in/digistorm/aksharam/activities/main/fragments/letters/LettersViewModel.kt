@@ -25,7 +25,6 @@ import `in`.digistorm.aksharam.activities.main.ActivityViewModel
 
 import androidx.lifecycle.*
 import androidx.navigation.NavDirections
-import `in`.digistorm.aksharam.activities.main.fragments.TabbedViewsFragmentDirections
 import `in`.digistorm.aksharam.activities.main.language.Category
 import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.language.TransliteratedLetters
@@ -38,7 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
-class LettersTabViewModel(
+class LettersViewModel(
     application: Application,
     // We persist some state information in the activityViewModel for Fragments reachable
     // from LettersTabFragment
@@ -134,7 +133,7 @@ class LettersTabViewModel(
             else
                 it.toString()
         }
-        return TabbedViewsFragmentDirections.actionTabbedViewsFragmentToLetterInfoFragment(
+        return LettersFragmentDirections.actionLettersFragmentToLetterInfoFragment(
             letter = letter,
             category = category,
             targetLanguage = targetLanguageSelected.value!!,
@@ -143,7 +142,7 @@ class LettersTabViewModel(
 
     val languageInfoOnClick: OnClickListener = OnClickListener {
         if(targetLanguageSelected.value != null) {
-            val directions = TabbedViewsFragmentDirections.actionTabbedViewsFragmentToLanguageInfoFragment(
+            val directions = LettersFragmentDirections.actionLettersFragmentToLanguageInfoFragment(
                 languageSelected.value!!,
                 targetLanguageSelected.value!!
             )

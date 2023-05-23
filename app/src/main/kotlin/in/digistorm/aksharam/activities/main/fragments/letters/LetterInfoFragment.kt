@@ -31,11 +31,12 @@ import android.view.ViewGroup
 import android.os.Bundle
 import android.view.View
 import androidx.core.text.HtmlCompat
+import androidx.core.view.ViewCompat
+import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.transition.MaterialContainerTransform
 import `in`.digistorm.aksharam.databinding.FragmentLetterInfoBinding
 
 class LetterInfoFragment : Fragment() {
@@ -47,10 +48,19 @@ class LetterInfoFragment : Fragment() {
 
     private val letter by lazy { args.letter }
     private val targetLanguage by lazy { args.targetLanguage }
+    private val category by lazy { args.category }
     private val languageData by lazy { activityViewModel.language.value!! }
     private val targetLanguageCode by lazy { languageData.getLanguageCode(targetLanguage) }
     private val letterDefinition by lazy { languageData.getLetterDefinition(letter) }
     private val letterType by lazy { letterDefinition?.type }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
+            scrimColor = endContainerColor
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,19 +68,18 @@ class LetterInfoFragment : Fragment() {
     ): View {
         super.onCreateView(inflater, container, savedInstanceState)
         binding = FragmentLetterInfoBinding.inflate(inflater, container, false)
+
+        ViewCompat.setTransitionName(binding.content, "${letter}_heading")
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        postponeEnterTransition()
+
         super.onViewCreated(view, savedInstanceState)
 
-        binding.toolbar.setupWithNavController(
-            findNavController(),
-            // AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
-        )
-
-        findNavController().getBackStackEntry(R.id.tabbedViewsFragment).apply {
-            logDebug(logTag, "Found back stack entry: ${this.id}")
+        binding.content.doOnPreDraw {
+            startPostponedEnterTransition()
         }
 
         setUp(layoutInflater)

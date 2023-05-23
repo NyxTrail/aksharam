@@ -26,9 +26,13 @@ import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.FragmentContainerView
+import androidx.navigation.NavController
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment
 import `in`.digistorm.aksharam.activities.main.fragments.initialise.InitialisationScreenDirections
 
 class MainActivity : AppCompatActivity() {
@@ -37,6 +41,9 @@ class MainActivity : AppCompatActivity() {
     private val activityViewModel: ActivityViewModel by viewModels()
     private lateinit var activityMainBinding: ActivityMainBinding
 
+    private val navController: NavController
+        get() = findNavController(R.id.nav_host_fragment_container)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         logDebug(logTag, "onCreate")
         super.onCreate(savedInstanceState)
@@ -44,12 +51,38 @@ class MainActivity : AppCompatActivity() {
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
 
         activityViewModel.availableLanguages.observe(this) { languageFiles ->
-            val navController = findNavController(R.id.nav_host_fragment_container)
+            val navController = findNavController(activityMainBinding.navHostFragmentContainer.id)
             if(languageFiles.size > 0 && navController.currentDestination?.id == R.id.initialisationScreen) {
                 findNavController(R.id.nav_host_fragment_container)
                     .navigate(InitialisationScreenDirections.actionInitialisationScreenToTabbedViewsFragment())
             }
         }
+
+        val onBackPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                logDebug(logTag, "on back pressed")
+                val letterNavController = findViewById<FragmentContainerView>(R.id.letters_tab_contents)
+                    ?.getFragment<NavHostFragment>()?.navController
+                if(letterNavController != null &&
+                    letterNavController.currentDestination?.id != R.id.lettersFragment
+                ) {
+                    letterNavController.popBackStack()
+                }
+                else {
+                    if(navController.currentDestination?.id == R.id.tabbedViewsFragment)
+                        finish()
+                    else {
+                        navController.navigateUp()
+                        logDebug(
+                            logTag,
+                            "Current destination is ${navController.currentDestination}"
+                        )
+                    }
+                }
+            }
+
+        }
+        onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
     }
 
     override fun onSupportNavigateUp(): Boolean {
