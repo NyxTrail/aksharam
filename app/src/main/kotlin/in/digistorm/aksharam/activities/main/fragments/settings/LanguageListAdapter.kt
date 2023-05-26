@@ -34,10 +34,11 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.launch
+import java.lang.Exception
 
-class LanguageListAdapter: ListAdapter<AksharamFile, LanguageListAdapter.LanguageListItemViewHolder>(
-    LanguageListDiffer()
-) {
+class LanguageListAdapter(
+    val showErrorDialog: () -> Unit
+): ListAdapter<AksharamFile, LanguageListAdapter.LanguageListItemViewHolder>(LanguageListDiffer()) {
     private val logTag = javaClass.simpleName
 
     private class LanguageListDiffer: DiffUtil.ItemCallback<AksharamFile>() {
@@ -99,15 +100,23 @@ class LanguageListAdapter: ListAdapter<AksharamFile, LanguageListAdapter.Languag
             holder.listItemBinding.root.findViewTreeLifecycleOwner()!!.lifecycleScope.launch {
                 holder.listItemBinding.downloadLanguage.visibility = View.GONE
                 holder.listItemBinding.progressCircular.visibility = View.VISIBLE
-                val fileContent = downloadFile(
-                    url = getItem(position).onlineLanguageFile?.download_url!!,
-                )
-                writeTofile(
-                    fileName = getItem(position).onlineLanguageFile?.name!!,
-                    fileContent!!,
-                    holder.listItemBinding.root.context
-                )
-                getItem(position).isDownloaded = true
+                try {
+                    val fileContent = downloadFile(
+                        url = getItem(position).onlineLanguageFile?.download_url!!,
+                    )
+                    writeTofile(
+                        fileName = getItem(position).onlineLanguageFile?.name!!,
+                        fileContent!!,
+                        holder.listItemBinding.root.context
+                    )
+                    getItem(position).isDownloaded = true
+                }
+                catch(e: Exception) {
+                    logDebug(logTag, "${e.stackTrace}")
+                    holder.listItemBinding.progressCircular.visibility = View.GONE
+                    holder.listItemBinding.downloadLanguage.visibility = View.VISIBLE
+                    showErrorDialog()
+                }
                 holder.listItemBinding.progressCircular.visibility = View.GONE
                 notifyItemChanged(position)
             }

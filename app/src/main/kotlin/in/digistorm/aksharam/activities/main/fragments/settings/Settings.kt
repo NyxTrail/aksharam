@@ -26,11 +26,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import `in`.digistorm.aksharam.R
 import kotlinx.coroutines.*
 
@@ -38,6 +40,8 @@ class SettingsFragment: Fragment() {
     private val logTag = javaClass.simpleName
     private lateinit var binding: FragmentSettingsBinding
     private val settingsViewModel: SettingsViewModel by viewModels()
+
+    private var alertDialog: AlertDialog? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -48,11 +52,18 @@ class SettingsFragment: Fragment() {
         return binding.root
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        logDebug(logTag, "Destroying...")
+        // Clean up dialogs
+        if(alertDialog?.isShowing == true) alertDialog?.dismiss()
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.lifecycleOwner = viewLifecycleOwner
         binding.swipeRefreshLayout.isRefreshing = true
-        binding.languageList.adapter = LanguageListAdapter()
+        binding.languageList.adapter = LanguageListAdapter(::showFailedDialog)
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             settingsViewModel.fetchLanguageFiles(requireContext()).invokeOnCompletion(updateViewsAfterFileListChanged())
@@ -88,5 +99,17 @@ class SettingsFragment: Fragment() {
                 }
             }
         }
+    }
+
+    private fun showFailedDialog() {
+        if(alertDialog?.isShowing == true) alertDialog?.dismiss()
+
+        alertDialog = MaterialAlertDialogBuilder(requireContext())
+            .setNegativeButton(getString(R.string.dismiss)) { dialogInterFace ,_ ->
+                dialogInterFace.dismiss()
+            }
+            .setMessage(getString(R.string.could_not_connect))
+            .create()
+        alertDialog?.show()
     }
 }

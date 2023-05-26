@@ -76,7 +76,7 @@ fun getLanguageData(file: String, context: Context): Language? {
                 "Generated file name: $fileLC")
         return null
     } catch (e: IOException) {
-        logDebug(logTag, "Read operation failed on file: $fileLC")
+        logError(logTag, "Read operation failed on file: $fileLC")
         e.printStackTrace()
         throw e
     }

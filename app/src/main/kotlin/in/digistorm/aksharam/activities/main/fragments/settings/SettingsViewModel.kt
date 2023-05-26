@@ -27,8 +27,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import `in`.digistorm.aksharam.activities.main.util.IdlingResourceHelper
+import `in`.digistorm.aksharam.activities.main.util.LanguageFile
 import `in`.digistorm.aksharam.activities.main.util.getLocalFiles
 import kotlinx.coroutines.*
+import java.lang.Exception
 
 class SettingsViewModel: ViewModel() {
     private val logTag = javaClass.simpleName
@@ -42,12 +46,22 @@ class SettingsViewModel: ViewModel() {
     ): Job {
         val job = viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val onlineFiles = Network.onlineFiles.getContents()
+                var onlineFiles: List<LanguageFile>? = null
+                try {
+                    IdlingResourceHelper.countingIdlingResource.increment()
+                    onlineFiles = Network.onlineFiles.getContents()
+                } catch (e: Exception) {
+                    logDebug(logTag, "${e.printStackTrace()}")
+                } finally {
+                  if(!IdlingResourceHelper.countingIdlingResource.isIdleNow)
+                      IdlingResourceHelper.countingIdlingResource.decrement()
+                }
+
                 logDebug(logTag, "Files available online: $onlineFiles")
                 val localFiles = arrayListOf<String>().apply { addAll( getLocalFiles(context)) }
                 logDebug(logTag, "File available locally: $localFiles")
                 val files = mutableListOf<AksharamFile>()
-                for(file in onlineFiles) {
+                onlineFiles?.forEach { file ->
                     if(localFiles.contains(file.name)) {
                         files.add(AksharamFile(
                             onlineLanguageFile = file,

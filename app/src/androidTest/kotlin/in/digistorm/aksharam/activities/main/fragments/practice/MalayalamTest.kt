@@ -6,7 +6,6 @@ import `in`.digistorm.aksharam.activities.main.language.Language
 import `in`.digistorm.aksharam.activities.main.language.getLanguageData
 import `in`.digistorm.aksharam.activities.main.language.transliterate
 import `in`.digistorm.aksharam.util.containsOneOf
-import org.junit.Before
 import org.junit.Test
 
 class MalayalamTest: PracticeTabTest() {
@@ -21,12 +20,16 @@ class MalayalamTest: PracticeTabTest() {
 
     private lateinit var malayalamData: Language
 
-    @Before
-    fun initialiseData() {
+    private fun initialiseData() {
         malayalamData = getLanguageData(
             "malayalam.json",
             ApplicationProvider.getApplicationContext()
         ) ?: throw(Exception("Could not load language data for Malayalam"))
+    }
+
+    override fun initialise() {
+        initialiseData()
+        super.initialise()
     }
 
     private fun practiceVowels(practiceInLanguage: String) {
@@ -135,21 +138,24 @@ class MalayalamTest: PracticeTabTest() {
 
     @Test
     fun practiceInKannada() {
-        val practiceIn = "Kannada"
+        runMainActivityTest {
+            initialise()
+            val practiceIn = "Kannada"
 
-        chooseLanguage(language)
-        choosePracticeInLanguage(practiceIn)
+            chooseLanguage(language)
+            choosePracticeInLanguage(practiceIn)
 
-        for(practiceType in practiceTypes) {
-            when(practiceType) {
-                "Vowels" -> practiceVowels(practiceIn)
-                "Consonants" -> practiceConsonants(practiceIn)
-                "Signs" -> practiceSigns(practiceIn)
-                "Chillu" -> practiceChillu(practiceIn)
-                "Ligatures" -> practiceLigatures(practiceIn)
-                "Random Words" -> {
-                    practiceRandomWords(practiceIn, true)
-                    practiceRandomWords(practiceIn, false)
+            for (practiceType in practiceTypes) {
+                when (practiceType) {
+                    "Vowels" -> practiceVowels(practiceIn)
+                    "Consonants" -> practiceConsonants(practiceIn)
+                    "Signs" -> practiceSigns(practiceIn)
+                    "Chillu" -> practiceChillu(practiceIn)
+                    "Ligatures" -> practiceLigatures(practiceIn)
+                    "Random Words" -> {
+                        practiceRandomWords(practiceIn, true)
+                        practiceRandomWords(practiceIn, false)
+                    }
                 }
             }
         }
@@ -157,21 +163,24 @@ class MalayalamTest: PracticeTabTest() {
 
     @Test
     fun practiceInHindi() {
-        val practiceIn = "Hindi"
+        runMainActivityTest {
+            initialise()
+            val practiceIn = "Hindi"
 
-        chooseLanguage(language)
-        choosePracticeInLanguage(practiceIn)
+            chooseLanguage(language)
+            choosePracticeInLanguage(practiceIn)
 
-        for(practiceType in practiceTypes) {
-            when(practiceType) {
-                "Vowels" -> practiceVowels(practiceIn)
-                "Consonants" -> practiceConsonants(practiceIn)
-                "Signs" -> practiceSigns(practiceIn)
-                "Chillu" -> practiceChillu(practiceIn)
-                "Ligatures" -> practiceLigatures(practiceIn)
-                "Random Words" -> {
-                    practiceRandomWords(practiceIn, true)
-                    practiceRandomWords(practiceIn, false)
+            for (practiceType in practiceTypes) {
+                when (practiceType) {
+                    "Vowels" -> practiceVowels(practiceIn)
+                    "Consonants" -> practiceConsonants(practiceIn)
+                    "Signs" -> practiceSigns(practiceIn)
+                    "Chillu" -> practiceChillu(practiceIn)
+                    "Ligatures" -> practiceLigatures(practiceIn)
+                    "Random Words" -> {
+                        practiceRandomWords(practiceIn, true)
+                        practiceRandomWords(practiceIn, false)
+                    }
                 }
             }
         }

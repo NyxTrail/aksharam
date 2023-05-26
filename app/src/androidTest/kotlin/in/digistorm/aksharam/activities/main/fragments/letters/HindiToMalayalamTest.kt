@@ -15,7 +15,6 @@ class HindiToMalayalamTest: LettersTabTest() {
     private val categories = listOf("Vowels", "Consonants", "Signs", "Ligatures")
 
 
-    @Before
     override fun initialise() {
         super.initialise()
         Log.d(logTag, "Selecting Hindi as the source language.")
@@ -25,8 +24,8 @@ class HindiToMalayalamTest: LettersTabTest() {
     }
 
 
-    @Test
-    fun singleClickTransliterations() {
+    // Exposed so sibling classes can run these tests easily.
+    private fun singleClickTest() {
         // Vowels
         scrollToCardAtPosition(position = 0)
         checkLetter("ऊ", "ഊ")
@@ -59,90 +58,106 @@ class HindiToMalayalamTest: LettersTabTest() {
     }
 
     @Test
+    fun singleClickTransliterations() {
+        runMainActivityTest {
+            initialise()
+
+            singleClickTest()
+        }
+    }
+
+    @Test
     fun longClickInfo() {
-        // Check vowels
-        scrollToCardAtPosition(0)
-        longClickLetter("इ")
-        onView(withId(R.id.heading)).check(matches(withText("इ")))
-        onView(withId(R.id.transliterated_heading)).check(matches(withText("ഇ")))
-        checkLetterInfoHeadingAlignment()
-        checkWordAndMeaningDisplayed("इधर", "ഇധര", "ഇവിടെ")
-        onView(withId(R.id.letter_info_container)).perform(pressBack())
+        runMainActivityTest {
+            initialise()
 
-        // Check vowel signs
-        scrollToCardAtPosition(2)
-        longClickLetter("ु")
-        checkLetterInfoHeading("ु", "ു")
-        checkLetterInfoHeadingAlignment()
-        checkWordAndMeaningHeadingHidden()
-        checkInfoDisplayed("उ")
-        checkDiacriticHint("ु with consonants and ligatures")
-        checkCombineSignWithConsonants("ु", listOf("न", "र", "ञ", "त्र", "ब"))
-        onView(withId(R.id.letter_info_container)).perform(pressBack())
+            // Check vowels
+            scrollToCardAtPosition(0)
+            longClickLetter("इ")
+            onView(withId(R.id.heading)).check(matches(withText("इ")))
+            onView(withId(R.id.transliterated_heading)).check(matches(withText("ഇ")))
+            checkLetterInfoHeadingAlignment()
+            checkWordAndMeaningDisplayed("इधर", "ഇധര", "ഇവിടെ")
+            onView(withId(R.id.letter_info_container)).perform(pressBack())
 
-        // Check consonants
-        scrollToCardAtPosition(1)
-        longClickLetter("ध")
-        checkLetterInfoHeading("ध", "ധ")
-        checkLetterInfoHeadingAlignment()
-        checkWordAndMeaningDisplayed("धरती", "ധരതീ", "ഭൂമി")
-        checkInfoHidden()
-        checkCombineConsonantWithVowelSigns("ध", listOf("ा", "ै", "ी"))
-        checkConsonantAsSuffix("ध", "्", listOf("ध", "द", "ण", "न"))
-        checkConsonantAsPrefix("ध", "्", listOf("ध", "द", "ण", "न"))
-        onView(withId(R.id.letter_info_container)).perform(pressBack())
+            // Check vowel signs
+            scrollToCardAtPosition(2)
+            longClickLetter("ु")
+            checkLetterInfoHeading("ु", "ു")
+            checkLetterInfoHeadingAlignment()
+            checkWordAndMeaningHeadingHidden()
+            checkInfoDisplayed("उ")
+            checkDiacriticHint("ु with consonants and ligatures")
+            checkCombineSignWithConsonants("ु", listOf("न", "र", "ञ", "त्र", "ब"))
+            onView(withId(R.id.letter_info_container)).perform(pressBack())
 
-        // Check ligatures
-        scrollToCardAtPosition(3)
-        longClickLetter("श्र")
-        checkLetterInfoHeading("श्र", "ശ്ര")
-        checkLetterInfoHeadingAlignment()
-        checkWordAndMeaningDisplayed("विश्राम", "വിശ്രാമ", "വിശ്രമം")
-        checkInfoDisplayed("श्र = श् + र")
-        checkCombineConsonantWithVowelSigns("श्र", listOf("ो", "े", "्", "ृ"))
-        checkLigaturesWithLetterAsPrefixHidden()
-        checkLigaturesWithLetterAsSuffixHidden()
-        onView(withId(R.id.letter_info_container)).perform(pressBack())
+            // Check consonants
+            scrollToCardAtPosition(1)
+            longClickLetter("ध")
+            checkLetterInfoHeading("ध", "ധ")
+            checkLetterInfoHeadingAlignment()
+            checkWordAndMeaningDisplayed("धरती", "ധരതീ", "ഭൂമി")
+            checkInfoHidden()
+            checkCombineConsonantWithVowelSigns("ध", listOf("ा", "ै", "ी"))
+            checkConsonantAsSuffix("ध", "्", listOf("ध", "द", "ण", "न"))
+            checkConsonantAsPrefix("ध", "्", listOf("ध", "द", "ण", "न"))
+            onView(withId(R.id.letter_info_container)).perform(pressBack())
+
+            // Check ligatures
+            scrollToCardAtPosition(3)
+            longClickLetter("श्र")
+            checkLetterInfoHeading("श्र", "ശ്ര")
+            checkLetterInfoHeadingAlignment()
+            checkWordAndMeaningDisplayed("विश्राम", "വിശ്രാമ", "വിശ്രമം")
+            checkInfoDisplayed("श्र = श् + र")
+            checkCombineConsonantWithVowelSigns("श्र", listOf("ो", "े", "्", "ृ"))
+            checkLigaturesWithLetterAsPrefixHidden()
+            checkLigaturesWithLetterAsSuffixHidden()
+            onView(withId(R.id.letter_info_container)).perform(pressBack())
+        }
     }
 
     @Test
     fun singleClickTestAfterCollapsionExpansion() {
-        clickCardCategory(0, categories[0]) // Collapse Vowels
-        clickCardCategory(2, categories[2]) // Collapse Signs
-        clickCardCategory(2, categories[2]) // Expand Signs
-        clickCardCategory(0, categories[0]) // Expand Vowels
+        runMainActivityTest {
+            initialise()
 
-        // Check a Vowel
-        scrollToCardAtPosition(0)
-        checkLetter("ऊ", "ഊ")
-        // Check a consonant
-        scrollToCardAtPosition(1)
-        checkLetter("ब", "ബ")
-        // Check a vowel sign
-        scrollToCardAtPosition(2)
-        checkLetter("े", "േ")
-        checkLetter("ू", "ൂ")
+            clickCardCategory(0, categories[0]) // Collapse Vowels
+            clickCardCategory(2, categories[2]) // Collapse Signs
+            clickCardCategory(2, categories[2]) // Expand Signs
+            clickCardCategory(0, categories[0]) // Expand Vowels
 
-        // Collapse Everything
-        clickCardCategory(0, categories[0])
-        clickCardCategory(1, categories[1])
-        clickCardCategory(2, categories[2])
-        clickCardCategory(3, categories[3])
+            // Check a Vowel
+            scrollToCardAtPosition(0)
+            checkLetter("ऊ", "ഊ")
+            // Check a consonant
+            scrollToCardAtPosition(1)
+            checkLetter("ब", "ബ")
+            // Check a vowel sign
+            scrollToCardAtPosition(2)
+            checkLetter("े", "േ")
+            checkLetter("ू", "ൂ")
 
-        clickCardCategory(1, categories[1]) // Expand consonants
-        checkLetter("ख", "ഖ")
-        checkLetter("भ", "ഭ")
+            // Collapse Everything
+            clickCardCategory(0, categories[0])
+            clickCardCategory(1, categories[1])
+            clickCardCategory(2, categories[2])
+            clickCardCategory(3, categories[3])
 
-        clickCardCategory(1, categories[1]) // Collapse consonants
-        clickCardCategory(3, categories[3]) // Expand ligatures
+            clickCardCategory(1, categories[1]) // Expand consonants
+            checkLetter("ख", "ഖ")
+            checkLetter("भ", "ഭ")
 
-        chooseTransliterationLanguage("Kannada")
-        // Expand everything
-        clickCardCategory(0, categories[0])
-        clickCardCategory(1, categories[1])
-        clickCardCategory(2, categories[2])
-        HindiToKannadaTest().singleClickTransliterations()
-        chooseTransliterationLanguage("Malayalam")
-        singleClickTransliterations()
+            clickCardCategory(1, categories[1]) // Collapse consonants
+            clickCardCategory(3, categories[3]) // Expand ligatures
+
+            chooseTransliterationLanguage("Kannada")
+            // Expand everything
+            clickCardCategory(0, categories[0])
+            clickCardCategory(1, categories[1])
+            clickCardCategory(2, categories[2])
+            chooseTransliterationLanguage("Malayalam")
+            singleClickTest()
+        }
     }
 }

@@ -121,4 +121,13 @@
     <!-- Strings used for fragments for navigation -->
 
     <string name="language_info">Language Info</string>
+
+    <!-- Network Errors -->
+    <string name="could_not_connect">
+        Could not connect to the internet to download data files.
+        Please make sure you are connected to the internet or try again later.
+    </string>
+    <string name="exit">Exit</string>
+    <string name="try_again">Try Again</string>
+    <string name="dismiss">Dismiss</string>
 </resources>

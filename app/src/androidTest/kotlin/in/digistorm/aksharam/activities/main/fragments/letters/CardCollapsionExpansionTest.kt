@@ -6,139 +6,151 @@ class CardCollapsionExpansionTest: LettersTabTest() {
 
     @Test
     fun checkKannadaCategoryCards() {
-        chooseLanguage("Kannada")
-        val categories = listOf("Vowels", "Consonants", "Signs", "Ligatures")
-        val charsToTest = listOf(
-            listOf("ಅ", "ಏ", "ಅಂ"),
-            listOf("ಕ", "ಜ", "ಶ", "ಹ"),
-            listOf("ಾ", "ೃ", "ೈ", "ೌ", "್"),
-            listOf("ಕ್ತ", "ಸ್ನ", "ರ್")
-        )
+        runMainActivityTest {
+            initialise()
 
-        checkCharsAtCardPosition(0, charsToTest[0], Visibility.VISIBLE)
+            chooseLanguage("Kannada")
+            val categories = listOf("Vowels", "Consonants", "Signs", "Ligatures")
+            val charsToTest = listOf(
+                listOf("ಅ", "ಏ", "ಅಂ"),
+                listOf("ಕ", "ಜ", "ಶ", "ಹ"),
+                listOf("ಾ", "ೃ", "ೈ", "ೌ", "್"),
+                listOf("ಕ್ತ", "ಸ್ನ", "ರ್")
+            )
 
-        // Collapse category 0 - Vowels
-        clickCardCategory(0, categories[0])
-        checkCharsAtCardPosition(0, charsToTest[0], Visibility.HIDDEN)
+            checkCharsAtCardPosition(0, charsToTest[0], Visibility.VISIBLE)
 
-        checkCharsAtCardPosition(3, charsToTest[3], Visibility.VISIBLE)
-        // Collapse category 3 - Ligatures
-        clickCardCategory(3, categories[3])
-        checkCharsAtCardPosition(3, charsToTest[3], Visibility.HIDDEN)
+            // Collapse category 0 - Vowels
+            clickCardCategory(0, categories[0])
+            checkCharsAtCardPosition(0, charsToTest[0], Visibility.HIDDEN)
 
-        // Expand category 0 - Vowels
-        clickCardCategory(0, categories[0])
-        checkCharsAtCardPosition(0, charsToTest[0], Visibility.VISIBLE)
+            checkCharsAtCardPosition(3, charsToTest[3], Visibility.VISIBLE)
+            // Collapse category 3 - Ligatures
+            clickCardCategory(3, categories[3])
+            checkCharsAtCardPosition(3, charsToTest[3], Visibility.HIDDEN)
 
-        // Collapse all categories
-        clickCardCategory(0, categories[0]) // Collapse Vowels
-        clickCardCategory(1, categories[1]) // Collapse Consonants
-        clickCardCategory(2, categories[2]) // Collapse Signs
-        for((i, charsOfCategory) in charsToTest.withIndex()) {
-            checkCharsAtCardPosition(i, charsOfCategory, Visibility.HIDDEN)
-        }
+            // Expand category 0 - Vowels
+            clickCardCategory(0, categories[0])
+            checkCharsAtCardPosition(0, charsToTest[0], Visibility.VISIBLE)
 
-        // Expand all categories
-        clickCardCategory(0, categories[0])
-        clickCardCategory(1, categories[1])
-        clickCardCategory(2, categories[2])
-        clickCardCategory(3, categories[3])
-        for((i, charsOfCategory) in charsToTest.withIndex()) {
-            checkCharsAtCardPosition(i, charsOfCategory, Visibility.VISIBLE)
+            // Collapse all categories
+            clickCardCategory(0, categories[0]) // Collapse Vowels
+            clickCardCategory(1, categories[1]) // Collapse Consonants
+            clickCardCategory(2, categories[2]) // Collapse Signs
+            for ((i, charsOfCategory) in charsToTest.withIndex()) {
+                checkCharsAtCardPosition(i, charsOfCategory, Visibility.HIDDEN)
+            }
+
+            // Expand all categories
+            clickCardCategory(0, categories[0])
+            clickCardCategory(1, categories[1])
+            clickCardCategory(2, categories[2])
+            clickCardCategory(3, categories[3])
+            for ((i, charsOfCategory) in charsToTest.withIndex()) {
+                checkCharsAtCardPosition(i, charsOfCategory, Visibility.VISIBLE)
+            }
         }
     }
 
     @Test
     fun checkMalayalamCategoryCards() {
-        chooseLanguage("Malayalam")
-        val categories = listOf("Vowels", "Consonants", "Signs", "Chillu", "Ligatures")
-        val charsToTest = listOf(
-            listOf("ആ", "ഈ", "അം", "അഃ"),
-            listOf("ച", "ങ", "ഗ", "ഷ", "ഴ"),
-            listOf("ാ", "ു", "ൃ", "ൈ", "ൊ", "ൌ"),
-            listOf("ൺ", "ൻ", "ൽ", "ൾ", "ർ"),
-            listOf("ട്ട", "ള്ള", "ണ്ണ", "ഞ്ച", "റ്റ", "ന്റ")
-        )
+        runMainActivityTest {
+            initialise()
 
-        // Collapse category 0 - Vowels
-        clickCardCategory(0, categories[0])
-        checkCharsAtCardPosition(0, charsToTest[0], Visibility.HIDDEN)
+            chooseLanguage("Malayalam")
+            val categories = listOf("Vowels", "Consonants", "Signs", "Chillu", "Ligatures")
+            val charsToTest = listOf(
+                listOf("ആ", "ഈ", "അം", "അഃ"),
+                listOf("ച", "ങ", "ഗ", "ഷ", "ഴ"),
+                listOf("ാ", "ു", "ൃ", "ൈ", "ൊ", "ൌ"),
+                listOf("ൺ", "ൻ", "ൽ", "ൾ", "ർ"),
+                listOf("ട്ട", "ള്ള", "ണ്ണ", "ഞ്ച", "റ്റ", "ന്റ")
+            )
 
-        // Collapse category 3 - Chillu
-        checkCharsAtCardPosition(3, charsToTest[3], Visibility.VISIBLE)
-        clickCardCategory(3, categories[3])
-        checkCharsAtCardPosition(3, charsToTest[3], Visibility.HIDDEN)
+            // Collapse category 0 - Vowels
+            clickCardCategory(0, categories[0])
+            checkCharsAtCardPosition(0, charsToTest[0], Visibility.HIDDEN)
 
-        // Expand category 0 - Vowels
-        clickCardCategory(0, categories[0])
-        checkCharsAtCardPosition(0, charsToTest[0], Visibility.VISIBLE)
+            // Collapse category 3 - Chillu
+            checkCharsAtCardPosition(3, charsToTest[3], Visibility.VISIBLE)
+            clickCardCategory(3, categories[3])
+            checkCharsAtCardPosition(3, charsToTest[3], Visibility.HIDDEN)
 
-        // Collapse category 4 - Ligatures
-        clickCardCategory(4, categories[4])
-        checkCharsAtCardPosition(4, charsToTest[4], Visibility.HIDDEN)
+            // Expand category 0 - Vowels
+            clickCardCategory(0, categories[0])
+            checkCharsAtCardPosition(0, charsToTest[0], Visibility.VISIBLE)
 
-        // Collapse all categories
-        clickCardCategory(0, categories[0]) // Vowels
-        clickCardCategory(1, categories[1]) // Consonants
-        clickCardCategory(2, categories[2]) // Signs
-        for((i, charsOfCategory) in charsToTest.withIndex()) {
-            checkCharsAtCardPosition(i, charsOfCategory, Visibility.HIDDEN)
+            // Collapse category 4 - Ligatures
+            clickCardCategory(4, categories[4])
+            checkCharsAtCardPosition(4, charsToTest[4], Visibility.HIDDEN)
+
+            // Collapse all categories
+            clickCardCategory(0, categories[0]) // Vowels
+            clickCardCategory(1, categories[1]) // Consonants
+            clickCardCategory(2, categories[2]) // Signs
+            for ((i, charsOfCategory) in charsToTest.withIndex()) {
+                checkCharsAtCardPosition(i, charsOfCategory, Visibility.HIDDEN)
+            }
+
+            // Expand all categories
+            clickCardCategory(0, categories[0])
+            clickCardCategory(1, categories[1])
+            clickCardCategory(2, categories[2])
+            clickCardCategory(3, categories[3])
+            clickCardCategory(4, categories[4])
+            for ((i, charsOfCategory) in charsToTest.withIndex()) {
+                checkCharsAtCardPosition(i, charsOfCategory, Visibility.VISIBLE)
+            }
+
+            clickCardCategory(0, categories[0])
         }
-
-        // Expand all categories
-        clickCardCategory(0, categories[0])
-        clickCardCategory(1, categories[1])
-        clickCardCategory(2, categories[2])
-        clickCardCategory(3, categories[3])
-        clickCardCategory(4, categories[4])
-        for((i, charsOfCategory) in charsToTest.withIndex()) {
-            checkCharsAtCardPosition(i, charsOfCategory, Visibility.VISIBLE)
-        }
-
-        clickCardCategory(0, categories[0])
     }
 
     @Test
     fun checkHindiCategoryCards() {
-        chooseLanguage("Hindi")
-        val categories = listOf("Vowels", "Consonants", "Signs", "Ligatures")
-        val charsToTest = listOf(
-            listOf("अ", "औ", "ऋ", "ई", "अं"),
-            listOf("ङ", "य", "न", "ड", "फ", "ञ"),
-            listOf("ा", "ि", "ू", "ो", "ं", "ः", "्"),
-            listOf("क्ष", "ग़", "ज्ञ", "य़", "त्र", "श्र")
-        )
+        runMainActivityTest {
+            initialise()
 
-        // Collapse category 0 - Vowels
-        clickCardCategory(0, categories[0])
-        checkCharsAtCardPosition(0, charsToTest[0], Visibility.HIDDEN)
+            chooseLanguage("Hindi")
+            val categories = listOf("Vowels", "Consonants", "Signs", "Ligatures")
+            val charsToTest = listOf(
+                listOf("अ", "औ", "ऋ", "ई", "अं"),
+                listOf("ङ", "य", "न", "ड", "फ", "ञ"),
+                listOf("ा", "ि", "ू", "ो", "ं", "ः", "्"),
+                listOf("क्ष", "ग़", "ज्ञ", "य़", "त्र", "श्र")
+            )
 
-        // Collapse category 2 - Signs
-        clickCardCategory(2, categories[2])
-        checkCharsAtCardPosition(2, charsToTest[2], Visibility.HIDDEN)
+            // Collapse category 0 - Vowels
+            clickCardCategory(0, categories[0])
+            checkCharsAtCardPosition(0, charsToTest[0], Visibility.HIDDEN)
 
-        // Collapse category 3 - Ligatures
-        clickCardCategory(3, categories[3])
-        checkCharsAtCardPosition(3, charsToTest[3], Visibility.HIDDEN)
+            // Collapse category 2 - Signs
+            clickCardCategory(2, categories[2])
+            checkCharsAtCardPosition(2, charsToTest[2], Visibility.HIDDEN)
 
-        // Expand category 0 - Vowels
-        clickCardCategory(0, categories[0])
-        checkCharsAtCardPosition(0, charsToTest[0], Visibility.VISIBLE)
+            // Collapse category 3 - Ligatures
+            clickCardCategory(3, categories[3])
+            checkCharsAtCardPosition(3, charsToTest[3], Visibility.HIDDEN)
 
-        // Collapse all categories
-        clickCardCategory(0, categories[0])
-        clickCardCategory(1, categories[1])
-        for((i, charsOfCategory) in charsToTest.withIndex()) {
-            checkCharsAtCardPosition(i, charsOfCategory, Visibility.HIDDEN)
-        }
+            // Expand category 0 - Vowels
+            clickCardCategory(0, categories[0])
+            checkCharsAtCardPosition(0, charsToTest[0], Visibility.VISIBLE)
 
-        // Expand all categories
-        clickCardCategory(0, categories[0])
-        clickCardCategory(1, categories[1])
-        clickCardCategory(2, categories[2])
-        clickCardCategory(3, categories[3])
-        for((i, charsOfCategory) in charsToTest.withIndex()) {
-            checkCharsAtCardPosition(i, charsOfCategory, Visibility.VISIBLE)
+            // Collapse all categories
+            clickCardCategory(0, categories[0])
+            clickCardCategory(1, categories[1])
+            for ((i, charsOfCategory) in charsToTest.withIndex()) {
+                checkCharsAtCardPosition(i, charsOfCategory, Visibility.HIDDEN)
+            }
+
+            // Expand all categories
+            clickCardCategory(0, categories[0])
+            clickCardCategory(1, categories[1])
+            clickCardCategory(2, categories[2])
+            clickCardCategory(3, categories[3])
+            for ((i, charsOfCategory) in charsToTest.withIndex()) {
+                checkCharsAtCardPosition(i, charsOfCategory, Visibility.VISIBLE)
+            }
         }
     }
 }

@@ -2,7 +2,6 @@ package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import android.util.Log
 import androidx.test.espresso.Espresso.onData
-import androidx.test.espresso.IdlingRegistry
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.longClick
@@ -11,20 +10,14 @@ import androidx.test.espresso.assertion.PositionAssertions.isBottomAlignedWith
 import androidx.test.espresso.assertion.PositionAssertions.isTopAlignedWith
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.contrib.RecyclerViewActions
-import androidx.test.espresso.idling.CountingIdlingResource
 import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers
 import androidx.test.espresso.matcher.ViewMatchers.*
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import androidx.test.filters.LargeTest
 import `in`.digistorm.aksharam.AksharamTestBaseExp
 import `in`.digistorm.aksharam.DELAYS
-import `in`.digistorm.aksharam.activities.main.MainActivity
 import org.hamcrest.Matchers.*
-import org.junit.Rule
 import `in`.digistorm.aksharam.R
-import org.junit.After
-import org.junit.Before
 
 enum class Visibility { VISIBLE, HIDDEN }
 
@@ -32,17 +25,16 @@ enum class Visibility { VISIBLE, HIDDEN }
 open class LettersTabTest: AksharamTestBaseExp() {
     override val logTag: String = this.javaClass.simpleName
 
-    @Before
-    open fun initialise() {
+    init {
+        downloadLanguageDataBeforeTest()
+    }
+
+    protected open fun initialise() {
         // Make sure we are on the letters tab.
-        Log.d(logTag, "Selecting the letters tab.")
+        log("Selecting the letters tab.")
         onView(withText(R.string.letters_tab_header)).perform(click())
         DELAYS.UI_WAIT_TIME.waitShortDuration()
     }
-
-    @get: Rule
-    var mainActivityRule: ActivityScenarioRule<MainActivity> =
-        ActivityScenarioRule(MainActivity::class.java)
 
     protected fun chooseLanguage(language: String): ViewInteraction {
         Log.d(logTag, "Choosing language: $language")

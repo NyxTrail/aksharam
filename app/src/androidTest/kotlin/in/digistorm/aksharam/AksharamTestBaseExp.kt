@@ -1,16 +1,21 @@
 package `in`.digistorm.aksharam
 
+import android.app.Activity
 import android.util.Log
 import android.view.View
-import android.widget.Spinner
 import android.widget.TextView
+import androidx.test.core.app.ActivityScenario
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.AmbiguousViewMatcherException
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.UiController
 import androidx.test.espresso.ViewAction
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.matcher.ViewMatchers
-import androidx.test.espresso.matcher.ViewMatchers.withId
+import `in`.digistorm.aksharam.activities.main.MainActivity
+import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
+import `in`.digistorm.aksharam.activities.main.util.Network
+import `in`.digistorm.aksharam.activities.main.util.downloadFile
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matcher
@@ -80,6 +85,44 @@ open class AksharamTestBaseExp {
                 onView(viewMatcher, false)
             } else {
                 throw e
+            }
+        }
+    }
+
+    protected fun log(message: String) {
+        Log.d(logTag, message)
+    }
+
+    protected fun runMainActivityTest(block: () -> Unit) {
+        runActivityTest(MainActivity::class.java) {
+            block()
+        }
+    }
+
+    protected fun <T: Activity, R> runActivityTest(
+        activity: Class<T>,
+        block: (activityScenario: ActivityScenario<T>) -> R)
+    {
+        ActivityScenario.launch(activity).use {
+            block(it)
+        }
+    }
+
+    protected fun downloadLanguageDataBeforeTest() {
+        runMainActivityTest {
+            runBlocking {
+                val downloadedLanguages =
+                    getDownloadedLanguages(ApplicationProvider.getApplicationContext())
+
+                log("Fetching files online...")
+                val onlineFiles = Network.onlineFiles.getContents()
+
+                onlineFiles.filter {
+                    !downloadedLanguages.contains(it.name)
+                }.forEach { languageFile ->
+                    log("Downloading file: ${languageFile.download_url}")
+                    downloadFile(languageFile, ApplicationProvider.getApplicationContext())
+                }
             }
         }
     }

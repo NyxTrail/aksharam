@@ -33,7 +33,9 @@ import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
+import androidx.test.espresso.idling.CountingIdlingResource
 import `in`.digistorm.aksharam.activities.main.fragments.initialise.InitialisationScreenDirections
+import `in`.digistorm.aksharam.activities.main.util.IdlingResourceHelper
 
 class MainActivity : AppCompatActivity() {
     private val logTag = javaClass.simpleName
@@ -94,5 +96,9 @@ class MainActivity : AppCompatActivity() {
     public override fun onResume() {
         logDebug(logTag, "onResume")
         super.onResume()
+    }
+
+    fun getIdlingResource(): CountingIdlingResource {
+        return IdlingResourceHelper.countingIdlingResource
     }
 }

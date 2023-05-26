@@ -1,8 +1,6 @@
 package `in`.digistorm.aksharam.activities.main.fragments.practice
 
-import android.util.Log
 import androidx.test.espresso.Espresso.onData
-import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.ViewInteraction
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.action.ViewActions.replaceText
@@ -11,16 +9,13 @@ import androidx.test.espresso.matcher.RootMatchers
 import androidx.test.espresso.matcher.ViewMatchers.isEnabled
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.espresso.matcher.ViewMatchers.withText
-import androidx.test.ext.junit.rules.ActivityScenarioRule
 import `in`.digistorm.aksharam.AksharamTestBaseExp
 import org.junit.Before
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.activities.main.MainActivity
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.not
-import org.junit.Rule
 
 // Delay in milliseconds before updating EdiText with new string.
 private const val TYPING_DELAY: Long = 10
@@ -30,13 +25,13 @@ private const val UI_WAIT_TIME: Long = 500
 open class PracticeTabTest: AksharamTestBaseExp() {
     override val logTag: String = this.javaClass.simpleName
 
-    @get:Rule
-    var mainActivityRule: ActivityScenarioRule<MainActivity> =
-        ActivityScenarioRule(MainActivity::class.java)
-
     @Before
-    open fun initialise() {
-        Log.d(logTag, "Selecting the practice tab.")
+    open fun beforeTest() {
+        downloadLanguageDataBeforeTest()
+    }
+
+    protected open fun initialise() {
+        log("Selecting the practice tab.")
         onView(withText(R.string.practice_tab_header)).perform(click())
         // Without this wait, during second test the click on language_selector (which is the next action
         // in most tests) does not happen.
@@ -44,7 +39,7 @@ open class PracticeTabTest: AksharamTestBaseExp() {
     }
 
     protected fun chooseLanguage(language: String): ViewInteraction {
-        Log.d(logTag, "Choosing language: $language")
+        log("Choosing language: $language")
         onView(withId(R.id.language_selector)).perform(click())
         return onData(`is`(language)).inRoot(RootMatchers.isPlatformPopup()).perform(click())
     }

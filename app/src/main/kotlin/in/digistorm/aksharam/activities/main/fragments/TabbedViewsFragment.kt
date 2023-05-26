@@ -12,6 +12,7 @@ import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.PageCollectionAdapter
 import `in`.digistorm.aksharam.databinding.FragmentTabbedViewsBinding
 import `in`.digistorm.aksharam.activities.main.language.getDownloadedLanguages
+import `in`.digistorm.aksharam.activities.main.util.IdlingResourceHelper
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -82,6 +83,9 @@ class TabbedViewsFragment: Fragment() {
             binding.pager
         ) { tab: TabLayout.Tab, position: Int -> tab.text = tabHeads[position] }
             .attach()
+
+        if(!IdlingResourceHelper.countingIdlingResource.isIdleNow)
+            IdlingResourceHelper.countingIdlingResource.decrement()
     }
 
     override fun onResume() {
