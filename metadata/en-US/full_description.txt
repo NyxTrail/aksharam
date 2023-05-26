@@ -10,7 +10,9 @@ Aksharam is an easy to use reference app to learn Indian language scripts by com
 <li>Practice your ability to recognize the script for a language by typing in corresponding letters in a language you are familiar with</li>
 </ul>
 
-Note:
-* This app is designed for those who already know the script for an Indian language.
-* Currently Kannada, Hindi and Malayalam languages are supported.
-* UI language is in English.
+<b>Note:</b>
+<ul>
+<li>This app is designed for those who already know the script for an Indian language.</li>
+<li>Currently Kannada, Hindi and Malayalam languages are supported.</li>
+<li>UI language is in English.<li>
+</ul>
