@@ -8,6 +8,15 @@ The app comes with a feature to practice the letters in a new language by enteri
 transliterated characters. Finally, the app also has a small transliteration utility to quickly
 enter some text and see how it transliterates to a language of your choice.
 
+## Download this app
+
+[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+alt="Get it on F-Droid"
+height="80">](https://f-droid.org/packages/in.digistorm.aksharam/)
+[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
+alt="Get it on Google Play"
+height="80">](https://play.google.com/store/apps/details?id=in.digistorm.aksharam)
+
 # What languages are supported?
 
 Currently Kannada, Hindi and Malayalam are supported.
@@ -34,15 +43,6 @@ In cases where such pronunciation discrepancies turn up, I have tried to add som
 under the details of that letter (long press a letter to see its details).
 
 # How to use the app
-
-## Download this app
-
-[<img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
-     alt="Get it on F-Droid"
-     height="80">](https://f-droid.org/packages/in.digistorm.aksharam/)
-[<img src="https://play.google.com/intl/en_us/badges/images/generic/en-play-badge.png"
-     alt="Get it on Google Play"
-     height="80">](https://play.google.com/store/apps/details?id=in.digistorm.aksharam)
 
 ## Downloading Data Files
 
