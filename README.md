@@ -1,3 +1,38 @@
+# What is Aksharam?
+
+Aksharam is an an android application for users who know the script for an Indic language and want 
+to use that existing knowledge to learn the script for another Indic language.
+
+Aksharam lays out the alphabets of each language in a format that is easy to understand and refer.
+The app comes with a feature to practice the letters in a new language by entering the corresponding
+transliterated characters. Finally, the app also has a small transliteration utility to quickly
+enter some text and see how it transliterates to a language of your choice.
+
+# What languages are supported?
+
+Currently Kannada, Hindi and Malayalam are supported.
+
+For the future, I would like to support as many languages as possible.
+Tamil and Telugu are the immediate next ones I would like to add.
+
+# Disclaimer
+
+Note, I am not a student of languages and while I have tried my best to be as accurate as possible 
+in the data presented in the app, it is quite possible that errors might have crept in.
+
+Please feel free to let me know in case of any oversight/incorrectness and I will try my best to 
+address them as soon as possible.
+
+# Methodology for Transliteration
+
+The app just matches the characters based on the Unicode blocks of a language. Note that in many cases,
+how a glyphs for a character is transliterated may not directly correspond to the pronunciation of 
+that character in the source language. In all such cases, the app gives precedence to what the character
+matches to in the Unicode block than to the exact pronunciation.
+
+In cases where such pronunciation discrepancies turn up, I have tried to add some helpful notes
+under the details of that letter (long press a letter to see its details).
+
 # How to use the app
 
 ## Download this app
