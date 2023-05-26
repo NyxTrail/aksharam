@@ -76,3 +76,31 @@ and [F-Droid](https://f-droid.org/en/packages/org.smc.inputmethod.indic/).
 In the practice tab, choose a script you wish to learn and a script that you know. Next you
 can choose a suitable practice type and test your knowledge by entering characters in the script
 that you already know.
+
+# Credits & Sources
+
+References for example words and their meanings:
+- Kannada:
+  
+  The unicode block for Kannada at [Wikipedia](https://en.wikipedia.org/wiki/Kannada_(Unicode_block))
+ 
+  [alar.ink](https://alar.ink/) for referencing Kannada
+  
+  [The kannada Wiktionary](https://kn.m.wiktionary.org/wiki/%E0%B2%AE%E0%B3%81%E0%B2%96%E0%B3%8D%E0%B2%AF_%E0%B2%AA%E0%B3%81%E0%B2%9F)
+  
+- Malayalam:
+
+  The unicode block for Malayalam at [Wikipedia](https://en.wikipedia.org/wiki/Malayalam_(Unicode_block))
+  
+  [Shadbdatharavali](https://stv.sayahna.org/stv-a1.html)
+  
+  [Olam](https://olam.in/)
+  
+  [The Malayalam Wiktionary](https://ml.wiktionary.org/wiki/പ്രധാന_താൾ)
+  
+- Hindi
+  
+  The unicode block for Devanagari at [Wikipedia](https://en.wikipedia.org/wiki/Devanagari_(Unicode_block))
+  
+  [The Hindi Wiktionary](https://hi.wiktionary.org/wiki/%E0%A4%AE%E0%A5%81%E0%A4%96%E0%A4%AA%E0%A5%83%E0%A4%B7%E0%A5%8D%E0%A4%A0)
+  
