@@ -1,0 +1,13 @@
+Changes in 1.0.1
+- Fixed clipping in low width devices
+- Letters in grid now take up excess space whenever available
+
+Changes in 1.0.0
+- UI revamped to more closely follow Material guidelines
+- Re-designed material theme
+- Code base completely overhauled and re-written in Kotlin
+- Material transitions and animations added when traversing between
+  screens
+- Animated card views for each category of letters in Letters tab
+- Performance gains by delegating tasks in background threads
+- More complete and comprehensive UI tests added to minimise bugs
