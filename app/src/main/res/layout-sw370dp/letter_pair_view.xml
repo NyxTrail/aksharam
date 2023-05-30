@@ -21,18 +21,21 @@
  ~
  -->
 
-<layout xmlns:android="http://schemas.android.com/apk/res/android">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data>
 
     </data>
 
-    <in.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
-        android:id="@+id/letter_view"
-        style="@style/LetterView"
+    <in.digistorm.aksharam.activities.main.fragments.letters.LetterPairView
+        android:id="@+id/letter_pair_view"
+        style="@style/Aksharam.LetterButton"
         android:layout_width="65dp"
         android:layout_height="65dp"
-        android:layout_margin="4dp"
         android:text="@string/test_text"
-        android:gravity="center" />
+        android:textSize="30sp"
+        android:padding="2dp"
+        android:gravity="center"
+        app:layout_columnWeight="1" />
 </layout>

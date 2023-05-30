@@ -19,13 +19,13 @@
  */
 package `in`.digistorm.aksharam.activities.main.fragments.letters
 
-import `in`.digistorm.aksharam.activities.main.util.AutoAdjustingTextView
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import androidx.appcompat.widget.AppCompatTextView
 
-class LetterPairView: AutoAdjustingTextView, View.OnClickListener {
+class LetterPairView: AppCompatTextView, View.OnClickListener {
     private var logTag: String = javaClass.simpleName
 
     /* Boolean to track if the letter or its transliterated pair is current displayed. */

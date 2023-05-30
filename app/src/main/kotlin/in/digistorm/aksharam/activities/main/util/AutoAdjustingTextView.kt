@@ -65,16 +65,47 @@ open class AutoAdjustingTextView : AppCompatTextView {
             super.setText(value)
         }
 
+    private val drawableWidth: Int
+        get() = measuredWidth - paddingLeft - paddingRight
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
+
         val text = text
-        var difference = measuredWidth - paint.measureText(text)
-        var size: Float
-        if (difference < 9) logDebug(logTag, "Resizing $text container text view")
-        while (difference < 9) {
-            size = textSize - 1.0f
-            difference = measuredWidth - paint.measureText(text)
-            setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
+
+        // Save drawable width before starting
+        val initialDrawableWidth = drawableWidth
+
+        if(maxLines == 1) {
+            val textWidth = paint.measureText(text)
+            var difference = drawableWidth - textWidth
+
+            var size: Float
+            if (difference < 9) logDebug(
+                logTag, "Resizing $text container with drawableWidth: $drawableWidth " +
+                        "& measureText: ${paint.measureText(text)} in text view"
+            )
+            else {
+                logDebug(
+                    logTag, "Not resizing $text container with drawableWidth: $drawableWidth " +
+                            "& measureText: ${paint.measureText(text)} in text view"
+                )
+                return
+            }
+
+            while (difference < 9) {
+                size = textSize - 1.0f
+                difference = drawableWidth - paint.measureText(text)
+                setTextSize(TypedValue.COMPLEX_UNIT_PX, size)
+
+                // Avoid run away scenarios where the view size changes after we update the text size,
+                // resulting in us racing against the view to set text size
+                if(drawableWidth != initialDrawableWidth) {
+                    logDebug(logTag, "Width of the view has changed. Not trying to resize text anymore.")
+                    return
+                }
+            }
+            logDebug(logTag, "Done resizing; drawableWidth: $drawableWidth, textWidth: ${paint.measureText(text)}")
         }
     }
 }

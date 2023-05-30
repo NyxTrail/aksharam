@@ -85,7 +85,7 @@ class SettingsFragment: Fragment() {
 
     private fun updateViewsAfterFileListChanged(): CompletionHandler {
         return {
-            logDebug(logTag, "Language list:\n ${settingsViewModel.languageFiles.value!!}")
+            logDebug(logTag, "Language list:\n \"${settingsViewModel.languageFiles.value ?: "null"}\"")
             when(it) {
                 null -> {
                     binding.swipeRefreshLayout.isRefreshing = false

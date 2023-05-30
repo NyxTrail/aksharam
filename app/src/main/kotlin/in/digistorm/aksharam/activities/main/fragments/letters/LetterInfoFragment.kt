@@ -21,7 +21,6 @@ package `in`.digistorm.aksharam.activities.main.fragments.letters
 
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.activities.main.ActivityViewModel
-import `in`.digistorm.aksharam.databinding.LetterViewBinding
 import `in`.digistorm.aksharam.databinding.WordAndMeaningBinding
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 import `in`.digistorm.aksharam.activities.main.language.transliterate
@@ -35,9 +34,11 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.doOnPreDraw
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.gridlayout.widget.GridLayout
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.transition.MaterialContainerTransform
 import `in`.digistorm.aksharam.databinding.FragmentLetterInfoBinding
+import `in`.digistorm.aksharam.databinding.GridLetterViewBinding
 
 class LetterInfoFragment : Fragment() {
     private val logTag = javaClass.simpleName
@@ -182,7 +183,7 @@ class LetterInfoFragment : Fragment() {
             getString(R.string.letter_with_consonants_and_ligatures, letter)
         languageData.generateDiacriticsForSign(letter).forEach { diacritic ->
             val letterView =
-                LetterViewBinding.inflate(
+                GridLetterViewBinding.inflate(
                     inflater,
                     binding.diacriticExamplesContainer,
                     false
@@ -202,12 +203,14 @@ class LetterInfoFragment : Fragment() {
         binding.diacriticHint.text =
             getString(R.string.letter_with_vowel_signs, letter)
         languageData.generateDiacriticsForLetter(letter).forEach { diacritic ->
-            val letterView = LetterViewBinding.inflate(
+            val letterView = GridLetterViewBinding.inflate(
                 inflater,
                 binding.diacriticExamplesContainer,
                 false
             )
             letterView.letterView.text = diacritic
+            val gridLayoutParams = GridLayout.LayoutParams(binding.diacriticExamplesContainer.layoutParams)
+            gridLayoutParams.columnSpec
             binding.diacriticExamplesContainer.addView(letterView.root)
         }
     }
@@ -232,7 +235,7 @@ class LetterInfoFragment : Fragment() {
                         languageData.virama
                     )
                 forEach { ligature ->
-                    val letterView = LetterViewBinding.inflate(
+                    val letterView = GridLetterViewBinding.inflate(
                         inflater,
                         binding.ligaturesWithLetterAsPrefixGl,
                         false
@@ -255,7 +258,7 @@ class LetterInfoFragment : Fragment() {
                         letter
                     )
                 forEach { ligature ->
-                    val letterView = LetterViewBinding.inflate(
+                    val letterView = GridLetterViewBinding.inflate(
                         inflater,
                         binding.ligaturesWithLetterAsSuffixGl,
                         false

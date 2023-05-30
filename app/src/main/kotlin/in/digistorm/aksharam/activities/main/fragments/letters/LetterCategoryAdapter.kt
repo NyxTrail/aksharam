@@ -238,7 +238,6 @@ class LetterCategoryAdapter(
 
             logDebug(logTag, "Initialising letter grid for position: $position")
             val category = getItem(position).name
-            // val letterPairs: List<Pair<String, String>> = getItem(position)[category] ?: ArrayList()
             logDebug(logTag, "Current category: $category")
             logDebug(logTag, "Letter Pairs: ${getItem(position).letterPairs}")
             for(letterPair in getItem(position).letterPairs) {
@@ -248,7 +247,6 @@ class LetterCategoryAdapter(
                         letterCategoryCardViewHolder.letterGrid, false) as LetterPairView
                 letterView.setOnLongClickListener { view ->
                     val extras = FragmentNavigatorExtras(letterView to "${letterPair.first}_heading")
-//                        FragmentNavigatorExtras(letterView to "${letterPair.first}_transliterated_heading")
 
                     view.findNavController().navigate(letterOnLongClickAction(letterPair.first), extras)
                     true
