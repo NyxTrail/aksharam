@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Alan M Varghese <alan@digistorm.in>
+ * Copyright (c) 2023-2024 Alan M Varghese <alan@digistorm.in>
  *
  * This files is part of Aksharam, a script teaching app for Indic
  * languages.
@@ -20,35 +20,62 @@
 package `in`.digistorm.aksharam.activities.main.fragments
 
 import `in`.digistorm.aksharam.R
-import `in`.digistorm.aksharam.databinding.FragmentPrivacyBinding
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.text.HtmlCompat
 import androidx.fragment.app.Fragment
-import androidx.navigation.fragment.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.textview.MaterialTextView
 
 class PrivacyFragment: Fragment() {
-    private lateinit var binding: FragmentPrivacyBinding
+    private lateinit var privacyText: String
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = FragmentPrivacyBinding.inflate(inflater, container, false)
-        binding.textView.movementMethod = LinkMovementMethod.getInstance()
-        return binding.root
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                PrivacyScreen()
+            }
+        }
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val navController = findNavController()
-        binding.toolbar.setupWithNavController(
-            navController,
-            AppBarConfiguration(setOf(R.id.tabbedViewsFragment, R.id.initialisationScreen))
-        )
+    @Preview(name = "PrivacyScreen", device = "id:pixel_2")
+    @Composable
+    fun PrivacyScreen() {
+        Column(modifier = Modifier.padding(12.dp)) {
+            AndroidView(
+                factory = {
+                    privacyText = it.getString(R.string.privacy_text)
+                    val mtv = MaterialTextView(it).apply {
+                        linksClickable = true
+                        movementMethod = LinkMovementMethod.getInstance()
+                        setTextIsSelectable(true)
+                        setTextSize(TypedValue.COMPLEX_UNIT_SP, 22f)
+                    }
+                    mtv
+                },
+                update = {
+                    it.text = HtmlCompat.fromHtml(
+                        privacyText, HtmlCompat.FROM_HTML_MODE_LEGACY
+                    )
+                }
+            )
+        }
     }
 }
