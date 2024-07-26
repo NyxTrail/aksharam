@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 Alan M Varghese <alan@digistorm.in>
+ * Copyright (c) 2022-2024 Alan M Varghese <alan@digistorm.in>
  *
  * This files is part of Aksharam, a script teaching app for Indic
  * languages.
@@ -26,8 +26,8 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:8.1.4'
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.0'
-        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.7.5'
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.24'
+        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.7.7'
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
