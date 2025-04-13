@@ -43,8 +43,8 @@ android {
         applicationId "in.digistorm.aksharam"
         minSdkVersion 21
         targetSdkVersion 35
-        versionCode 100020
-        versionName "1.0.2"
+        versionCode 100030
+        versionName "1.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
