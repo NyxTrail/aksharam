@@ -20,14 +20,21 @@
 
 package `in`.digistorm.aksharam.activities.main
 
+import android.content.Context
 import `in`.digistorm.aksharam.R
 import `in`.digistorm.aksharam.databinding.ActivityMainBinding
 import `in`.digistorm.aksharam.activities.main.util.logDebug
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.AttributeSet
+import android.view.View
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.updatePadding
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.FragmentContainerView
 import androidx.navigation.NavController
@@ -47,7 +54,7 @@ class MainActivity : AppCompatActivity() {
         get() = findNavController(R.id.nav_host_fragment_container)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        logDebug(logTag, "onCreate")
+        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         activityMainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -85,6 +92,34 @@ class MainActivity : AppCompatActivity() {
 
         }
         onBackPressedDispatcher.addCallback(this, onBackPressedCallback)
+    }
+
+    override fun onCreateView(
+        parent: View?,
+        name: String,
+        context: Context,
+        attrs: AttributeSet
+    ): View? {
+        val view = super.onCreateView(parent, name, context, attrs)
+        if (parent != null) {
+            ViewCompat.setOnApplyWindowInsetsListener(parent) { v, insets ->
+                // https://developer.android.com/develop/ui/views/layout/edge-to-edge
+                logDebug(logTag, "Setting inset to support edge to edge display.")
+                val bars = insets.getInsets(
+                    WindowInsetsCompat.Type.systemBars()
+                            or WindowInsetsCompat.Type.displayCutout()
+                )
+                logDebug(logTag, "Setting inset to " + bars.left + "," + bars.top)
+                v.updatePadding(
+                    left = bars.left,
+                    top = bars.top,
+                    right = bars.right,
+                    bottom = bars.bottom,
+                )
+                WindowInsetsCompat.CONSUMED
+            }
+        }
+        return view
     }
 
     override fun onSupportNavigateUp(): Boolean {
